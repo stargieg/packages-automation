@@ -1,0 +1,12 @@
+--- bcusdk-0.0.5/eibd/usb/linux_usbfs.c.orig	2011-01-26 11:50:08.000000000 +0100
++++ bcusdk-0.0.5/eibd/usb/linux_usbfs.c	2011-08-25 22:57:29.000000000 +0200
+@@ -52,7 +52,8 @@
+ 	return 0;
+ }
+ 
+-int clock_gettime(clockid_t clk_id, struct timespec *tp)
++#define clock_gettime(A,B) xclock_gettime(A, B)
++int xclock_gettime(clockid_t clk_id, struct timespec *tp)
+ {
+ 	pth_int_time (tp);
+ 	return 0;

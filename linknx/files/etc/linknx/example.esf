@@ -1,0 +1,17 @@
+3.OG
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/1	bel_de_1_e_a_R301	EIS 1 'Switching' (1 Bit)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/2	bel_de_1_hw_R301	Uncertain (1 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/3	bel_de_1_dim_R301	EIS 2 'Dimming - control' (4 Bit)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/4	bel_de_1_sm_kurz_R301	EIS 1 'Switching' (1 Bit)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/5	bel_de_1_sm_last_R301	EIS 1 'Switching' (1 Bit)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/6	ezr_bz_soll_R301	Uncertain (1 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/7	ezr_pres_R301	EIS 1 'Switching' (1 Bit)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/8	ezr_stat_dw_1_R301	Uncertain (1 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/9	ezr_stat_dw_2_R301	Uncertain (1 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/10	ezr_t_soll_R301	Uncertain (2 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/11	hlk_hz_y_R301	Uncertain (1 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/12	hlk_ku_y_R301	Uncertain (1 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/13	hlk_b_sw_R301	Uncertain (2 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/14	hlk_t_ist_R301	Uncertain (2 Byte)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/15	hlk_fk_R301	EIS 1 'Switching' (1 Bit)	Low	
+Neue Hauptgruppe.Neue Mittelgruppe.0/0/21	bel_de_1_e_a_rm_R301	EIS 1 'Switching' (1 Bit)	Low	

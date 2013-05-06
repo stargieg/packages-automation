@@ -1,0 +1,7 @@
+rlt_humidity		fzul_x:GAUGE:0:100, fabl_x:GAUGE:0:100, faus_x:GAUGE:0:100
+rlt_temperature		zul_x:GAUGE:-273:274, zul_xs:GAUGE:-273:274, abl_x:GAUGE:-273:274, abl_xs:GAUGE:-273:274, a_x:GAUGE:-273:274
+rlt_valve		ve_y:GAUGE:0:100, lk_y:GAUGE:0:100, wrg_y:GAUGE:0:100
+ezr_temperature		rt_x:GAUGE:-273:274, rt_xs:GAUGE:-273:274, a_x:GAUGE:-273:274
+ezr_valve		ve_y:GAUGE:0:100, lk_y:GAUGE:0:100
+hk_temperature		vl_xb:GAUGE:-273:274, vlpr_x:GAUGE:-273:274, rlpr_x:GAUGE:-273:274, vlse_x:GAUGE:-273:274, rlse_x:GAUGE:-273:274
+hk_valve		rv_y:GAUGE:0:100

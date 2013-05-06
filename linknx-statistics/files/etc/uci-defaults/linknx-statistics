@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# register commit handler
+#uci -q batch <<-EOF >/dev/null
+#	delete ucitrack.@ino_statistics[-1]
+#	add ucitrack linknx_statistics
+#	set ucitrack.@linknx_statistics[-1].init=linknx_statistics
+#	commit ucitrack
+#EOF
+
+# RRASingle=0 MinVal,MaxVal,AvaregVal
+uci -q batch <<-EOF >/dev/null
+	set luci_statistics.collectd_rrdtool.enable=1
+	set luci_statistics.collectd_rrdtool.RRATimespans='3hour 3day 1week 1month 1year'
+	set luci_statistics.collectd_rrdtool.RRASingle=0
+	set luci_statistics.collectd_rrdtool.DataDir='/home/rrd'
+	set luci_statistics.rrdtool.default_timespan='3hour'
+	set luci_statistics.rrdtool.image_width=600
+	set luci_statistics.rrdtool.image_path='/tmp/rrdimg'
+	set luci_statistics.collectd_exec.enable=1
+	delete luci_statistics.@collectd_exec_input[-1]
+	add luci_statistics collectd_exec_input
+	set luci_statistics.@collectd_exec_input[-1].cmdline='/usr/bin/linknx-collectd-cmd.lua'
+	commit luci_statistics
+EOF
+
+
+
+
+# symlink for busybox httpd
+[ -x /usr/sbin/httpd ] && [ ! -h /www/rrdimg ] && \
+	ln -s /tmp/rrdimg /www/rrdimg
+
+# symlink for uhttpd
+[ -x /usr/sbin/uhttpd ] && [ ! -h /www/rrdimg ] && \
+	ln -s /tmp/rrdimg /www/rrdimg
+
+# restart LuCId service
+[ -x /etc/init.d/lucid ] && /etc/init.d/lucid enabled && /etc/init.d/lucid restart
+
+rm -f /tmp/luci-indexcache
+exit 0

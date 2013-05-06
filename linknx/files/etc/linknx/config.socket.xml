@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<config>
+    <services>
+        <knxconnection url="ip:127.0.0.1" />
+        <xmlserver type="unix" path="/var/run/linknx.sock"/>
+        <persistence type="file" path="/var/lib/linknx/persist"/>
+    </services>
+</config>

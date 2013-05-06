@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2012 Patrick Grimm
+
+START=55
+SERVER="ubus-linknx"
+SERVER_BIN="/usr/sbin/ubus-linknx"
+SERVER_ARGS="-r linknxws"
+SERVER_PID="ubus-linknx"
+
+start() {
+	start-stop-daemon -S -x $SERVER_BIN \
+		-p /var/run/${SERVER_PID}.pid \
+		-m -b -- ${SERVER_ARGS}
+}
+
+stop() {
+	[ -f /var/run/${SERVER_PID}.pid ] && {
+		start-stop-daemon -K -q -n ${SERVER_BIN##*/} \
+			-p /var/run/${SERVER_PID}.pid -s TERM
+
+		rm -f /var/run/${SERVER_PID}.pid
+	}
+}
