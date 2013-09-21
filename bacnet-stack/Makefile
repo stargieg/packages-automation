@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2013-04-30-1
-PKG_SOURCE_VERSION:=0817567e8268416624574c1dc483fc40b983671a
+PKG_VERSION:=2013-09-21-1
+PKG_SOURCE_VERSION:=3dfa360ef5a472dde4abc4397f1d22e95d84374e
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
@@ -27,7 +27,7 @@ define Package/bacnet-stack/description
 endef
 
 TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
-BUILD=debug
+#BUILD=debug
 
 define Package/bacnet-stack/postinst
 #!/bin/sh
