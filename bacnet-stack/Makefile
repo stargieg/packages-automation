@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2013-09-21-1
+PKG_VERSION:=2013-09-21-7
 PKG_SOURCE_VERSION:=3dfa360ef5a472dde4abc4397f1d22e95d84374e
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
@@ -28,33 +28,36 @@ endef
 
 TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
 #BUILD=debug
+#BACDL_DEFINE=-DBACDL_MSTP=1
+#BACDL_DEFINE=-DBACDL_ETHERNET=1
+BACDL_DEFINE=-DBACDL_BIP=1
+
+# un-comment the next line to build the routing demo application
+#BACNET_DEFINES += -DBAC_ROUTING
+
+# Declare your level of BBMD support
+BBMD_DEFINE:=-DBBMD_ENABLED=0
+#BBMD_DEFINE:=-DBBMD_ENABLED=1
+#BBMD_DEFINE:=-DBBMD_CLIENT_ENABLED
+
+BACNET_PORT:=linux
 
 define Package/bacnet-stack/postinst
 #!/bin/sh
-[ -n "${IPKG_INSTROOT}" ] || {
+
+if [ -z $${IPKG_INSTROOT} ] ; then
+	( . /etc/uci-defaults/bacserv ) && rm /etc/uci-defaults/bacserv
+fi
+
+[ -n $${IPKG_INSTROOT} ] || {
 	/etc/init.d/bacserv enable
-	/etc/init.d/bacserv start
-	exit 0
+	/etc/init.d/bacserv restart
 }
-[ -f "${IPKG_INSTROOT}/etc/config/ucitrack" ] && \
-[ "$(uci get ucitrack.@bacnet_dev[0] 2>/dev/null)" != "bacnet_dev" ] && \
-uci batch <<-EOF >/dev/null 2>/dev/null
-        add ucitrack bacnet_dev
-        set ucitrack.@bacnet_dev[-1].init="bacserv"
-        add ucitrack bacnet_av
-        set ucitrack.@bacnet_av[-1].init="bacserv"
-        add ucitrack bacnet_mv
-        set ucitrack.@bacnet_mv[-1].init="bacserv"
-        add ucitrack bacnet_nc
-        set ucitrack.@bacnet_nc[-1].init="bacserv"
-        add ucitrack bacnet_bi
-        set ucitrack.@bacnet_bi[-1].init="bacserv"
-        commit ucitrack
-EOF
 endef
 
 define Package/bacnet-stack/install
-	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin $(1)/etc/init.d $(1)/etc/config
+	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/bacserv.defaults $(1)/etc/uci-defaults/bacserv
 	$(INSTALL_BIN) ./files/bacserv.init $(1)/etc/init.d/bacserv
 	$(INSTALL_DATA) ./files/bacnet_dev.config $(1)/etc/config/bacnet_dev
 	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
@@ -62,13 +65,13 @@ define Package/bacnet-stack/install
 	$(INSTALL_DATA) ./files/bacnet_nc.config $(1)/etc/config/bacnet_nc
 	$(INSTALL_DATA) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
 	$(INSTALL_DATA) ./files/bacnet_group.config $(1)/etc/config/bacnet_group
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacarf $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacarf $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacdcc $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/baciamr $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacrd $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacrpm $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacucov $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacwh $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacwir $(1)/usr/bin/
