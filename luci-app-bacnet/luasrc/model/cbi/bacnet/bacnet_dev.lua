@@ -32,9 +32,9 @@ s.addremove = true
 s.anonymous = false
 
 sva = s:option(Value, "bacdl", "Netzwerk Layer")
-sva:value('ip4','BACnet IPv4')
-sva:value('ip6','BACnet IPv6')
-sva:value('ether','BACnet Ethernet')
+sva:value('bip','BACnet IPv4')
+sva:value('bip6','BACnet IPv6')
+sva:value('ethernet','BACnet Ethernet')
 sva:value('mstp','BACnet MSTP (RS485/RS232)')
 
 sva = s:option(Value, "iface", "Netzwerk Interface")
@@ -44,6 +44,7 @@ uci:foreach("network", "interface",
 	end)
 
 sva = s:option(Value, "port", "UDP Port")
+sva:depends("bacdl","bip")
 sva:value('47808')
 sva:value('47809')
 sva:value('47810')

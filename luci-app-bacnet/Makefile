@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-bacnet
-PKG_RELEASE:=0.1.4
+PKG_RELEASE:=0.1.5
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
@@ -12,7 +12,7 @@ define Package/luci-app-bacnet
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Bacnet Device
-  DEPENDS:=+bacnet-stack +luci-lib-web 
+  DEPENDS:=+bacnet-stack-uci +luci-lib-web 
 endef
 
 define Package/luci-app-bacnet/description
