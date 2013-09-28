@@ -1,14 +1,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2013-09-25-3
-PKG_SOURCE_VERSION:=df612f15aa0097441612998e97e41f06280cd6fa
+PKG_VERSION:=2013-09-25-6
+PKG_SOURCE_VERSION:=45c29da1bd8994e8e3fd10072e8b0d4139593a2e
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=git://github.com/stargieg/bacnet-stack.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -27,34 +28,45 @@ define Package/bacnet-stack/Default/description
   Data Communication Protocol for Building Automation and Control Networks
 endef
 
-define Package/bacnet-stack
+define Package/bacnet-stack-uci
 $(call Package/bacnet-stack/Default)
-  TITLE+= (BACnet)
+  TITLE+= (UCI)
+  VARIANT:=uci
 endef
 
-define Package/bacnet-stack/description
+define Package/bacnet-stack-uci/description
   This package is a BACnet Meta Package with uci integration.
 endef
 
-define Package/bacnet-stack-ip4
+define Package/bacnet-stack-utils
 $(call Package/bacnet-stack/Default)
-  TITLE+= (IP4)
-  VARIANT:=ip4
-  DEPENDS:=+bacnet-stack
+  TITLE+= (Utils)
+  VARIANT:=utils
 endef
 
-define Package/bacnet-stack-ip4/description
+define Package/bacnet-stack-utils/description
+  This package is a BACnet utils bacrp,bacepics.
+endef
+
+define Package/bacnet-stack-bip
+$(call Package/bacnet-stack/Default)
+  TITLE+= (IPv4)
+  VARIANT:=bip
+  DEPENDS+= +bacnet-stack-uci
+endef
+
+define Package/bacnet-stack-bip/description
   This package is built with IPv4 support.
 endef
 
-define Package/bacnet-stack-ether
+define Package/bacnet-stack-ethernet
 $(call Package/bacnet-stack/Default)
   TITLE+= (ETHERNET)
-  VARIANT:=ether
-  DEPENDS:=+bacnet-stack
+  VARIANT:=ethernet
+  DEPENDS+= +bacnet-stack-uci
 endef
 
-define Package/bacnet-stack-ether/description
+define Package/bacnet-stack-ethernet/description
   This package is built with Ethernet support.
 endef
 
@@ -62,7 +74,7 @@ define Package/bacnet-stack-mstp
 $(call Package/bacnet-stack/Default)
   TITLE+= (MSTP)
   VARIANT:=mstp
-  DEPENDS:=+bacnet-stack
+  DEPENDS+= +bacnet-stack-uci
 endef
 
 define Package/bacnet-stack-mstp/description
@@ -70,34 +82,28 @@ define Package/bacnet-stack-mstp/description
 endef
 
 TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
-BUILD=debug
+BUILD = debug
 
-ifeq ($(BUILD_VARIANT),)
-define Build/Compile
-endef
+ifeq ($(BUILD_VARIANT),bip)
+MAKE_VARS += BACDL_DEFINE=-DBACDL_BIP=1
 endif
 
-ifeq ($(BUILD_VARIANT),ip4)
-	BACDL_DEFINE=-DBACDL_BIP=1
-endif
-
-ifeq ($(BUILD_VARIANT),ether)
-	BACDL_DEFINE=-DBACDL_ETHERNET=1
+ifeq ($(BUILD_VARIANT),ethernet)
+MAKE_VARS += BACDL_DEFINE=-DBACDL_ETHERNET=1
 endif
 
 ifeq ($(BUILD_VARIANT),mstp)
-	BACDL_DEFINE=-DBACDL_MSTP=1
+MAKE_VARS += BACDL_DEFINE=-DBACDL_MSTP=1
 endif
 
-# un-comment the next line to build the routing demo application
-#BACNET_DEFINES += -DBAC_ROUTING
+ifeq ($(BUILD_VARIANT),utils)
+MAKE_VARS += BACDL_DEFINE=-DBACDL_BIP=1
+endif
 
-# Declare your level of BBMD support
-BBMD_DEFINE:=-DBBMD_ENABLED=0
-#BBMD_DEFINE:=-DBBMD_ENABLED=1
-#BBMD_DEFINE:=-DBBMD_CLIENT_ENABLED
-
-BACNET_PORT:=linux
+ifeq ($(BUILD_VARIANT),uci)
+define Build/Compile
+endef
+endif
 
 define Package/bacnet-stack/postinst
 #!/bin/sh
@@ -112,7 +118,7 @@ fi
 }
 endef
 
-define Package/bacnet-stack/install
+define Package/bacnet-stack-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/bacserv.defaults $(1)/etc/uci-defaults/bacserv
 	$(INSTALL_BIN) ./files/bacserv.init $(1)/etc/init.d/bacserv
@@ -126,14 +132,14 @@ define Package/bacnet-stack/install
 	$(INSTALL_DATA) ./files/bacnet_group.config $(1)/etc/config/bacnet_group
 endef
 
-define Package/bacnet-stack-ip4/install
+define Package/bacnet-stack-bip/install
 	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-ip4
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-bip
 endef
 
-define Package/bacnet-stack-ether/install
+define Package/bacnet-stack-ethernet/install
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-ether
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-ethernet
 endef
 
 define Package/bacnet-stack-mstp/install
@@ -167,7 +173,8 @@ define Package/bacnet-stack-util/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bvlc.sh $(1)/usr/bin/
 endef
 
-$(eval $(call BuildPackage,bacnet-stack))
-$(eval $(call BuildPackage,bacnet-stack-ip4))
-$(eval $(call BuildPackage,bacnet-stack-ether))
+$(eval $(call BuildPackage,bacnet-stack-uci))
+$(eval $(call BuildPackage,bacnet-stack-bip))
+$(eval $(call BuildPackage,bacnet-stack-ethernet))
 $(eval $(call BuildPackage,bacnet-stack-mstp))
+$(eval $(call BuildPackage,bacnet-stack-utils))
