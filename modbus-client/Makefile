@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=modbus-client
 PKG_VERSION:=0.1
-PKG_RELEASE:=1
+PKG_RELEASE:=6
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 PKG_BUILD_DEPENDS:=libmodbus
@@ -22,7 +22,7 @@ define Package/modbus-client
   $(Package/modbus-client/default)
   MENU:=1
 endef
-                            
+
 define Package/modbus-client/description
  modbus-client
  use libmodbus https://github.com/stephane/libmodbus

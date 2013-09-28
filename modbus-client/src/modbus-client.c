@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <modbus/modbus.h>
 
-
 void about (char *arg0)
 {
 	printf ("%s -<r|w> -ip <Remote IP> -port <Remote Port> -id <Station ID> -base <Base Address> -off <Offset> -[h?]\n", arg0);
@@ -41,6 +40,8 @@ int main(int argc, char *argv[])
 {
 	modbus_t *ctx;
 	uint16_t tab_reg[64];
+	uint16_t tab_f[2];
+	int nb_points;
 	int rc;
 	int i;
 	int read_flag = 1;
@@ -51,6 +52,7 @@ int main(int argc, char *argv[])
 	int station_id = 255;
 	int base = 0;
 	int offset = 1;
+	float real;
 	if (argc < 4) {
 		about(argv[0]);
 		exit(0);
@@ -127,6 +129,9 @@ int main(int argc, char *argv[])
 		for (i=0; i < rc; i++) {
 				printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]);
 		}
+		modbus_read_registers(ctx, base, 2, tab_f);
+		real = modbus_get_float(tab_f);
+		printf("real: %f\n",real);
 	}
 	
 	modbus_close(ctx);
