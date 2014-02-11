@@ -2,29 +2,29 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=modbus-client
-PKG_VERSION:=0.1
-PKG_RELEASE:=6
+PKG_NAME:=modbus-uci
+PKG_VERSION:=0.5
+PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 PKG_BUILD_DEPENDS:=libmodbus
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/modbus-client/default
+define Package/modbus-uci/default
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=modbus-client
-  DEPENDS:=+libmodbus
+  TITLE:=modbus-uci uci-gateway
+  DEPENDS:=+libmodbus +libuci
 endef
 
-define Package/modbus-client
-  $(Package/modbus-client/default)
+define Package/modbus-uci
+  $(Package/modbus-uci/default)
   MENU:=1
 endef
 
-define Package/modbus-client/description
- modbus-client
+define Package/modbus-uci/description
+ modbus-uci-gateway
  use libmodbus https://github.com/stephane/libmodbus
 endef
 
@@ -33,13 +33,27 @@ define Build/Prepare
 	$(CP) ./src/* $(PKG_BUILD_DIR)/
 endef
 
-define Package/modbus-client/install
-#	$(CP) -a ./ipkg/* $(1)/CONTROL/ 2>/dev/null || true
-#	$(INSTALL_DIR) $(1)/etc/init.d
-#	$(INSTALL_BIN) ./files/modbus-client.init $(1)/etc/init.d/modbus-client
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/modbus-client $(1)/usr/sbin/
+define Package/bacnet-stack/postinst
+#!/bin/sh
+
+if [ -z $${IPKG_INSTROOT} ] ; then
+	( . /etc/uci-defaults/modbus-uci ) && rm /etc/uci-defaults/modbus-uci
+fi
+
+[ -n $${IPKG_INSTROOT} ] || {
+	/etc/init.d/modbus-uci enable
+	/etc/init.d/modbus-uci restart
+}
 endef
 
-$(eval $(call BuildPackage,modbus-client))
+define Package/modbus-uci/install
+	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/modbus-uci.config $(1)/etc/config/modbus
+	$(INSTALL_BIN) ./files/modbus-uci.defaults $(1)/etc/uci-defaults/modbus-uci
+	$(INSTALL_BIN) ./files/modbus-uci.init $(1)/etc/init.d/modbus-uci
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/modbus-uci $(1)/usr/sbin/modbus-uci
+endef
+
+$(eval $(call BuildPackage,modbus-uci))
 
