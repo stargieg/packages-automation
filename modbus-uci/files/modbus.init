@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2013 Patrick Grimm
+
+START=60
+SERVER="modbus-uci"
+SERVER_BIN="/usr/sbin/${SERVER}"
+SERVICE_DAEMONIZE=1
+SERVICE_WRITE_PID=1
+SERVICE_PID_FILE=/var/run/${SERVER}.pid
+
+start() {
+	service_start $SERVER_BIN
+}
+
+restart() {
+	stop
+	start
+}
+
+stop() {
+	killall ${SERVER}
+	rm -f /var/run/${SERVER}.pid
+}
