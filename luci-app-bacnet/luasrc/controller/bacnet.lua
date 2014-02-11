@@ -21,19 +21,23 @@ function index()
 	page.dependent = true
 	local page = entry({"admin", "services", "bacnet_av"}, cbi("bacnet/bacnet_av"), "Analog Value", 21)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_bi"}, cbi("bacnet/bacnet_bi"), "Binary Input", 22)
+	local page = entry({"admin", "services", "bacnet_ao"}, cbi("bacnet/bacnet_ao"), "Analog Output", 22)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_mv"}, cbi("bacnet/bacnet_mv"), "Multisate Value", 23)
+	local page = entry({"admin", "services", "bacnet_bi"}, cbi("bacnet/bacnet_bi"), "Binary Input", 23)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_nc"}, cbi("bacnet/bacnet_nc"), "Notification Class", 24)
+	local page = entry({"admin", "services", "bacnet_bv"}, cbi("bacnet/bacnet_bv"), "Binary Value", 24)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnettypes"}, cbi("bacnet/types", {autoapply=false}), "Bacnet Types", 25)
+	local page = entry({"admin", "services", "bacnet_mv"}, cbi("bacnet/bacnet_mv"), "Multisate Value", 25)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnetrules"}, cbi("bacnet/rules", {autoapply=false}), "Bacnet Rules", 26)
+	local page = entry({"admin", "services", "bacnet_nc"}, cbi("bacnet/bacnet_nc"), "Notification Class", 26)
+	page.dependent = true
+	local page = entry({"admin", "services", "bacnettypes"}, cbi("bacnet/types", {autoapply=false}), "Bacnet Types", 27)
+	page.dependent = true
+	local page = entry({"admin", "services", "bacnetrules"}, cbi("bacnet/rules", {autoapply=false}), "Bacnet Rules", 28)
 	page.dependent = true
 
-	entry({"admin", "services", "bacnetgroups"}, cbi("bacnet/groups", {autoapply=false}), "Bacnet Groups", 27)
-	local page = entry({"admin", "services", "icinga_mv"}, cbi("bacnet/icinga_mv"), "Icinga MV", 28)
+	entry({"admin", "services", "bacnetgroups"}, cbi("bacnet/groups", {autoapply=false}), "Bacnet Groups", 29)
+	local page = entry({"admin", "services", "icinga_mv"}, cbi("bacnet/icinga_mv"), "Icinga MV", 30)
 	page.dependent = true
 end
 

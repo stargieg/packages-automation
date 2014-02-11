@@ -26,21 +26,34 @@ if not luci.fs.access("/etc/config/bacnet_av") then
 	end
 end
 
+local events = {}
+events[1] = {0,"Keine Ereignis Behandlung"}
+events[2] = {1,"Ereignis"}
+events[3] = {2,"Ereignis"}
+events[4] = {3,"Ereignis"}
+events[5] = {4,"Ereignis"}
+events[6] = {5,"Ereignis"}
+events[7] = {6,"Ereignis"}
+events[8] = {7,"Alle Ereignis behandeln"}
+
 --if arg1 then
 --	m = Map("bacnet_av_"..arg1, "Bacnet Analog Value", "Bacnet Analog Value Configuration")
 --else
 m = Map("bacnet_av", "Bacnet Analog Value", "Bacnet Analog Value Configuration")
 --end
 
-s = m:section(TypedSection, "av", arg1 or 'AV Index')
+local s = m:section(TypedSection, "av", arg1 or 'AV Index')
 s.addremove = true
 s.anonymous = false
-s.template = "cbi/tblsection"
+--s.template = "cbi/tblsection"
+s:tab("main","Standard")
+s:tab("adv","Erweitert")
+s:tab("io","Zugrifsname")
 
 s:option(Flag, "disable", "Disable")
 s:option(Value, "name", "AV Name")
 
-sva = s:option(Value, "tagname",  "Zugrifsname")
+local sva = s:taboption("io", Value, "tagname", "Zugrifsname")
 uci:foreach("linknx", "daemon",
 	function (section)
 			sva:value(section.tagname)
@@ -51,30 +64,48 @@ uci:foreach("modbus", "station",
 	end)
 sva:value("icinga")
 
-s:option(Value, "addr", "Addr")
-s:option(Value, "value", "Value")
+local sva = s:taboption("io", Value, "addr", "Addr")
+local sva = s:taboption("io", Value, "resolution", "Aufloesung")
+sva:value("doublefloat","2 Register zu Fliesspunkt")
+sva:value("float","1 Register zu Fliesspunkt")
+sva:value("bit","1 Bit aus 1 Register")
+sva:value("0.1","1 Register * 0.1")
+sva:value("1","1 Register * 1")
+sva:value("10","1 Register * 10")
+
+local sva = s:taboption("main", Value, "value", "Value")
+sva.rmempty = false
+
+local sva = s:taboption("main", Value, "unit", "Einheit")
+sva:value("95","Keine Einheit")
+sva:value("98","Prozent")
+sva:value("62","Grad Celsius")
+sva:value("63","Grad Kelvin")
+sva:value("53","Pascal")
+sva:value("134","mbar")
+sva:value("27","Hz")
 
 
-
-sva = s:option(ListValue, "group",  "Gruppe")
+local sva = s:taboption("main", ListValue, "group",  "Gruppe")
 local uci = luci.model.uci.cursor()
 uci:foreach("bacnet_group", "group",
 	function (section)
 			sva:value(section.name)
 	end)
 
-s:option(Value, "description", "Anzeige Name")
-s:option(Flag, "tl", "Trend Log")
-sva = s:option(Value, "nc",  "Notification Class")
+s:taboption("main", Value, "description", "Anzeige Name")
+s:taboption("adv", Flag, "tl", "Trend Log")
+local sva = s:taboption("adv", Value, "nc",  "Notification Class")
 sva.rmempty = true
 local uci = luci.model.uci.cursor()
 uci:foreach("bacnet_nc", "nc",
 	function (section)
 			sva:value(section[".name"],section.name)
 	end)
-sva = s:option(Value, "event",  "BIT1 Alarm,BIT2 Fehler,BIT3 Alarm oder Fehler geht [7]")
-sva:value(0,"0 Keine Ereignis Behandlung")
-sva:value(7,"7 Alle Ereignis behandeln")
+local sva = s:taboption("adv", Value, "event",  "BIT1 Alarm,BIT2 Fehler,BIT3 Alarm oder Fehler geht [7]")
+for i, v in ipairs(events) do
+	sva:value(v[1],v[1]..": "..v[2])
+end
 
 return m
 

@@ -45,20 +45,20 @@ m = Map("bacnet_bi", "Bacnet Binary Input", "Bacnet Binary Input Configuration")
 local s = m:section(TypedSection, "bi", arg1 or 'BI Index')
 s.addremove = true
 s.anonymous = false
-s.template = "cbi/tblsection"
+--s.template = "cbi/tblsection"
 s:tab("main","Standard")
 s:tab("adv","Erweitert")
 s:tab("io","Zugrifsname")
 
-local sva = s:taboption("main", Flag, "disable", "Disable")
-
-local sva = s:taboption("main", Value, "name", "BI Name")
+s:taboption("main", Flag, "disable", "Disable")
+s:taboption("main", Value, "name", "BI Name")
 
 local sva = s:taboption("io", Value, "linknx", "Linknx Zugrifsname")
 uci:foreach("linknx", "daemon",
 	function (section)
 			sva:value(section.tagname)
 	end)
+
 local sva = s:taboption("io", Value, "modbus", "Modbus Zugrifsname")
 uci:foreach("modbus", "station",
 	function (section)
@@ -72,6 +72,27 @@ uci:foreach("icinga", "station",
 	end)
 
 local sva = s:taboption("io", Value, "addr", "Addr")
+local sva = s:taboption("io", Value, "resolution", "Aufloesung")
+sva:value("dword","1 Bit aus 1 Register")
+sva:value("bit","1 Bit")
+local sva = s:taboption("io", ListValue, "bit", "Bit 0-15")
+sva:depends("resolution","dword")
+sva:value("0","Bit 0")
+sva:value("1","Bit 1")
+sva:value("2","Bit 2")
+sva:value("3","Bit 3")
+sva:value("4","Bit 4")
+sva:value("5","Bit 5")
+sva:value("6","Bit 6")
+sva:value("7","Bit 7")
+sva:value("8","Bit 8")
+sva:value("9","Bit 9")
+sva:value("10","Bit 10")
+sva:value("11","Bit 11")
+sva:value("12","Bit 12")
+sva:value("13","Bit 13")
+sva:value("14","Bit 14")
+sva:value("15","Bit 15")
 
 local sva = s:taboption("main", Flag, "value", "Value")
 sva.rmempty = false
