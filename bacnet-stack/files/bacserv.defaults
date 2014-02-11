@@ -1,0 +1,41 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+
+if [ "$(uci get system.@system[0].hostname)" == "OpenWrt" ]; then
+	rand="$(echo -n $(head -n 1 /dev/urandom 2>/dev/null | md5sum | cut -b 1-4))"
+	rand="$(printf "%d" "0x$rand")"
+	uci set system.@system[0].hostname="OpenWrt-$rand"
+	uci set bacnet_dev.0.name="OpenWrt-$rand-bip"
+	uci set bacnet_dev.0.id="$rand"
+	uci set bacnet_dev.1.name="OpenWrt-$rand-ethernet"
+	uci set bacnet_dev.1.id=$((rand+1))
+	uci commit
+	echo OpenWrt-$rand > /proc/sys/kernel/hostname
+	(
+	sleep 3
+	uci set network.lan.proto=dhcp
+	uci commit
+	/etc/init.d/network restart
+	/etc/init.d/dnsmasq restart
+	/etc/init.d/bacserv restart
+	/etc/init.d/avahi-daemon restart
+	) &
+fi
+
+[ "$(uci get ucitrack.@bacnet_dev[0] 2>/dev/null)" != "bacnet_dev" ] && \
+uci batch <<-EOF >/dev/null 2>/dev/null
+	add ucitrack bacnet_dev
+	set ucitrack.@bacnet_dev[-1].init="bacserv"
+	add ucitrack bacnet_av
+	set ucitrack.@bacnet_av[-1].init="bacserv"
+	add ucitrack bacnet_mv
+	set ucitrack.@bacnet_mv[-1].init="bacserv"
+	add ucitrack bacnet_nc
+	set ucitrack.@bacnet_nc[-1].init="bacserv"
+	add ucitrack bacnet_bi
+	set ucitrack.@bacnet_bi[-1].init="bacserv"
+	commit ucitrack
+EOF
+
