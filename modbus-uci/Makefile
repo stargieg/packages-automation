@@ -14,7 +14,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/modbus-uci/default
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=modbus-uci uci-gateway
+  TITLE:=modbus-uci gateway
   DEPENDS:=+libmodbus +libuci
 endef
 
@@ -37,20 +37,20 @@ define Package/bacnet-stack/postinst
 #!/bin/sh
 
 if [ -z $${IPKG_INSTROOT} ] ; then
-	( . /etc/uci-defaults/modbus-uci ) && rm /etc/uci-defaults/modbus-uci
+	( . /etc/uci-defaults/modbus ) && rm /etc/uci-defaults/modbus
 fi
 
 [ -n $${IPKG_INSTROOT} ] || {
-	/etc/init.d/modbus-uci enable
-	/etc/init.d/modbus-uci restart
+	/etc/init.d/modbus enable
+	/etc/init.d/modbus restart
 }
 endef
 
 define Package/modbus-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/modbus-uci.config $(1)/etc/config/modbus
-	$(INSTALL_BIN) ./files/modbus-uci.defaults $(1)/etc/uci-defaults/modbus-uci
-	$(INSTALL_BIN) ./files/modbus-uci.init $(1)/etc/init.d/modbus-uci
+	$(INSTALL_BIN) ./files/modbus.config $(1)/etc/config/modbus
+	$(INSTALL_BIN) ./files/modbus.defaults $(1)/etc/uci-defaults/modbus
+	$(INSTALL_BIN) ./files/modbus.init $(1)/etc/init.d/modbus
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/modbus-uci $(1)/usr/sbin/modbus-uci
 endef
