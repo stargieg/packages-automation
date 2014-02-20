@@ -82,7 +82,8 @@ define Package/bacnet-stack-mstp/description
 endef
 
 TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
-BUILD = debug
+MAKE_VARS += MAKE_DEFINE=" -DMAX_ANALOG_VALUES=1024 -DMAX_MULTI_STATE_VALUES=1024 -DMAX_NOTIFICATION_CLASSES=16 -DMAX_TREND_LOGS=1024"
+MAKE_VARS += BUILD=debug
 
 ifeq ($(BUILD_VARIANT),bip)
 MAKE_VARS += BACDL_DEFINE=-DBACDL_BIP=1
@@ -149,7 +150,7 @@ define Package/bacnet-stack-mstp/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-mstp
 endef
 
-define Package/bacnet-stack-util/install
+define Package/bacnet-stack-utils/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacarf $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacarf $(1)/usr/bin/
