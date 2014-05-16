@@ -29,6 +29,10 @@
 #define MODFLOAT 2
 #define MODDOUBLEFLOAT 3
 #define MODDWORD 4
+#define MODUINT 5
+#define MODUDOUBLEFLOAT 6
+#define MODUFLOAT 7
+
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
 #define SET_BIT(var,pos) ((var) |= 1<<(pos))
 #define RESET_BIT(var,pos) ((pos) &= ~(1<<(var)))
@@ -111,22 +115,29 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 	const char *cov_increment;
 	const char *value;
 	const char *res;
-	int bit;
+	int bitv=0;
 	int val_i;
+	int usign=0;
 	float val_f;
 	time_t value_time;
 
-	if (!strcmp(sec_idx, "default"))
+	if (!strcmp(sec_idx, "default")) {
+		printf("ignore default %s,%s\n",itr_pv->section,sec_idx);
 		return;
+	}
 
 	disable = ucix_get_option(itr_pv->ctx, itr_pv->section, sec_idx, "disable");
-	if (disable)
+	if (disable) {
+		printf("ignore disable %s,%s\n",itr_pv->section,sec_idx);
 		return;
+	}
 
 	tagname = ucix_get_option(itr_pv->ctx, itr_pv->section, sec_idx, "tagname");
 	if ( tagname != NULL ) {
-		if (!strcmp(tagname, itr_pv->tagname))
+		if (strcmp(tagname, itr_pv->tagname)) {
+			printf("ignore wrong tagneame %s,%s\n",tagname, itr_pv->tagname);
 			return;
+		}
 	} else {
 		printf("no tagname %s,%s\n",itr_pv->section,sec_idx);
 		return;
@@ -151,38 +162,57 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 
 		res = ucix_get_option(itr_pv->ctx, itr_pv->section, sec_idx,
 			"resolution");
+		usign = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
+			"unsigned",0);
 
 		if (res == NULL) {
-			t->modtype = MODINT;
-			t->bit = NULL;
+			if (usign==0) {
+				t->modtype = MODINT;
+			} else {
+				t->modtype = MODUINT;
+			}
+			t->bit = 0;
 			t->res = 1;
 		} else if (!strcmp(res, "doublefloat")) {
-			t->modtype = MODDOUBLEFLOAT;
-			t->bit = NULL;
+			if (usign==0) {
+				t->modtype = MODDOUBLEFLOAT;
+			} else {
+				t->modtype = MODUDOUBLEFLOAT;
+			}
+			t->bit = 0;
 			t->res = 1;
 		} else if (!strcmp(res, "float")) {
-			t->modtype = MODFLOAT;
-			t->bit = NULL;
+			if (usign==0) {
+				t->modtype = MODFLOAT;
+			} else {
+				t->modtype = MODUFLOAT;
+			}
+			t->bit = 0;
 			t->res = 1;
 		} else if (!strcmp(res, "bit")) {
 			t->modtype = MODBIT;
-			t->bit = NULL;
+			t->bit = 0;
 			t->res = 1;
 		} else if (!strcmp(res, "dword")) {
 			t->modtype = MODDWORD;
-			bit = ucix_get_option_int(itr_pv->ctx, itr_pv->section, 
+			bitv = ucix_get_option_int(itr_pv->ctx, itr_pv->section, 
 				sec_idx, "bit",0);
-			t->bit = bit;
+			t->bit = bitv;
 			t->res = 1;
 		} else if (res != NULL ) {
-			t->modtype = MODINT;
+			if (usign==0) {
+				t->modtype = MODINT;
+			} else {
+				t->modtype = MODUINT;
+			}
 			if (atoi(res) == 1 ) {
 				t->res = 1;
 			} else {
 				t->res = strtof(res,NULL);
 			}
-			t->bit = NULL;
+			t->bit = 0;
 		}
+
 
 		t->addr = addr;
 		si_unit = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
@@ -217,9 +247,9 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 				t->value_int = val_i;
 			} else if (t->modtype == MODDWORD) {
 				if ( val_i > 0 ) {
-					SETBIT(val_i,bit);
+					SETBIT(val_i,bitv);
 				} else {
-					CLEARBIT(val_i,bit);
+					CLEARBIT(val_i,bitv);
 				}
 				t->value_int = val_i;
 			} else {
@@ -244,7 +274,7 @@ void load_bacnet(char *idx) {
 	const char *tagname;
 	int port;
 	const char *ipaddr;
-	int station_id;
+	//int station_id;
 	struct uci_context *uctx_m;
 /*	char pv_section[16][32] = {
 		"bacnet_bi","bacnet_ao","bacnet_av","bacnet_ai","bacnet_mv"
@@ -272,12 +302,12 @@ void load_bacnet(char *idx) {
 	int rc = -1;
 	int rewrite = 1;
 	float val_f, pval_f,val_fab;
-	int j,k,l,m,n,write,bit,val_i;
+	int j,k,l,m,n,write,bitv,val_i;
 	bool uci_change[16],uci_change_ext[16];
 	bool newval;
 	time_t chk_mtime[16];
 	time_t mtime_bacnet[16];
-	time_t value_time = 0;
+	//time_t value_time = 0;
 	int pimage[65535];
 	bool pimage_read[65535];
 
@@ -292,8 +322,10 @@ void load_bacnet(char *idx) {
 			"port",502);
 		ipaddr = ucix_get_option(uctx_m, section, idx,
 			"ipaddr");
-		station_id = ucix_get_option_int(uctx_m, section, idx,
-			"station_id",255);
+		//station_id = ucix_get_option_int(uctx_m, section, idx,
+		//	"station_id",255);
+	} else {
+		return;
 	}
 
 	struct pv_itr_ctx itr_b;
@@ -304,6 +336,7 @@ void load_bacnet(char *idx) {
 		uct_b = ucix_init(pv_section[n]);
 		if(uct_b) {
 			type = pv_type[n];
+			printf("section %s type %s\n",pv_section[n],type);
 			itr_b.section = pv_section[n];
 			itr_b.section_idx = n;
 			itr_b.ctx = uct_b;
@@ -369,7 +402,7 @@ void load_bacnet(char *idx) {
 					write = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"write",0);
 					if (write != 0) {
 						value = ucix_get_option(uct_b, pv_section[j], cur_pv->idx,"value");
-						printf("bac change %i %s=%s\n",chk_mtime[j],cur_pv->name,value);
+						printf("bac change %i %s=%s\n",(int)chk_mtime[j],cur_pv->name,value);
 						if ( value != NULL ) {
 							offset = 1;
 							strncpy(cur_pv->value, value, sizeof(cur_pv->value));
@@ -383,27 +416,35 @@ void load_bacnet(char *idx) {
 								cur_pv->value_int = val_i;
 								tab_reg[0] = val_i;
 							} else if (cur_pv->modtype == MODDWORD) {
-								printf("bac change %i %s=%s\n",chk_mtime[j],cur_pv->name,value);
+								printf("bac change %i %s=%s\n",(int)chk_mtime[j],cur_pv->name,value);
 								val_i = atoi(cur_pv->value);
-								bit = cur_pv->bit;
+								bitv = cur_pv->bit;
 								if (pimage_read[addr]) {
 									cur_pv->value_int = pimage[addr];
 									printf("pimage MODDWORD 1 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 								}
 								if (val_i > 0) {
-									SETBIT(cur_pv->value_int,bit);
+									SETBIT(cur_pv->value_int,bitv);
 									printf("MODDWORD 1 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 								} else {
 									printf("MODDWORD 0 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
-									CLEARBIT(cur_pv->value_int,bit);
+									CLEARBIT(cur_pv->value_int,bitv);
 									printf("MODDWORD 0 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 								}
 								tab_reg[0] = cur_pv->value_int;
-							} else {
+							} else if (cur_pv->modtype == MODUINT) {
 								val_f = val_f/cur_pv->res;
 								val_f += 0.5;
 								tab_reg[0] = (int)val_f;
 								cur_pv->value_int = (int)val_f;
+							} else {
+								val_f = val_f/cur_pv->res;
+								val_f += 0.5;
+								val_i = (int)val_f;
+								if (val_i < 0)
+									val_i = (val_i*1)+65536;
+								tab_reg[0] = val_i;
+								cur_pv->value_int = val_i;
 							}
 							k=0;
 							for (n=addr;n<addr+offset;n++) {
@@ -413,7 +454,7 @@ void load_bacnet(char *idx) {
 							}
 							rc = modbus_write_registers(mctx, addr, offset, tab_reg);
 							modbus_close(mctx);
-							value_time = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"value_time",0);
+							//value_time = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"value_time",0);
 							uci_change_ext[j] = true;
 							uci_change[j] = true;
 							ucix_del(uct_b, pv_section[j], cur_pv->idx,"write");
@@ -468,7 +509,7 @@ void load_bacnet(char *idx) {
 					pval_f = modbus_get_float(&tab_reg[0]);
 					val_fab = val_f - pval_f;
 					if ( val_fab > 0.001 ) {
-						cur_pv->value_float == pval_f;
+						cur_pv->value_float = pval_f;
 						sprintf(cur_pv->value,"%f",pval_f);
 						newval=true;
 					}
@@ -501,8 +542,8 @@ void load_bacnet(char *idx) {
 					val_i = tab_reg[0];
 					if ( cur_pv->value_int != val_i ) {
 						cur_pv->value_int = val_i;
-						bit=cur_pv->bit;
-						if (BITVAL(val_i, bit)) {
+						bitv=cur_pv->bit;
+						if (BITVAL(val_i, bitv)) {
 							sprintf(cur_pv->value,"%i",1);
 						} else {
 							sprintf(cur_pv->value,"%i",0);
@@ -511,16 +552,32 @@ void load_bacnet(char *idx) {
 					}
 					if ( rewrite == 0) {
 						cur_pv->value_int = val_i;
-						bit=cur_pv->bit;
-						if (BITVAL(val_i, bit)) {
+						bitv=cur_pv->bit;
+						if (BITVAL(val_i, bitv)) {
 							sprintf(cur_pv->value,"%i",1);
 						} else {
 							sprintf(cur_pv->value,"%i",0);
 						}
 						newval=true;
 					}
+				} else if ( cur_pv->modtype == MODUINT ) {
+					val_i = tab_reg[0];
+					if ( cur_pv->value_int != val_i ) {
+						cur_pv->value_int = val_i;
+						pval_f = (float)val_i;
+						sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
+						newval=true;
+					}
+					if ( rewrite == 0) {
+						cur_pv->value_int = tab_reg[0];
+						pval_f = (float)tab_reg[0];
+						sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
+						newval=true;
+					}
 				} else {
 					val_i = tab_reg[0];
+					if (val_i > 32767)
+						val_i = val_i - 65536;
 					if ( cur_pv->value_int != val_i ) {
 						cur_pv->value_int = val_i;
 						pval_f = (float)val_i;

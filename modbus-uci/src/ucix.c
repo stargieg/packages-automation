@@ -284,13 +284,13 @@ void load_value(const char *sec_idx, struct uci_itr_ctx *itr)
 		return;
 
 	const char *value;
-	int value_time;
-	int Out_Of_Service;
+	//int value_time;
+	//int Out_Of_Service;
 	value = ucix_get_option(itr->ctx, itr->section, sec_idx, "value");
-	value_time = ucix_get_option_int(itr->ctx, itr->section, sec_idx,
-		"value_time",0);
-	Out_Of_Service = ucix_get_option_int(itr->ctx, itr->section, sec_idx,
-		"Out_Of_Service",1);
+	//value_time = ucix_get_option_int(itr->ctx, itr->section, sec_idx,
+	//	"value_time",0);
+	//Out_Of_Service = ucix_get_option_int(itr->ctx, itr->section, sec_idx,
+	//	"Out_Of_Service",1);
 	if( (t = (value_tuple_t *)malloc(sizeof(value_tuple_t))) != NULL ) {
 		strncpy(t->idx, sec_idx, sizeof(t->idx));
 		if ( value != NULL ) {
