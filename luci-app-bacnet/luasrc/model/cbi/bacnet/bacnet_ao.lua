@@ -20,8 +20,8 @@ local arg1 = arg[1]
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
 
-if not luci.fs.access("/etc/config/bacnet_av") then
-	if not luci.sys.exec("touch /etc/config/bacnet_av") then
+if not luci.fs.access("/etc/config/bacnet_ao") then
+	if not luci.sys.exec("touch /etc/config/bacnet_ao") then
 		return
 	end
 end
@@ -43,12 +43,12 @@ limits[3] = {2,"High"}
 limits[4] = {3,"Low High"}
 
 --if arg1 then
---	m = Map("bacnet_av_"..arg1, "Bacnet Analog Value", "Bacnet Analog Value Configuration")
+--	m = Map("bacnet_ao_"..arg1, "Bacnet Analog Output", "Bacnet Analog Output Configuration")
 --else
-m = Map("bacnet_av", "Bacnet Analog Value", "Bacnet Analog Value Configuration")
+m = Map("bacnet_ao", "Bacnet Analog Output", "Bacnet Analog Output Configuration")
 --end
 
-local s = m:section(TypedSection, "av", arg1 or 'Index')
+local s = m:section(TypedSection, "ao", arg1 or 'Index')
 s.addremove = true
 s.anonymous = false
 --s.template = "cbi/tblsection"

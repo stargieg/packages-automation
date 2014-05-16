@@ -19,24 +19,29 @@ function index()
 	end
 	local page = entry({"admin", "services", "bacnet_dev"}, cbi("bacnet/bacnet_dev"), "Bacnet Device", 20)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_av"}, cbi("bacnet/bacnet_av"), "Analog Value", 21)
+	local page = entry({"admin", "services", "bacnet_ai"}, cbi("bacnet/bacnet_ai"), "Analog Input", 21)
 	page.dependent = true
 	local page = entry({"admin", "services", "bacnet_ao"}, cbi("bacnet/bacnet_ao"), "Analog Output", 22)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_bi"}, cbi("bacnet/bacnet_bi"), "Binary Input", 23)
+	local page = entry({"admin", "services", "bacnet_av"}, cbi("bacnet/bacnet_av"), "Analog Value", 23)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_bv"}, cbi("bacnet/bacnet_bv"), "Binary Value", 24)
+	local page = entry({"admin", "services", "bacnet_bi"}, cbi("bacnet/bacnet_bi"), "Binary Input", 24)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_mv"}, cbi("bacnet/bacnet_mv"), "Multisate Value", 25)
+	local page = entry({"admin", "services", "bacnet_bo"}, cbi("bacnet/bacnet_bo"), "Binary Output", 25)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnet_nc"}, cbi("bacnet/bacnet_nc"), "Notification Class", 26)
+	local page = entry({"admin", "services", "bacnet_bv"}, cbi("bacnet/bacnet_bv"), "Binary Value", 26)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnettypes"}, cbi("bacnet/types", {autoapply=false}), "Bacnet Types", 27)
+	local page = entry({"admin", "services", "bacnet_mi"}, cbi("bacnet/bacnet_mi"), "Multisate Input", 27)
 	page.dependent = true
-	local page = entry({"admin", "services", "bacnetrules"}, cbi("bacnet/rules", {autoapply=false}), "Bacnet Rules", 28)
+	local page = entry({"admin", "services", "bacnet_mo"}, cbi("bacnet/bacnet_mo"), "Multisate Output", 28)
+	page.dependent = true
+	local page = entry({"admin", "services", "bacnet_mv"}, cbi("bacnet/bacnet_mv"), "Multisate Value", 29)
+	page.dependent = true
+	local page = entry({"admin", "services", "bacnet_nc"}, cbi("bacnet/bacnet_nc"), "Notification Class", 30)
 	page.dependent = true
 
-	entry({"admin", "services", "bacnetgroups"}, cbi("bacnet/groups", {autoapply=false}), "Bacnet Groups", 29)
+	local page = entry({"admin", "services", "bacnetgroups"}, cbi("bacnet/groups", {autoapply=false}), "Bacnet Groups", 29)
+	page.dependent = true
 	local page = entry({"admin", "services", "icinga_mv"}, cbi("bacnet/icinga_mv"), "Icinga MV", 30)
 	page.dependent = true
 end

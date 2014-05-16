@@ -37,12 +37,12 @@ events[7] = {6,"Ereignis"}
 events[8] = {7,"Alle Ereignis behandeln"}
 
 --if arg1 then
---	m = Map("bacnet_av_"..arg1, "Bacnet Analog Value", "Bacnet Analog Value Configuration")
+--	m = Map("bacnet_bi_"..arg1, "Bacnet Binary Input", "Bacnet Binary Input Configuration")
 --else
 m = Map("bacnet_bi", "Bacnet Binary Input", "Bacnet Binary Input Configuration")
 --end
 
-local s = m:section(TypedSection, "bi", arg1 or 'BI Index')
+local s = m:section(TypedSection, "bi", arg1 or 'Index')
 s.addremove = true
 s.anonymous = false
 --s.template = "cbi/tblsection"
@@ -51,7 +51,8 @@ s:tab("adv","Erweitert")
 s:tab("io","Zugrifsname")
 
 s:taboption("main", Flag, "disable", "Disable")
-s:taboption("main", Value, "name", "BI Name")
+s:taboption("main",Flag, "Out_Of_Service", "Out Of Service")
+s:taboption("main", Value, "name", "Name")
 
 local sva = s:taboption("io", Value, "linknx", "Linknx Zugrifsname")
 uci:foreach("linknx", "daemon",
@@ -72,7 +73,7 @@ uci:foreach("icinga", "station",
 	end)
 
 local sva = s:taboption("io", Value, "addr", "Addr")
-local sva = s:taboption("io", Value, "resolution", "Aufloesung")
+local sva = s:taboption("io", Value, "resolution", "Auflösung")
 sva:value("dword","1 Bit aus 1 Register")
 sva:value("bit","1 Bit")
 local sva = s:taboption("io", ListValue, "bit", "Bit 0-15")
@@ -133,6 +134,7 @@ for i, v in ipairs(events) do
 end
 
 local sva = s:taboption("adv", Value, "time_delay",  "Zeitverzoegerung in sec")
+local sva = s:taboption("adv", Value, "value_time", "value_time")
 
 return m
 

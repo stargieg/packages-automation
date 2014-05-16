@@ -20,8 +20,8 @@ local arg1 = arg[1]
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
 
-if not luci.fs.access("/etc/config/bacnet_mv") then
-	if not luci.sys.exec("touch /etc/config/bacnet_mv") then
+if not luci.fs.access("/etc/config/bacnet_mo") then
+	if not luci.sys.exec("touch /etc/config/bacnet_mo") then
 		return
 	end
 end
@@ -37,12 +37,12 @@ events[7] = {6,"Ereignis"}
 events[8] = {7,"Alle Ereignis behandeln"}
 
 if arg1 then
-	m = Map("bacnet_mv_"..arg1, "Bacnet Multisate Value", "Bacnet Multisate Value Configuration")
+	m = Map("bacnet_mo_"..arg1, "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
 else
-	m = Map("bacnet_mv", "Bacnet Multisate Value", "Bacnet Multisate Value Configuration")
+	m = Map("bacnet_mo", "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
 end
 
-s = m:section(TypedSection, "mv", arg1 or 'Index')
+s = m:section(TypedSection, "mo", arg1 or 'Index')
 s.addremove = true
 s.anonymous = false
 s.template = "cbi/tblsection"
