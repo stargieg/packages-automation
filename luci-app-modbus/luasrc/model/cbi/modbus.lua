@@ -31,8 +31,7 @@ s = m:section(TypedSection, "station", 'Station')
 s.addremove = true
 s.anonymous = true
 
-sva = s:option(Flag, "enable", "enable")
-sva:value('1')
+s:option(Flag, "enable", "enable")
 
 sva = s:option(Value, "ipaddr", "IP Adresse")
 

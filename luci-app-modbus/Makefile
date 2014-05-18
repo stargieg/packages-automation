@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-modbus
-PKG_RELEASE:=0.0.1
+PKG_RELEASE:=0.0.3
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
