@@ -51,7 +51,7 @@ s:option(Value, "description", "Anzeige Name")
 
 s:option(Value, "location", "Einbau Ort")
 
-s:option(File, "csv", "Datenpunktliste")
+s:option(FileUpload, "csv", "Datenpunktliste")
 
 return m
 
