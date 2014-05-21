@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2014-05-19-1
-PKG_SOURCE_VERSION:=1e6812542a5dc2cc1cd70a908faa6daa39002f69
+PKG_VERSION:=2014-05-22-1
+PKG_SOURCE_VERSION:=1ea3bdb9cce1f4234595a0c3092566ba3e2368e9
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
@@ -140,14 +140,16 @@ define Package/bacnet-stack-uci/install
 	$(INSTALL_BIN) ./files/bacserv.defaults $(1)/etc/uci-defaults/bacserv
 	$(INSTALL_BIN) ./files/bacserv.init $(1)/etc/init.d/bacserv
 	$(INSTALL_DATA) ./files/bacnet_dev.config $(1)/etc/config/bacnet_dev
-	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
+	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_ai
 	$(INSTALL_DATA) ./files/bacnet_ao.config $(1)/etc/config/bacnet_ao
-	$(INSTALL_DATA) ./files/bacnet_mv.config $(1)/etc/config/bacnet_mv
+	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
+	$(INSTALL_DATA) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
+	$(INSTALL_DATA) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bo
+	$(INSTALL_DATA) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bv
 	$(INSTALL_DATA) ./files/bacnet_mi.config $(1)/etc/config/bacnet_mi
 	$(INSTALL_DATA) ./files/bacnet_mo.config $(1)/etc/config/bacnet_mo
+	$(INSTALL_DATA) ./files/bacnet_mv.config $(1)/etc/config/bacnet_mv
 	$(INSTALL_DATA) ./files/bacnet_nc.config $(1)/etc/config/bacnet_nc
-	$(INSTALL_DATA) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
-	$(INSTALL_DATA) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bv
 	$(INSTALL_DATA) ./files/bacnet_tl.config $(1)/etc/config/bacnet_tl
 	$(INSTALL_DATA) ./files/bacnet_group.config $(1)/etc/config/bacnet_group
 endef
