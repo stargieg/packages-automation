@@ -71,6 +71,11 @@ uci:foreach("modbus", "station",
 	end)
 sva:value("icinga")
 
+local sva = s:taboption("main", Value, "min_value", "Min Present Value")
+sva:value("0")
+local sva = s:taboption("main", Value, "max_value", "Max Present Value")
+sva:value("100")
+
 local sva = s:taboption("io", Value, "addr", "Addr")
 local sva = s:taboption("io", Value, "resolution", "Auflösung")
 sva:value("doublefloat","2 Register zu Fliesspunkt")

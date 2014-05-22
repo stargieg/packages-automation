@@ -98,13 +98,8 @@ sva:value("15","Bit 15")
 local sva = s:taboption("main", Flag, "value", "Value")
 sva.rmempty = false
 
-local sva = s:taboption("adv", Flag, "alarm_value", "Alarm Value")
+local sva = s:taboption("main", Flag, "fb_value", "Feedback Value")
 sva.rmempty = false
-for i, v in ipairs(events) do
-	if v[1] ~= 0 then
-		sva:depends("event",v[1])
-	end
-end
 
 local sva = s:taboption("main", Value, "group",  "Gruppe")
 local uci = luci.model.uci.cursor()

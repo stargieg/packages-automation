@@ -64,8 +64,8 @@ sva:value("icinga")
 
 s:option(Value, "addr", "Addr")
 s:option(Value, "value", "Value")
+s:option(Value, "fb_value", "Feedback Value")
 s:option(DynamicList, "state", "Stats")
-s:option(DynamicList, "alarmstate", "Alarm Stats")
 
 sva = s:option(Value, "group",  "Gruppe")
 local uci = luci.model.uci.cursor()
