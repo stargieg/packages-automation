@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-bacnet
-PKG_RELEASE:=0.1.9
+PKG_RELEASE:=0.1.10
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
