@@ -12,7 +12,7 @@ define Package/luci-app-modbus
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Modbus Device
-  DEPENDS:=+modbus-uci +luci-lib-web 
+  DEPENDS:=+modbus-uci +luci-base
 endef
 
 define Package/luci-app-modbus/description

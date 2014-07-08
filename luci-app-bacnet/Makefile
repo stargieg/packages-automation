@@ -12,7 +12,7 @@ define Package/luci-app-bacnet
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Bacnet Device
-  DEPENDS:=+bacnet-stack-uci +luci-lib-web 
+  DEPENDS:=+bacnet-stack-uci +luci-base
 endef
 
 define Package/luci-app-bacnet/description

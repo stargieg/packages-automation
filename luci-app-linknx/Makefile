@@ -16,7 +16,7 @@ define Package/luci-app-linknx
   SUBMENU:=3. Applications
   TITLE:=Eib KNX deamon
   URL:=http://www.auto.tuwien.ac.at/~mkoegler/index.php/eibd
-  DEPENDS:=+linknx +luci-lib-web +luci-lib-json +linknx-statistics +ws-mirror-server +libubox +ubusd +luci-app-eibd +ssl-cert +uhttpd-mod-tls
+  DEPENDS:=+linknx +luci-base +linknx-statistics +ws-mirror-server +libubox +ubusd +luci-app-eibd +ssl-cert +uhttpd-mod-tls
 endef
 
 define Package/luci-app-linknx/description

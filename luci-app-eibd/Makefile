@@ -15,7 +15,7 @@ define Package/luci-app-eibd
   SUBMENU:=3. Applications
   TITLE:=Eib KNX deamon
   URL:=http://www.auto.tuwien.ac.at/~mkoegler/index.php/eibd
-  DEPENDS:=+eibd +luci-lib-web
+  DEPENDS:=+eibd +luci-base
 endef
 
 define Package/luci-app-eibd/description
