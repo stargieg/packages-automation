@@ -12,21 +12,17 @@ You may obtain a copy of the License at
 $Id$
 ]]--
 
-module("luci.controller.eibd", package.seeall)
+module("luci.controller.knxd", package.seeall)
 
 function index()
 --	require("luci.i18n")
---	luci.i18n.loadc("eibd")
-	if not nixio.fs.access("/etc/config/eibd") then
+--	luci.i18n.loadc("knxd")
+	if not nixio.fs.access("/etc/config/knxd") then
 		return
 	end
-	
-	local page = entry({"admin", "services", "eibd"}, cbi("eibd/eibd"), "EIBD", 10)
---	page.i18n = "eibd"
+
+	local page = entry({"admin", "services", "knxd"}, cbi("knxd/knxd"), "KNXD", 10)
+--	page.i18n = "knxd"
 	page.dependent = true
-	
-	
-	local page = entry({"mini", "network", "eibd"}, cbi("eibd/eibdmini", {autoapply=true}), "EIBD", 10)
---	page.i18n = "eibd"
-	page.dependent = true
+
 end

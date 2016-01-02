@@ -14,15 +14,13 @@ $Id$
 
 require("luci.tools.webadmin")
 
-m = Map("eibd", "EIB Server", "EIB/KNX Server for RS232 USB EIB/IP Routing EIB/IP Tunnelling")
+m = Map("knxd", "KNX Server", "KNX Server for RS232 USB EIB/IP Routing EIB/IP Tunnelling")
 
-s = m:section(TypedSection, "eibinterface", "EIB Interface")
+s = m:section(TypedSection, "eibinterface", "KNX Interface")
 s.addremove = true
 s.anonymous = true
 s:option(DummyValue, "dv1", "info", "Supported Hardware: http://sourceforge.net/apps/trac/bcusdk/wiki/SupportedHardware")
 s:option(DummyValue, "dv1", "info", "FAQ: http://sourceforge.net/apps/trac/bcusdk/wiki/FAQ")
-
-s:option(Flag, "disable", "Disable").optional = true
 
 s:option(DummyValue, "dv1", "supported URLs are:")
 s:option(DummyValue, "dv1", "ft12:/dev/ttySx", "FT1.2 Protocol to a BCU 2")
@@ -33,23 +31,24 @@ s:option(DummyValue, "dv1", "ip:[multicast_addr[:port]]", "connects with the EIB
 s:option(DummyValue, "dv1", "ipt:router_ip[:dest_port[:src_port[:nat_ip[:data_port]]]]]", "connects with the EIBnet/IP Tunneling protocol")
 s:option(DummyValue, "dv1", "iptn:router_ip[:dest_port[:src_port]]", "connects with the EIBnet/IP Tunneling protocol over an EIBnet/IP gateway using the NAT mode")
 s:option(DummyValue, "dv1", "bcu1s:/dev/ttySx", "connects using the PEI16 Protocoll over a BCU experimental")
-s:option(DummyValue, "dv1", "tpuarts:/dev/ttySx", "connects to the EIB bus over an TPUART experimental")
+s:option(DummyValue, "dv1", "tpuarts:/dev/ttySx", "connects to the KNX bus over an TPUART experimental")
 s:option(DummyValue, "dv1", "usb:[bus[:device[:config[:interface]]]]", "default is autodetect with findknxusb tool connects over a KNX USB interface autodetect with findknxusb tool")
 
 svc = s:option(Value, "url", "URL")
-svc:value("usb")
-svc:value("ip")
+svc:value("usb:")
+svc:value("ip:")
 svc:value("tpuarts:/dev/ttyACM0")
 
 s:option(Flag, "Discovery", "Discover for ETS").optional = true
 s:option(Flag, "Server", "Server for ETS").optional = true
 s:option(Flag, "Tunnelling", "Tunnelling for ETS").optional = true
-s:option(Value, "listentcp", "Listen tcp port").optional = true
-s:option(Value, "listenlocal", "Socket File").optional = true
+s:option(Flag, "Routing", "EIBnet/IP Routing in the EIBnet/IP server").optional = true
+s:option(Flag, "GroupCache", "caching of group communication networkstate").optional = true
+s:option(Value, "listen_tcp", "Listen tcp port").optional = true
+s:option(Value, "listen_local", "Socket File").optional = true
 s:option(Value, "eibaddr", "EIB HW Addr").optional = true
 s:option(Value, "daemon", "Logfile").optional = true
 s:option(Value, "trace", "set trace level").optional = true
 s:option(Value, "error", "set error level").optional = true
-s:option(Value, "pidfile", "PID File").optional = true
 
 return m
