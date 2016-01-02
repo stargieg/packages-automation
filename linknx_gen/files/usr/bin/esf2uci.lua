@@ -68,7 +68,7 @@ function find_type (pvar)
 	local ret3 = nil
 	local ret4 = nil
 	local prio = 0
-	uci:foreach("linknx", "typeexpr", function(s)
+	uci:foreach("linknx_expr", "typeexpr", function(s)
 		typeexpr = string.gsub(s.typeexpr,"%*","")
 		if string.find(pvar,'_stat_pos') then
 			ret1 = nil
@@ -96,7 +96,7 @@ end
 
 
 local esf_file
-uci:foreach("linknx", "daemon", function(s)
+uci:foreach("linknx_exp", "daemon", function(s)
 	if s.esf then
 		if nixio.fs.access(s.esf) then
 			esf_file = s.esf

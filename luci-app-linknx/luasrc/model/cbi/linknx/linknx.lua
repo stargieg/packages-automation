@@ -14,7 +14,7 @@ $Id$
 
 
 require("luci.tools.webadmin")
-m = Map("linknx", "EIB AppServer", "EIB/KNX AppServer for logic timeshedule and IO API")
+m = Map("linknx_exp", "EIB AppServer", "EIB/KNX AppServer for logic timeshedule and IO API")
 
 s = m:section(TypedSection, "daemon", "Daemon")
 s.addremove = true

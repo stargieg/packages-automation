@@ -49,7 +49,7 @@ function sval.value(self, section)
 end
 
 sva = s:option(ListValue, "tagname",  "Zugrifsname")
-uci:foreach("linknx", "daemon",
+uci:foreach("linknx_exp", "daemon",
 	function (section)
 			sva:value(section.tagname)
 	end)

@@ -14,7 +14,7 @@ $Id$
 module("luci.controller.linknx", package.seeall)
 
 function index()
-	if not nixio.fs.access("/etc/config/linknx") then
+	if not nixio.fs.access("/etc/config/linknx_exp") then
 		return
 	end
 	local page = entry({"admin", "services", "linknx"}, cbi("linknx/linknx"), "LINKNX", 10)

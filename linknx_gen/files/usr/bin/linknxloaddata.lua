@@ -42,7 +42,7 @@ end
 function find_type(pvar)
 	local ret1 = nil
 	local ret2 = nil
-	uci:foreach("linknx", "typeexpr", function(s)
+	uci:foreach("linknx_exp", "typeexpr", function(s)
 		typeexpr = string.gsub(s.typeexpr,"%*","")
 		if string.find(pvar,typeexpr) then
 			ret1 = s.type
@@ -187,18 +187,18 @@ end
 
 logger_info("start")
 
-uci:foreach("linknx", "daemon", function(y)
+uci:foreach("linknx_exp", "daemon", function(y)
 	load_group(y.tagname)
 end)
 
 
---uci:foreach("linknx", "rule", function(y)
+--uci:foreach("linknx_exp", "rule", function(y)
 --	print(y.id)
 --	if y.id then
 --		writerule(y.id,y.varname,y.value)
 --	end
 --end)
---uci:foreach("linknx", "mail", function(y)
+--uci:foreach("linknx_exp", "mail", function(y)
 --	print(y.id)
 --	if y.id then
 --		writemail(y.id,y.varname,y.value)

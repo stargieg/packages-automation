@@ -15,7 +15,7 @@ $Id$
 require("luci.sys")
 require("luci.util")
 require("luci.tools.webadmin")
-m = Map("linknx", "EIB Regeln", "EIB/KNX Regeln")
+m = Map("linknx_exp", "EIB Regeln", "EIB/KNX Regeln")
 
 s = m:section(TypedSection, "rule", "Type")
 s.addremove = true

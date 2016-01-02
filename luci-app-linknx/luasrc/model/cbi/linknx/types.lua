@@ -15,7 +15,7 @@ $Id$
 require("luci.sys")
 require("luci.util")
 require("luci.tools.webadmin")
-m = Map("linknx", "EIB Typen", "EIB/KNX Typen")
+m = Map("linknx_exp", "EIB Typen", "EIB/KNX Typen")
 
 s = m:section(TypedSection, "typeexpr", "Type")
 s.addremove = true

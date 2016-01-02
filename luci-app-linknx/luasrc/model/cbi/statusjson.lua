@@ -246,7 +246,7 @@ else
 	local socket_tagnames = {}
 	local socket_tagnames_i = 1
 	local has_hist = 0
-	uci:foreach("linknx", "socket", function(s)
+	uci:foreach("linknx_exp", "socket", function(s)
 		if s.cmd then
 			socket_tagnames[socket_tagnames_i] = s.tagname
 			socket_tagnames_i = socket_tagnames_i+1
@@ -261,7 +261,7 @@ else
 	
 	local linknx_tagnames = {}
 	local linknx_tagnames_i = 1
-	uci:foreach("linknx", "daemon", function(s)
+	uci:foreach("linknx_exp", "daemon", function(s)
 		if s.esf then
 			if nixio.fs.access(s.esf) then
 				linknx_tagnames[linknx_tagnames_i] = s.tagname

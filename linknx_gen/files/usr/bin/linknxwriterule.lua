@@ -18,14 +18,14 @@ end
 
 
 
-x:foreach("linknx", "rule", function(y)
+x:foreach("linknx_exp", "rule", function(y)
 	print(y.id)
 	if y.id then
 		writerule(y.id,y.varname,y.value)
 	end
 end)
 
-x:foreach("linknx", "mail", function(y)
+x:foreach("linknx_exp", "mail", function(y)
 	print(y.id)
 	if y.id then
 		writemail(y.id,y.varname,y.value)

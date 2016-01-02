@@ -16,7 +16,7 @@ define Package/luci-app-linknx
   SUBMENU:=3. Applications
   TITLE:=Eib KNX deamon
   URL:=http://www.auto.tuwien.ac.at/~mkoegler/index.php/eibd
-  DEPENDS:=+linknx +luci-base +linknx-statistics +ws-mirror-server +libubox +ubusd +luci-app-eibd +ssl-cert +uhttpd-mod-tls
+  DEPENDS:=+linknx_gen +luci-base +linknx-statistics +ws-mirror-server +luci-app-knxd
 endef
 
 define Package/luci-app-linknx/description
@@ -32,7 +32,7 @@ endef
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
 	$(MAKE) -C $(PKG_BUILD_DIR)/src  CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)"
-	$(MAKE) -C ./senchasdk/linknx INSTALL_DIR="$(PKG_BUILD_DIR)"
+	#$(MAKE) -C ./senchasdk/linknx INSTALL_DIR="$(PKG_BUILD_DIR)"
 endef
 
 define Package/luci-app-linknx/postinst
@@ -40,8 +40,6 @@ define Package/luci-app-linknx/postinst
 [ -n "${IPKG_INSTROOT}" ] || {
 	( . /etc/uci-defaults/luci-app-linknx ) &&	rm -f /etc/uci-defaults/luci-app-linknx
 	rm -f /tmp/luci-indexcache
-	/etc/init.d/ubus enable
-	[ -n "$(pidof ubusd)" ] || /etc/init.d/ubus start
 	/etc/init.d/ws-mirror-server-linknx enable
 	/etc/init.d/ws-mirror-server-linknx start
 	/etc/init.d/ubus-linknx enable
@@ -80,7 +78,7 @@ define Package/luci-app-linknx/install
 	$(INSTALL_BIN) ./files/usr/bin/ubus-linknx.lua $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/www/luci-static/linknx
 	$(CP) ./files/www/linknx.html $(1)/www
-	$(CP) $(PKG_BUILD_DIR)/production/* $(1)/www/luci-static/linknx
+#	$(CP) $(PKG_BUILD_DIR)/production/* $(1)/www/luci-static/linknx
 #	$(CP) $(PKG_BUILD_DIR)/testing/* $(1)/www/luci-static/linknx
 endef
 
