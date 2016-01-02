@@ -22,17 +22,6 @@ define Package/linknx-statistics/conffiles
 	/etc/config/linknx_luci_statistics
 endef
 
-#define Build/Prepare
-#	mkdir -p $(PKG_BUILD_DIR)
-#	$(CP) ./src/* $(PKG_BUILD_DIR)/
-#endef
-
-#define Build/Compile
-#	$(MAKE) -C $(PKG_BUILD_DIR) \
-#	CC=$(TARGET_CC) \
-#	CXX=$(TARGET_CROSS)g++ \
-#	LDFLAGS="-Wl,-rpath-link=$(STAGING_DIR)/usr/lib"
-#endef
 define Build/Configure
 endef
 
