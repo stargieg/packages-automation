@@ -1,6 +1,0 @@
-
-config 'eibinterface'
-	option 'listentcp' '6720'
-	option 'ignore' '0'
-	option 'url' 'ip'
-
