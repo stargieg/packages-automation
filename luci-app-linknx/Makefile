@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx
 PKG_VERSION:=0.1
-PKG_RELEASE:=21
+PKG_RELEASE:=22
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
@@ -16,7 +16,7 @@ define Package/luci-app-linknx
   SUBMENU:=3. Applications
   TITLE:=Eib KNX deamon
   URL:=http://www.auto.tuwien.ac.at/~mkoegler/index.php/eibd
-  DEPENDS:=+linknx_gen +luci-base +linknx-statistics +ws-mirror-server +luci-app-knxd
+  DEPENDS:=+linknx_gen +luci-base +linknx-statistics +luci-app-knxd
 endef
 
 define Package/luci-app-linknx/description
