@@ -31,7 +31,7 @@ endef
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
-	$(MAKE) -C $(PKG_BUILD_DIR)/src  CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)"
+	#$(MAKE) -C $(PKG_BUILD_DIR)/src  CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)"
 	#$(MAKE) -C ./senchasdk/linknx INSTALL_DIR="$(PKG_BUILD_DIR)"
 endef
 
@@ -71,8 +71,8 @@ define Package/luci-app-linknx/install
 	$(INSTALL_BIN) ./files/etc/init.d/ws-mirror-server-linknx $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ubus-linknx $(1)/etc/init.d
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ubus-linknx $(1)/usr/sbin
+	#$(INSTALL_DIR) $(1)/usr/sbin
+	#$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ubus-linknx $(1)/usr/sbin
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknx-uci-event.sh $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/ubus-linknx.lua $(1)/usr/bin
