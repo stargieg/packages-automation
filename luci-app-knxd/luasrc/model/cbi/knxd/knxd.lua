@@ -52,22 +52,70 @@ function svc.validate(self, value, section)
 			uci:save("network")
 			return nil, "Save and Apply the Multicast Route "...mcast.." in the Networkconfig"
 		end
-	else
+	elseif string.find(value, 'ipt:') then
+		--todo check ip and port
+		return value
+	elseif string.find(value, 'iptn:') then
+		--todo check ip and port
+		return value
+	elseif string.find(value, 'tpuarts:') then
+		--todo check dev file
+		return value
+	elseif string.find(value, 'usb:') then
+		--todo check proc bus usb
 		return value
 	end
+	return nil, "unknow KNX url: "..value
 end
-
 
 s:option(Flag, "Discovery", "Discover for ETS").optional = true
 s:option(Flag, "Server", "Server for ETS").optional = true
 s:option(Flag, "Tunnelling", "Tunnelling for ETS").optional = true
 s:option(Flag, "Routing", "EIBnet/IP Routing in the EIBnet/IP server").optional = true
 s:option(Flag, "GroupCache", "caching of group communication networkstate").optional = true
-s:option(Value, "listen_tcp", "Listen tcp port").optional = true
-s:option(Value, "listen_local", "Socket File").optional = true
-s:option(Value, "eibaddr", "EIB HW Addr").optional = true
-s:option(Value, "daemon", "Logfile").optional = true
-s:option(Value, "trace", "set trace level").optional = true
-s:option(Value, "error", "set error level").optional = true
+
+svc = s:option(Value, "listen_tcp", "Listen tcp port")
+svc.optional = true
+svc.datatype = "portrange"
+
+svc = s:option(Value, "listen_local", "Socket File")
+svc.optional = true
+svc.datatype = "string"
+
+svc = s:option(Value, "eibaddr", "EIB HW Addr")
+svc.optional = true
+function svc.validate(self, value, section)
+	local err
+	Area,Line,Device = string.match(value, "(%d+).(%d+).(%d+)")
+	if not Device tonumber(Device) > 255 or tonumber(Device) < 0 then
+		err = "Wrong eib addr Device is out of range [1-255] , "
+	end
+	if not Line or tonumber(Line) > 15 or tonumber(Line) < 0 then
+		if not err then err = "" end
+		err = "Wrong eib addr Line is out of range [0-15] , "..err
+	end
+	if not Area or tonumber(Area) > 15 or tonumber(Area) < 0 then
+		if not err then err = "" end
+		err = "Wrong eib addr Area is out of range [0-15] , "..err
+	end
+	if err then
+		err = "Use the form [0-15].[0-15].[1-255] , "..err
+		return nil, err
+	else
+		return value
+	end
+end
+
+svc = s:option(Value, "daemon", "Logfile")
+svc.optional = true
+svc.datatype = "string"
+
+svc = s:option(Value, "trace", "set trace level")
+svc.optional = true
+svc.datatype = "portrange"
+
+svc = s:option(Value, "error", "set error level")
+svc.optional = true
+svc.datatype = "portrange"
 
 return m
