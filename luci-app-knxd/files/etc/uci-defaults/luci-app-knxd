@@ -1,0 +1,9 @@
+#!/bin/sh
+
+[ -f "${IPKG_INSTROOT}/etc/config/ucitrack" ] && \
+[ "$(uci get ucitrack.@knxd[0].init 2>/dev/null)" != "knxd" ] && \
+uci batch <<-EOF >/dev/null 2>/dev/null
+	add ucitrack knxd
+	set ucitrack.@knxd[-1].init='knxd'
+	commit ucitrack
+EOF
