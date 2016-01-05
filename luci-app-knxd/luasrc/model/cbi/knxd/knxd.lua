@@ -50,7 +50,7 @@ function svc.validate(self, value, section)
 				target=mcast
 			})
 			uci:save("network")
-			return nil, "Save and Apply the Multicast Route "...mcast.." in the Networkconfig"
+			return nil, "Save and Apply the Multicast Route "..mcast.." in the Networkconfig"
 		end
 	elseif string.find(value, 'ipt:') then
 		--todo check ip and port
