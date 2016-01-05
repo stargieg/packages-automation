@@ -87,7 +87,7 @@ svc.optional = true
 function svc.validate(self, value, section)
 	local err
 	Area,Line,Device = string.match(value, "(%d+).(%d+).(%d+)")
-	if not Device tonumber(Device) > 255 or tonumber(Device) < 0 then
+	if not Device or tonumber(Device) > 255 or tonumber(Device) < 0 then
 		err = "Wrong eib addr Device is out of range [1-255] , "
 	end
 	if not Line or tonumber(Line) > 15 or tonumber(Line) < 0 then
