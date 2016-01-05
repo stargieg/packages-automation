@@ -15,24 +15,36 @@ $Id$
 require("luci.sys")
 require("luci.util")
 require("luci.tools.webadmin")
-require("luci.fs")
 local arg1 = arg[1]
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
 if not arg1 then
-	return
+	m = Map("linknx_group", "Gruppen", "Gruppen")
+	s = m:section(TypedSection, "group", "Group")
+	s.addremove = false
+	s.anonymous = false
+	s.extedit   = luci.dispatcher.build_url("admin", "services", "linknxvarlist") .. "/%s"
+	s.template = "cbi/tblsection"
+	s.sortable = true
+	sval = s:option(DummyValue, "name")
+	function sval.value(self, section)
+		value = self.map:get(section)
+		return uci:get('linknx_group',value[".name"],'name')
+	end	
+	sval = s:option(DummyValue, "comment")
+	function sval.value(self, section)
+		value = self.map:get(section)
+		return uci:get('linknx_group',value[".name"],'comment')
+	end	
+	return m
 end
-if not luci.fs.access("/etc/config/linknx_varlist_"..arg1) then
+if not nixio.fs.access("/etc/config/linknx_varlist_"..arg1) then
 	if not luci.sys.exec("touch /etc/config/linknx_varlist_"..arg1) then
 		return
 	end
 end
 
-if arg1 then
-	m = Map("linknx_varlist_"..arg1, "Variablen", "Variablen")
---else
---	m = Map("linknx_varlist", "Variablen", "Variablen")
-end
+m = Map("linknx_varlist_"..arg1, "Variablen", "Variablen")
 
 s = m:section(TypedSection, "pvar", arg1 or 'Variablen')
 s.addremove = true
@@ -76,4 +88,3 @@ svc:value("nichts")
 s:option(Value, "url", "Web Addresse")
 
 return m
-
