@@ -23,9 +23,9 @@ svc = s:option(Value, "conf", "read configuration from xml file")
 svc.optional = true
 svc.datatype = "file"
 
-s:option(DummyValue, "op1", "-d, --daemon[=FILE]", "start the program as daemon, the output will be written to FILE, if the argument present")
-s:option(DummyValue, "op2", "-p, --pid-file=FILE", "write the PID of the process to FILE")
-s:option(DummyValue, "op3", "-w, --write[=FILE]", "write configuration to file (if no FILE specified, the config file is overwritten)")
+s:option(DummyValue, "op1", "-d, --daemon[=FILE] start the program as daemon, the output will be written to FILE, if the argument present")
+s:option(DummyValue, "op2", "-p, --pid-file=FILE write the PID of the process to FILE")
+s:option(DummyValue, "op3", "-w, --write[=FILE] write configuration to file (if no FILE specified, the config file is overwritten)")
 
 svc = s:option(Value, "options", "Options")
 svc.optional = true
