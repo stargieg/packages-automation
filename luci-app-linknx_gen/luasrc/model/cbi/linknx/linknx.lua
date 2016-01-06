@@ -22,12 +22,6 @@ s.anonymous = true
 
 s:option(Flag, "disable", "Disable")
 s:option(Value, "tagname", "Linknx Name e.g. ISP1-LINKNX")
-
-svc = s:option(ListValue, "port", "TCP Port")
-svc.rmempty = true
-svc:value("")
-svc:value("8888")
-
-s:option(FileUpload, "esf",	"/etc/linknx/linknximport.esf" )
+s:option(FileUpload, "esf", "/etc/linknx/linknximport.esf")
 
 return m

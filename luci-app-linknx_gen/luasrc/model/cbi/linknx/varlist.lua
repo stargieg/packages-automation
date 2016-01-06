@@ -23,7 +23,7 @@ if not arg1 then
 	s = m:section(TypedSection, "group", "Group")
 	s.addremove = false
 	s.anonymous = false
-	s.extedit   = luci.dispatcher.build_url("admin", "services", "linknxvarlist") .. "/%s"
+	s.extedit   = luci.dispatcher.build_url("admin", "services", "linknx_varlist") .. "/%s"
 	s.template = "cbi/tblsection"
 	s.sortable = true
 	sval = s:option(DummyValue, "name")
@@ -60,7 +60,7 @@ function sval.value(self, section)
 	return uci_state:get('linknx_varlist',value[".name"],'value')
 end
 
-sva = s:option(ListValue, "tagname",  "Zugrifsname")
+sva = s:option(ListValue, "tagname", "Zugrifsname")
 uci:foreach("linknx_exp", "daemon",
 	function (section)
 			sva:value(section.tagname)

@@ -21,7 +21,7 @@ m = Map("linknx_group", "Gruppen", "Gruppen")
 s = m:section(TypedSection, "group", "Group")
 s.addremove = true
 s.anonymous = false
-s.extedit   = luci.dispatcher.build_url("admin", "services", "linknxvarlist") .. "/%s"
+s.extedit   = luci.dispatcher.build_url("admin", "services", "linknx_varlist") .. "/%s"
 s.template = "cbi/tblsection"
 s.sortable = true
 

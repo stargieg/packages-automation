@@ -17,13 +17,18 @@ function index()
 	if not nixio.fs.access("/etc/config/linknx_exp") then
 		return
 	end
-	local page = entry({"admin", "services", "linknx"}, cbi("linknx/linknx"), "LINKNX", 10)
+	local page = entry({"admin", "services", "linknx_load"}, cbi("linknx/linknx"), "linknx import", 12)
 	page.dependent = true
-	local page = entry({"admin", "services", "linknx_medialist"}, cbi("linknx/medialist", {autoapply=false}), "Media Listen", 10)
+	local page = entry({"admin", "services", "linknx_groups"}, cbi("linknx/groups", {autoapply=false}), "Groups", 13)
 	page.dependent = true
-	local page = entry({"admin", "services", "linknxtypes"}, cbi("linknx/types", {autoapply=false}), "LINKNXTypes", 11)
+	local page = entry({"admin", "services", "linknx_varlist"}, cbi("linknx/varlist", {autoapply=false}), "Variablenliste", 14)
+	page.leaf = true
+	page.subindex = true
+	local page = entry({"admin", "services", "linknx_types"}, cbi("linknx/types", {autoapply=false}), "linknx Types", 15)
 	page.dependent = true
-	local page = entry({"admin", "services", "linknxrules"}, cbi("linknx/rules", {autoapply=false}), "LINKNXRules", 14)
+	local page = entry({"admin", "services", "linknx_rules"}, cbi("linknx/rules", {autoapply=false}), "linknx Rules", 16)
+	page.dependent = true
+	local page = entry({"admin", "services", "linknx_medialist"}, cbi("linknx/medialist", {autoapply=false}), "Media Listen", 17)
 	page.dependent = true
 
 	local page  = node()
@@ -70,13 +75,6 @@ function index()
 		assign({"linknx", "graph"}, {"admin", "linknx_statistics", "graph"}, "Statistiken", 40)
 		assign({"linknx", "graph_render"}, {"admin", "linknx_statistics_render", "graph"}, "Statistiken Rendern", 40)
 	end
-
-	assign({"mini", "linknx"}, {"admin", "linknx"}, "linknx", 15)
-
-	entry({"admin", "services", "linknxgroups"}, cbi("linknx/groups", {autoapply=false}), "Groups", 12)
-	local page = entry({"admin", "services", "linknxvarlist"}, cbi("linknx/varlist", {autoapply=false}), "Variablenliste", 13)
-	page.leaf = true
-	page.subindex = true
 
 end
 
