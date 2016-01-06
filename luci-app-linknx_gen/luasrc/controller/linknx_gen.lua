@@ -11,25 +11,31 @@ You may obtain a copy of the License at
 
 $Id$
 ]]--
-module("luci.controller.linknx", package.seeall)
+module("luci.controller.linknx_gen", package.seeall)
 
 function index()
 	if not nixio.fs.access("/etc/config/linknx_exp") then
 		return
 	end
-	local page = entry({"admin", "services", "linknx_load"}, cbi("linknx/linknx"), "linknx import", 12)
+	local page = entry({"admin", "services", "linknx_load"}, cbi("linknx/linknx"), "linknx import")
 	page.dependent = true
-	local page = entry({"admin", "services", "linknx_groups"}, cbi("linknx/groups", {autoapply=false}), "Groups", 13)
+	page.order = 12
+	local page = entry({"admin", "services", "linknx_groups"}, cbi("linknx/groups", {autoapply=false}), "Groups")
 	page.dependent = true
-	local page = entry({"admin", "services", "linknx_varlist"}, cbi("linknx/varlist", {autoapply=false}), "Variablenliste", 14)
+	page.order = 13
+	local page = entry({"admin", "services", "linknx_varlist"}, cbi("linknx/varlist", {autoapply=false}), "Variablenliste")
 	page.leaf = true
 	page.subindex = true
-	local page = entry({"admin", "services", "linknx_types"}, cbi("linknx/types", {autoapply=false}), "linknx Types", 15)
+	page.order = 14
+	local page = entry({"admin", "services", "linknx_types"}, cbi("linknx/types", {autoapply=false}), "linknx Types")
 	page.dependent = true
-	local page = entry({"admin", "services", "linknx_rules"}, cbi("linknx/rules", {autoapply=false}), "linknx Rules", 16)
+	page.order = 15
+	local page = entry({"admin", "services", "linknx_rules"}, cbi("linknx/rules", {autoapply=false}), "linknx Rules")
 	page.dependent = true
-	local page = entry({"admin", "services", "linknx_medialist"}, cbi("linknx/medialist", {autoapply=false}), "Media Listen", 17)
+	page.order = 16
+	local page = entry({"admin", "services", "linknx_medialist"}, cbi("linknx/medialist", {autoapply=false}), "Media Listen")
 	page.dependent = true
+	page.order = 17
 
 	local page  = node()
 	page.lock   = true
@@ -52,7 +58,8 @@ function index()
 	page.order  = 10
 	page.indexignore = true
 
-	entry({"linknx", "status"}, alias("linknx", "status", "status"), "Status", 20)
+	local page = entry({"linknx", "status"}, alias("linknx", "status", "status"), "Status")
+	page.order = 20
 
 	local page  = node("linknx", "status", "status")
 	page.target = form("linknx/public_status")
@@ -63,19 +70,21 @@ function index()
 	page.setgroup = false
 
 	entry({"linknx", "status.json"}, call("jsonstatus"))
-	local page = entry({"linknx", "statusjson"}, cbi("statusjson"), "linknx json download",25)
+	local page = entry({"linknx", "statusjson"}, cbi("statusjson"), "linknx json download")
 	page.leaf = true
 	page.subindex = true
+	page.order = 25
 	entry({"linknx", "write.json"}, call("jsonswrite"))
-	local page = entry({"linknx", "writejson"}, cbi("writejson"), "linknx json write",25)
+	local page = entry({"linknx", "writejson"}, cbi("writejson"), "linknx json write")
 	page.leaf = true
 	page.subindex = true
+	page.order = 25
 
 	if nixio.fs.access("/usr/lib/lua/luci/controller/luci_statistics/linknx_statistics.lua") then
-		assign({"linknx", "graph"}, {"admin", "linknx_statistics", "graph"}, "Statistiken", 40)
-		assign({"linknx", "graph_render"}, {"admin", "linknx_statistics_render", "graph"}, "Statistiken Rendern", 40)
+		local page = assign({"linknx", "graph"}, {"admin", "linknx_statistics", "graph"}, "Statistiken")
+		page.order = 40
+		local page = assign({"linknx", "graph_render"}, {"admin", "linknx_statistics_render", "graph"}, "Statistiken Rendern")
+		page.order = 41
 	end
 
 end
-
-

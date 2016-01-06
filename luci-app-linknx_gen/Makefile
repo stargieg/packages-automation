@@ -16,7 +16,7 @@ define Package/luci-app-linknx_gen
   SUBMENU:=3. Applications
   TITLE:=linknx config generator
   URL:=https://sourceforge.net/p/linknx/wiki/Main_Page/
-  DEPENDS:=+linknx_gen +luci-mod-admin-full +linknx-statistics
+  DEPENDS:=+linknx_gen +luci-mod-admin-full +luci-lib-json +linknx-statistics
 endef
 
 define Package/luci-app-linknx_gen/description
