@@ -2,7 +2,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=luci-app-linknx
+PKG_NAME:=luci-app-linknx_gen
 PKG_VERSION:=0.1
 PKG_RELEASE:=22
 
@@ -10,16 +10,16 @@ PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/luci-app-linknx
+define Package/luci-app-linknx_gen
   SECTION:=luci
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
-  TITLE:=Eib KNX deamon
-  URL:=http://www.auto.tuwien.ac.at/~mkoegler/index.php/eibd
-  DEPENDS:=+linknx_gen +luci-base +linknx-statistics +luci-app-knxd
+  TITLE:=linknx config generator
+  URL:=https://sourceforge.net/p/linknx/wiki/Main_Page/
+  DEPENDS:=+linknx_gen +luci-mod-admin-full +linknx-statistics
 endef
 
-define Package/luci-app-linknx/description
+define Package/luci-app-linknx_gen/description
   http://sourceforge.net/apps/mediawiki/linknx
 endef
 
@@ -35,10 +35,10 @@ define Build/Compile
 	#$(MAKE) -C ./senchasdk/linknx INSTALL_DIR="$(PKG_BUILD_DIR)"
 endef
 
-define Package/luci-app-linknx/postinst
+define Package/luci-app-linknx_gen/postinst
 #!/bin/sh
 [ -n "${IPKG_INSTROOT}" ] || {
-	( . /etc/uci-defaults/luci-app-linknx ) &&	rm -f /etc/uci-defaults/luci-app-linknx
+	( . /etc/uci-defaults/luci-app-linknx_gen ) &&	rm -f /etc/uci-defaults/luci-app-linknx_gen
 	rm -f /tmp/luci-indexcache
 	/etc/init.d/ws-mirror-server-linknx enable
 	/etc/init.d/ws-mirror-server-linknx start
@@ -49,10 +49,10 @@ define Package/luci-app-linknx/postinst
 
 endef
 
-define Package/luci-app-linknx/install
+define Package/luci-app-linknx_gen/install
 	$(CP) -a ./ipkg/* $(1)/CONTROL/ 2>/dev/null || true
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(CP) $(PKG_BUILD_DIR)/luasrc/controller/linknx.lua $(1)/usr/lib/lua/luci/controller
+	$(CP) $(PKG_BUILD_DIR)/luasrc/controller/linknx_gen.lua $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/linknx
 	$(CP) $(PKG_BUILD_DIR)/luasrc/model/cbi/statusjson.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(CP) $(PKG_BUILD_DIR)/luasrc/model/cbi/writejson.lua $(1)/usr/lib/lua/luci/model/cbi
@@ -66,7 +66,7 @@ define Package/luci-app-linknx/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/linknx
 	$(CP) $(PKG_BUILD_DIR)/luasrc/view/linknx/index.htm $(1)/usr/lib/lua/luci/view/linknx
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(CP) ./files/etc/uci-defaults/luci-app-linknx $(1)/etc/uci-defaults
+	$(CP) ./files/etc/uci-defaults/luci-app-linknx_gen $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ws-mirror-server-linknx $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -82,4 +82,4 @@ define Package/luci-app-linknx/install
 #	$(CP) $(PKG_BUILD_DIR)/testing/* $(1)/www/luci-static/linknx
 endef
 
-$(eval $(call BuildPackage,luci-app-linknx))
+$(eval $(call BuildPackage,luci-app-linknx_gen))
