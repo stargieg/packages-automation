@@ -21,7 +21,7 @@ function index()
 		return
 	end
 
-	local page = entry({"admin", "services", "knxd"}, cbi("knxd/knxd"), "KNXD", 10)
+	local page = entry({"admin", "services", "knxd"}, cbi("knxd"), "knxd", 10)
 --	page.i18n = "knxd"
 	page.dependent = true
 
