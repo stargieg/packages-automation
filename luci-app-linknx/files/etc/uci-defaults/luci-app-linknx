@@ -1,0 +1,9 @@
+#!/bin/sh
+
+[ -f "${IPKG_INSTROOT}/etc/config/ucitrack" ] && \
+[ "$(uci get ucitrack.@linknx[0].init 2>/dev/null)" != "linknx" ] && \
+uci batch <<-EOF >/dev/null 2>/dev/null
+	add ucitrack linknx
+	set ucitrack.@linknx[-1].init='linknx'
+	commit ucitrack
+EOF
