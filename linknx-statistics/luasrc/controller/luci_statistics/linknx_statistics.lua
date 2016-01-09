@@ -22,14 +22,6 @@ function index()
 	require("luci.statistics.datatree")
 	require("luci.model.uci")
 
-	-- override entry(): check for existance <plugin>.so where <plugin> is derived from the called path
-	function _entry( path, ... )
-		local file = path[6] or path[5]
-		if nixio.fs.access( "/usr/lib/collectd/" .. file .. ".so" ) then
-			entry( path, ... )
-		end
-	end
-
 	local labels = {
 		ezr		= _("EZR"),
 		rlt		= _("RLT"),
@@ -42,16 +34,18 @@ function index()
 	local span = vars.timespan or nil
 	local vhost = vars.host or nil
 
-	local st = entry({ "admin", "linknx_statistics" }, template("admin_statistics/index"), "Linknx Statistics", 10)
-	st.index = true
+	--FIXME remove "graph" dep luci.dispatcher.context.path[i]
+	--local page = assign({"admin", "linknx_statistics"}, {"admin", "linknx_statistics", "graph"}, "Statistiken")
+	--                           Workaround
+	local page = assign({"admin", "graph"}, {"admin", "linknx_statistics", "graph"}, "Statistiken")
+	page.order  = 85
 
-	local page = entry({ "admin", "linknx_statistics", "graph" }, template("admin_statistics/index"), "Linknx Statistics", 20)
+	local page = entry({ "admin", "linknx_statistics", "graph" }, template("admin_statistics/index"), "Linknx Statistics")
 	page.index = true
 	page.setuser  = "nobody"
 	page.setgroup = "nogroup"
 
-	local page = entry({ "admin", "linknx_statistics_render", "graph" }, call("statistics_index_render"), "Graphs Json", 21)
-	page.i18n = "statistics"
+	local page = entry({ "admin", "linknx_statistics_render", "graph" }, call("statistics_index_render"), "Linknx Statistics json")
 	page.index = true
 	page.setuser  = "nobody"
 	page.setgroup = "nogroup"
@@ -59,33 +53,45 @@ function index()
 	local hosts = luci.statistics.datatree.Instance(nil):host_instances()
 	local j, host
 	for j, host in ipairs( hosts ) do
-		local tree = luci.statistics.datatree.Instance(host)
-		local st = entry({ "admin", "linknx_statistics", "graph", host }, template("admin_statistics/index"), host, 100+j)
-		st.i18n = "statistics"
-		st.index = true
-		st.query = { timespan = span , host = host }
+
+		local page = entry({ "admin", "linknx_statistics", "graph", host }, template("admin_statistics/index"), host )
+		page.i18n = "statistics"
+		page.index = true
+		page.order = j
+		if span then
+			page.query = { timespan = span }
+		end
+
 		local tree = luci.statistics.datatree.Instance(host)
 		local _, plugin, i
 		for _, plugin, i in luci.util.vspairs( tree:plugins() ) do
-	
+
 			-- get plugin instances
 			local instances = tree:plugin_instances( plugin )
-	
+
 			-- plugin menu entry
-			entry(
+			local page = entry(
 				{ "admin", "linknx_statistics", "graph", host, plugin },
-				call("statistics_render"), labels[plugin], i
-			).query = { timespan = span , host = host }
-	
+				call("statistics_render"), labels[plugin]
+			)
+			page.order = i
+			if span then
+				page.query = { timespan = span }
+			end
+
 			-- if more then one instance is found then generate submenu
 			if #instances > 1 then
 				local _, inst, k
 				for _, inst, k in luci.util.vspairs(instances) do
 					-- instance menu entry
-					entry(
+					local page = entry(
 						{ "admin", "linknx_statistics", "graph", host, plugin, inst },
-						call("statistics_render"), inst, k
-					).query = { timespan = span , host = host }
+						call("statistics_render"), inst
+					)
+					page.order = k
+					if span then
+						page.query = { timespan = span }
+					end
 				end
 			end
 		end
