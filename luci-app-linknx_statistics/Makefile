@@ -2,7 +2,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=linknx-statistics
+PKG_NAME:=luci-app-linknx_statistics
 PKG_VERSION:=0.2.0
 PKG_RELEASE:=1
 
@@ -10,7 +10,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/linknx-statistics
+define Package/luci-app-linknx_statistics
   SECTION:=luci
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
@@ -30,7 +30,7 @@ define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
 endef
 
-define Package/linknx-statistics/postinst
+define Package/luci-app-linknx_statistics/postinst
 #!/bin/sh
 [ -n "${IPKG_INSTROOT}" ] || {
 	rm -f /tmp/luci-indexcache
@@ -39,7 +39,7 @@ define Package/linknx-statistics/postinst
 
 endef
 
-define Package/linknx-statistics/install
+define Package/luci-app-linknx_statistics/install
 	$(INSTALL_DIR) $(1)/etc/collectd/conf.d
 	$(INSTALL_DATA) ./files/etc/collectd/conf.d/linknx.conf $(1)/etc/collectd/conf.d
 	$(INSTALL_DIR) $(1)/usr/share/collectd
@@ -58,4 +58,4 @@ define Package/linknx-statistics/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/luasrc/view/public_statistics/graph_linknx.htm $(1)/usr/lib/lua/luci/view/public_statistics/
 endef
 
-$(eval $(call BuildPackage,linknx-statistics))
+$(eval $(call BuildPackage,luci-app-linknx_statistics))
