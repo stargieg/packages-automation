@@ -24,19 +24,8 @@ uci -q batch <<-EOF >/dev/null
 	commit luci_statistics
 EOF
 
-
-
-
-# symlink for busybox httpd
-[ -x /usr/sbin/httpd ] && [ ! -h /www/rrdimg ] && \
-	ln -s /tmp/rrdimg /www/rrdimg
-
-# symlink for uhttpd
-[ -x /usr/sbin/uhttpd ] && [ ! -h /www/rrdimg ] && \
-	ln -s /tmp/rrdimg /www/rrdimg
-
-# restart LuCId service
-[ -x /etc/init.d/lucid ] && /etc/init.d/lucid enabled && /etc/init.d/lucid restart
+# symlink for httpd
+ln -s /tmp/rrdimg /www/rrdimg
 
 rm -f /tmp/luci-indexcache
 exit 0

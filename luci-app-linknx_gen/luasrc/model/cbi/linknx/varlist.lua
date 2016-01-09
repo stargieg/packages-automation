@@ -57,7 +57,8 @@ s:option(Value, "name", "Name")
 sval = s:option(DummyValue, "Value","Wert")
 function sval.value(self, section)
 	value = self.map:get(section)
-	return uci_state:get('linknx_varlist',value[".name"],'value')
+	return uci_state:get('linknx_varlist'..arg1,value[".name"],'value')
+	--return value[".name"],'value'
 end
 
 sva = s:option(ListValue, "tagname", "Zugrifsname")

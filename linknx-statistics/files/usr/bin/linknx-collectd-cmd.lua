@@ -20,6 +20,8 @@ function logger_std(msg)
 	print(msg)
 end
 
+--nav dummy entry
+print("PUTVAL "..host.."/ezr-"..group.."/ezr_temperature interval="..interval.." N:0:0:0")
 while true do
 	uci_state:load("linknx_group")
 	uci_state:foreach("linknx_group", "group", function(g)

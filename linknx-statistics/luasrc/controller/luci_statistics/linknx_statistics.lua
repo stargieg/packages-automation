@@ -24,7 +24,7 @@ function index()
 
 	-- override entry(): check for existance <plugin>.so where <plugin> is derived from the called path
 	function _entry( path, ... )
-		local file = path[5] or path[4]
+		local file = path[6] or path[5]
 		if nixio.fs.access( "/usr/lib/collectd/" .. file .. ".so" ) then
 			entry( path, ... )
 		end
@@ -40,55 +40,53 @@ function index()
 	local uci  = luci.model.uci.cursor()
 	local vars = luci.http.formvalue(nil, true)
 	local span = vars.timespan or nil
-	local host = 'alix-008_OG2'
-	
-	--local host = vars.host
-	--or uci:get( "luci_statistics", "collectd", "Hostname" ) or luci.sys.hostname()
+	local vhost = vars.host or nil
 
-	-- create toplevel menu nodes
-	--local st = entry({ "admin", "linknx_statistics" }, call("statistics_index_render"), "Graphs", 80)
-	local st = entry({ "admin", "linknx_statistics" }, template("admin_statistics/index"), _("Linknx Statistics"), 80)
-	st.i18n = "statistics"
+	local st = entry({ "admin", "linknx_statistics" }, template("admin_statistics/index"), "Linknx Statistics", 10)
 	st.index = true
 
-	--local page = entry({ "admin", "linknx_statistics", "graph" }, call("statistics_index_render"), "Graphs", 80)
-	local page = entry({ "admin", "linknx_statistics", "graph" }, template("admin_statistics/index"), _("Linknx Statistics"), 80)
+	local page = entry({ "admin", "linknx_statistics", "graph" }, template("admin_statistics/index"), "Linknx Statistics", 20)
+	page.index = true
+	page.setuser  = "nobody"
+	page.setgroup = "nogroup"
+
+	local page = entry({ "admin", "linknx_statistics_render", "graph" }, call("statistics_index_render"), "Graphs Json", 21)
 	page.i18n = "statistics"
 	page.index = true
 	page.setuser  = "nobody"
 	page.setgroup = "nogroup"
 
-	local page = entry({ "admin", "linknx_statistics_render", "graph" }, call("statistics_index_render"), "Graphs Json", 80)
-	--local page = entry({ "admin", "linknx_statistics_json", "graph" }, template("admin_statistics/index"), _("Linknx Statistics"), 80)
-	page.i18n = "statistics"
-	page.index = true
-	page.setuser  = "nobody"
-	page.setgroup = "nogroup"
-
-
-
-	-- get rrd data tree
-	local tree = luci.statistics.datatree.Instance(host)
-
-	for i, plugin in luci.util.vspairs( tree:plugins() ) do
-
-		-- get plugin instances
-		local instances = tree:plugin_instances( plugin )
-
-		-- plugin menu entry
-		entry(
-			{ "admin", "linknx_statistics", "graph", plugin },
-			call("statistics_render"), labels[plugin], i
-		).query = { timespan = span , host = host }
-
-		-- if more then one instance is found then generate submenu
-		if #instances > 1 then
-			for j, inst in luci.util.vspairs(instances) do
-				-- instance menu entry
-				entry(
-					{ "admin", "linknx_statistics", "graph", plugin, inst },
-					call("statistics_render"), inst, j
-				).query = { timespan = span , host = host }
+	local hosts = luci.statistics.datatree.Instance(nil):host_instances()
+	local j, host
+	for j, host in ipairs( hosts ) do
+		local tree = luci.statistics.datatree.Instance(host)
+		local st = entry({ "admin", "linknx_statistics", "graph", host }, template("admin_statistics/index"), host, 100+j)
+		st.i18n = "statistics"
+		st.index = true
+		st.query = { timespan = span , host = host }
+		local tree = luci.statistics.datatree.Instance(host)
+		local _, plugin, i
+		for _, plugin, i in luci.util.vspairs( tree:plugins() ) do
+	
+			-- get plugin instances
+			local instances = tree:plugin_instances( plugin )
+	
+			-- plugin menu entry
+			entry(
+				{ "admin", "linknx_statistics", "graph", host, plugin },
+				call("statistics_render"), labels[plugin], i
+			).query = { timespan = span , host = host }
+	
+			-- if more then one instance is found then generate submenu
+			if #instances > 1 then
+				local _, inst, k
+				for _, inst, k in luci.util.vspairs(instances) do
+					-- instance menu entry
+					entry(
+						{ "admin", "linknx_statistics", "graph", host, plugin, inst },
+						call("statistics_render"), inst, k
+					).query = { timespan = span , host = host }
+				end
 			end
 		end
 	end
@@ -106,12 +104,23 @@ function statistics_render()
 	local uci   = luci.model.uci.cursor()
 	local spans = luci.util.split( uci:get( "luci_statistics", "collectd_rrdtool", "RRATimespans" ), "%s+", nil, true )
 	local span  = vars.timespan or uci:get( "luci_statistics", "rrdtool", "default_timespan" ) or spans[1]
-	local host  = vars.host     or uci:get( "luci_statistics", "collectd", "Hostname" ) or luci.sys.hostname()
-	local opts = { host = vars.host }
-	local graph = luci.statistics.rrdtool.Graph( luci.util.parse_units( span ), opts )
-	local hosts = graph.tree:host_instances()
 
 	local is_index = false
+
+	local plugin, instances, host
+	local images = { }
+
+	-- find requested host, plugin and instance
+	for i, p in ipairs( luci.dispatcher.context.path ) do
+		if luci.dispatcher.context.path[i] == "graph" then
+			host    = luci.dispatcher.context.path[i+1]
+			plugin    = luci.dispatcher.context.path[i+2]
+			instances = { luci.dispatcher.context.path[i+3] }
+		end
+	end
+	local opts = { host = host }
+	local graph = luci.statistics.rrdtool.Graph( luci.util.parse_units( span ), opts )
+	local hosts = graph.tree:host_instances() or { }
 
 	-- deliver image
 	if vars.img then
@@ -120,25 +129,13 @@ function statistics_render()
 		if png then
 			luci.http.prepare_content("image/png")
 			l12.pump.all(l12.source.file(png), luci.http.write)
-			png:close()
 		end
 		return
 	end
 
-	local plugin, instances
-	local images = { }
-
-	-- find requested plugin and instance
-    for i, p in ipairs( luci.dispatcher.context.path ) do
-        if luci.dispatcher.context.path[i] == "graph" then
-            plugin    = luci.dispatcher.context.path[i+1]
-            instances = { luci.dispatcher.context.path[i+2] }
-        end
-    end
 
 	-- no instance requested, find all instances
 	if #instances == 0 then
-		--instances = { graph.tree:plugin_instances( plugin )[1] }
 		instances = graph.tree:plugin_instances( plugin )
 		is_index = true
 
@@ -164,7 +161,6 @@ function statistics_render()
 		local json = require "luci.json"
 		local el = {}
 		for i, img in ipairs(images) do
-			--el[#el+1] = luci.dispatcher.build_url("linknx", "graph", plugin).."?img="..img.."&host="..host
 			el[#el+1] = '/rrdimg/'..img
 		end
 		http.prepare_content("application/json")
@@ -172,13 +168,11 @@ function statistics_render()
 		return
 	end
 
-	luci.template.render( "public_statistics/graph", {
+	luci.template.render( "public_statistics/graph_linknx", {
 		images           = images,
 		plugin           = plugin,
 		timespans        = spans,
 		current_timespan = span,
-		hosts            = hosts,
-		current_host     = host,
 		is_index         = is_index
 	} )
 end
@@ -188,14 +182,21 @@ function statistics_index_render()
 	require("luci.model.uci")
 	require("luci.statistics.rrdtool")
 	local vars  = luci.http.formvalue()
+	local path  = luci.dispatcher.context.path
 	local uci   = luci.model.uci.cursor()
-	local host  = vars.host     or uci:get( "luci_statistics", "collectd", "Hostname" ) or luci.sys.hostname()
 	local spans = luci.util.split( uci:get( "luci_statistics", "collectd_rrdtool", "RRATimespans" ), "%s+", nil, true )
 	local span  = vars.timespan or uci:get( "luci_statistics", "rrdtool", "default_timespan" ) or spans[1]
+
+	-- find requested host, plugin and instance
+	for i, p in ipairs( luci.dispatcher.context.path ) do
+		if luci.dispatcher.context.path[i] == "graph" then
+			host    = luci.dispatcher.context.path[i+1]
+		end
+	end
 	local opts = { host = host }
 	local graph = luci.statistics.rrdtool.Graph( luci.util.parse_units( span ), opts )
 	local hosts = graph.tree:host_instances() or { }
-
+	
 	luci.template.render("admin_statistics/index", {
 		timespans        = spans,
 		current_timespan = span,
@@ -203,4 +204,3 @@ function statistics_index_render()
 		current_host     = host
 	} )
 end
-

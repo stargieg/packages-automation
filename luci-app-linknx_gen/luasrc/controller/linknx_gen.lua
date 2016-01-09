@@ -70,7 +70,7 @@ function index()
 	page.setgroup = false
 
 	entry({"linknx", "status.json"}, call("jsonstatus"))
-	local page = entry({"linknx", "statusjson"}, cbi("statusjson"), "linknx json download")
+	local page = entry({"linknx", "statusjson"}, cbi("statusjson"), "linknx json read")
 	page.leaf = true
 	page.subindex = true
 	page.order = 25

@@ -15,7 +15,7 @@ define Package/linknx_gen
   CATEGORY:=Network
   TITLE:=Config generator for KNX
   URL:=https://sourceforge.net/p/linknx/wiki/Main_Page/
-  DEPENDS:=+linknx
+  DEPENDS:=+linknx +luci-lib-json +luci-lib-nixio
 endef
 
 define Package/linknx_gen/description

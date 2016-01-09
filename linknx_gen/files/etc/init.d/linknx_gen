@@ -15,7 +15,8 @@ start() {
 	mkdir -p /var/lib/linknx/persist
 	mkdir -p /var/lib/linknx/rrd
 	mkdir -p /var/lib/linknx/tmp
-	uci set linknx.args.conf='/etc/linknx/config.socket.xml' 
+	uci set linknx.args.conf='/etc/linknx/config.socket.xml'
+	uci commit
 	#rm /var/lib/linknx/linknx.xml
 	#ln -s /etc/linknx/config.socket.xml /var/lib/linknx/linknx.xml
 	#rm /var/run/linknx.sock
