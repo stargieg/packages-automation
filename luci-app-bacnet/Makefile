@@ -1,9 +1,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-bacnet
-PKG_RELEASE:=0.1.11
+PKG_VERSION:=0.1.11
+PKG_RELEASE:=1
 
-PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -12,11 +13,7 @@ define Package/luci-app-bacnet
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Bacnet Device
-  DEPENDS:=+bacnet-stack-uci +luci-base
-endef
-
-define Package/luci-app-bacnet/description
-  Bacnet Device
+  DEPENDS:=+bacnet-stack-uci +luci-mod-admin-full
 endef
 
 define Build/Prepare
@@ -42,8 +39,8 @@ endef
 define Package/luci-app-bacnet/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
-	$(CP) $(PKG_BUILD_DIR)/luasrc/controller/* $(1)/usr/lib/lua/luci/controller
-	$(CP) $(PKG_BUILD_DIR)/luasrc/model/cbi/* $(1)/usr/lib/lua/luci/model/cbi
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/* $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/* $(1)/usr/lib/lua/luci/model/cbi
 endef
 
 $(eval $(call BuildPackage,luci-app-bacnet))

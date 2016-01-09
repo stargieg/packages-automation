@@ -6,7 +6,7 @@ PKG_NAME:=luci-app-linknx
 PKG_VERSION:=0.2.0
 PKG_RELEASE:=1
 
-PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -17,10 +17,6 @@ define Package/luci-app-linknx
   TITLE:=linknx daemon
   URL:=https://github.com/linknx/linknx/wiki
   DEPENDS:=+linknx +luci-mod-admin-full
-endef
-
-define Package/luci-app-linknx/description
-  https://github.com/linknx/linknx/wiki
 endef
 
 define Build/Prepare
