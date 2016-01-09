@@ -2,9 +2,6 @@
 # Copyright (C) 2012 Patrick Grimm
 
 START=95
-SERVER="linknx"
-SERVER_BIN="/usr/sbin/linknx"
-SERVER_ARGS="--config=/etc/linknx/config.socket.xml  --pid-file=/var/run/linknx.pid -d"
 
 load_uci() {
 	/usr/bin/linknxloaddata.lua
@@ -15,12 +12,15 @@ start() {
 	mkdir -p /var/lib/linknx/persist
 	mkdir -p /var/lib/linknx/rrd
 	mkdir -p /var/lib/linknx/tmp
-	uci set linknx.args.conf='/etc/linknx/config.socket.xml'
+	uci set linknx.args.conf='/var/lib/linknx/linknx.xml'
+	if [ "$(uci -q get linknx_exp.@daemon[0].log)" == 1 ] ; then
+		uci set linknx.args.options='--daemon=/var/lib/linknx/linknx.log --pid-file=/var/run/linknx.pid'
+	else
+		uci set linknx.args.options='--pid-file=/var/run/linknx.pid'
+	fi
 	uci commit
-	#rm /var/lib/linknx/linknx.xml
-	#ln -s /etc/linknx/config.socket.xml /var/lib/linknx/linknx.xml
-	#rm /var/run/linknx.sock
-	#ln -s /tmp/xmlserver.sock /var/run/linknx.sock
+	rm -f /var/lib/linknx/linknx.xml
+	cp /etc/linknx/config.socket.xml /var/lib/linknx/linknx.xml
 	/etc/init.d/linknx restart
 	sleep 3
 	load_uci

@@ -2,6 +2,7 @@
 config 'daemon'
 	option 'port' '8888'
 	option 'ignore' '0'
+	option 'log' '0'
 	option 'tagname' 'linknx'
 	option 'esf' '/etc/linknx/example.esf'
 

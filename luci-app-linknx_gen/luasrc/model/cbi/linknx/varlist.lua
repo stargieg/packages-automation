@@ -51,14 +51,12 @@ s.addremove = true
 s.anonymous = true
 s.template = "cbi/tblsection"
 
-s:option(Flag, "disable", "Disable")
--- en.optional = true
+--s:option(Flag, "disable", "Disable")
 s:option(Value, "name", "Name")
 sval = s:option(DummyValue, "Value","Wert")
 function sval.value(self, section)
 	value = self.map:get(section)
-	return uci_state:get('linknx_varlist'..arg1,value[".name"],'value')
-	--return value[".name"],'value'
+	return uci_state:get('linknx_varlist_'..arg1,value[".name"],'value') or 'nil'
 end
 
 sva = s:option(ListValue, "tagname", "Zugrifsname")

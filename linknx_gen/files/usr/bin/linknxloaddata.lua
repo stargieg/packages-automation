@@ -4,11 +4,22 @@ require("luci.util")
 require("luci.model.uci")
 require("luci.sys")
 local uci = luci.model.uci.cursor()
+local uci_state = luci.model.uci.cursor_state()
 local io    = require "io"
 local nixio = require "nixio"
 local fs    = require "nixio.fs"
 local s = nixio.socket('unix', 'stream', none)
 s:connect('/var/run/linknx.sock')
+
+
+function logger_err(msg)
+	os.execute("logger -p error -t linknxloaddata "..msg)
+end
+
+function logger_info(msg)
+	os.execute("logger -p info -t linknxloaddata "..msg)
+end
+
 
 function write(varname,addr,type,initv)
 		local line
@@ -132,56 +143,51 @@ function writemail(id,varname,varval)
 end
 
 
-function logger_err(msg)
-	os.execute("logger -p error -t linknxloaddata "..msg)
-end
-
-function logger_info(msg)
-	os.execute("logger -p info -t linknxloaddata "..msg)
-end
-
 function load_group(tagname)
 	uci:foreach("linknx_group", "group", function(s)
-			uci:foreach("linknx_varlist_"..s.name, "pvar", function(n)
-					if tagname == n.tagname then
-						local group = s.name
-						local name = n.name
-						local addr = n.addr
-						local initv = n.initv
-						local type = find_type(name)
-						local value
-						if type == "1.001" then
-							value="on"
-						elseif type == "5.001" then
-							value="0"
-						elseif type == "5.xxx" then
-							value="0"
-						elseif type == "9.xxx" then
-							value="0"
-						elseif type == "20.102" then
-							value="comfort"
-						end
-						if initv then
-							write(name,addr,type,initv)
-							value=initv
-						--elseif value then
-						--	write(name,addr,type,value)
-						else
-							write(name,addr,type)
-						end
-						if value then
-							writerule(name.."_rule",name,value,group,type)
-						end
-					end
-			end)
+		local group = s.name
+		uci:foreach("linknx_varlist_"..group, "pvar", function(n)
+			if tagname == n.tagname then
+				local group = s.name
+				local name = n.name
+				local addr = n.addr
+				local initv = n.initv
+				local type = find_type(name)
+				local value
+				if type == "1.001" then
+					value="on"
+				elseif type == "5.001" then
+					value="0"
+				elseif type == "5.xxx" then
+					value="0"
+				elseif type == "9.xxx" then
+					value="0"
+				elseif type == "20.102" then
+					value="comfort"
+				end
+				if initv then
+					write(name,addr,type,initv)
+					value=initv
+					uci_state:set('linknx_varlist_'..group,n[".name"],'value',value)
+				--elseif value then
+				--	write(name,addr,type,value)
+				else
+					write(name,addr,type)
+				end
+				if value then
+					writerule(name.."_rule",name,value,group,type)
+				end
+			end
+		end)
+		uci_state:save('linknx_varlist_'..group)
 	end)
 	uci:foreach("linknx_group", "group", function(s)
-			uci:foreach("linknx_varlist_"..s.name, "pvar", function(n)
-					if tagname == n.tagname then
-						local name = n.name
-						readval(name)
-					end
-			end)
+		uci:foreach("linknx_varlist_"..s.name, "pvar", function(n)
+			if tagname == n.tagname then
+				local name = n.name
+				readval(name)
+			end
+		end)
 	end)
 end
 

@@ -4,8 +4,9 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-knxd
 PKG_RELEASE:=0.2.0
+PKG_RELEASE:=1
 
-PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -16,10 +17,6 @@ define Package/luci-app-knxd
   TITLE:=Eib KNX deamon
   URL:=https://github.com/knxd/knxd/wiki
   DEPENDS:=+knxd +luci-mod-admin-full
-endef
-
-define Package/luci-app-knxd/description
-  https://github.com/knxd/knxd/wiki
 endef
 
 define Build/Prepare

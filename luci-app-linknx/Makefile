@@ -3,7 +3,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx
-PKG_RELEASE:=0.2.0
+PKG_VERSION:=0.2.0
+PKG_RELEASE:=1
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
@@ -13,7 +14,7 @@ define Package/luci-app-linknx
   SECTION:=luci
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
-  TITLE:=linknx deamon
+  TITLE:=linknx daemon
   URL:=https://github.com/linknx/linknx/wiki
   DEPENDS:=+linknx +luci-mod-admin-full
 endef
@@ -37,6 +38,7 @@ endef
 define Package/luci-app-linknx/postinst
 #!/bin/sh
 [ -n "${IPKG_INSTROOT}" ] || {
+	( . /etc/uci-defaults/luci-app-linknx ) && rm -f /etc/uci-defaults/luci-app-linknx
 	rm -f /tmp/luci-indexcache
 	exit 0
 }

@@ -27,5 +27,4 @@ EOF
 # symlink for httpd
 ln -s /tmp/rrdimg /www/rrdimg
 
-rm -f /tmp/luci-indexcache
 exit 0
