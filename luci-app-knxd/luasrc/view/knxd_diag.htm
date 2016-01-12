@@ -1,0 +1,114 @@
+<%#
+ Copyright 2015 Patrick Grimm <patrick@lunatiki.de>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+	var stxhr = new XHR();
+
+	function update_status(tool)
+	{
+		var legend = document.getElementById('diag-rc-legend');
+		var output = document.getElementById('diag-rc-output');
+
+		if (legend && output)
+		{
+			output.innerHTML =
+				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<%:Waiting for command to complete...%>'
+			;
+
+			legend.parentNode.style.display = 'block';
+			legend.style.display = 'inline';
+
+			stxhr.post('<%=url('admin/services')%>/knxd_diag_' + tool, { token: '<%=token%>' },
+				function(x)
+				{
+					if (x.responseText)
+					{
+						legend.style.display = 'none';
+						output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					}
+					else
+					{
+						legend.style.display = 'none';
+						output.innerHTML = '<span class="error"><%:Bad address!%></span>';
+					}
+				}
+			);
+		}
+	}
+
+	function write_addr(tool, addr, value)
+	{
+		var legend = document.getElementById('diag-rc-legend');
+		var output = document.getElementById('diag-rc-output');
+
+		if (legend && output)
+		{
+			output.innerHTML =
+				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<%:Waiting for command to complete...%>'
+			;
+
+			legend.parentNode.style.display = 'block';
+			legend.style.display = 'inline';
+
+			stxhr.post('<%=url('admin/services')%>/knxd_diag_' + tool + '/' + addr, { token: '<%=token%>' },
+				function(x)
+				{
+					if (x.responseText)
+					{
+						legend.style.display = 'none';
+						output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					}
+					else
+					{
+						legend.style.display = 'none';
+						output.innerHTML = '<span class="error"><%:Bad address specified!%></span>';
+					}
+				}
+			);
+		}
+	}
+
+//]]></script>
+
+<form method="post" action="<%=url('admin/service/knxd_diag')%>">
+	<div class="cbi-map">
+		<h2 name="content"><%:KNX Diagnostics%></h2>
+
+		<fieldset class="cbi-section">
+			<legend><%:KNX Tools%></legend>
+
+			<br />
+
+			<div style="width:30%; float:left">
+				<input type="button" value="<%:vbusmonitor%>" class="cbi-button cbi-button-apply" onclick="update_status('vbusmonitor')" />
+			</div>
+
+			<div style="width:33%; float:left">
+				<input type="button" value="<%:groupsocketlisten%>" class="cbi-button cbi-button-apply" onclick="update_status('groupsocketlisten')" />
+			</div>
+
+			<div style="width:33%; float:left;">
+				<input style="margin: 5px 0" type="text" value="0/0/1" name="addr" /><br />
+				<input style="margin: 5px 0" type="text" value="1" name="value" /><br />
+				<input type="button" value="<%:groupswrite%>" class="cbi-button cbi-button-apply" onclick="write_addr(this.form.addr,this.form.value)" />
+			</div>
+
+			<br style="clear:both" /><br />
+
+		</fieldset>
+	</div>
+
+	<fieldset class="cbi-section" style="display:none">
+		<legend id="diag-rc-legend"><%:Collecting data...%></legend>
+		<span id="diag-rc-output"></span>
+	</fieldset>
+</form>
+
+<%+footer%>
