@@ -74,12 +74,14 @@ s:option(Flag, "Tunnelling", "Tunnelling for ETS").optional = true
 s:option(Flag, "Routing", "EIBnet/IP Routing in the EIBnet/IP server").optional = true
 s:option(Flag, "GroupCache", "caching of group communication networkstate").optional = true
 
-svc = s:option(Value, "listen_tcp", "Listen tcp port")
+svc = s:option(Value, "listen_tcp", "Listen tcp port", "listen at TCP port PORT (default 6720)")
 svc.optional = true
+svc.placeholder = 6720
 svc.datatype = "portrange"
 
-svc = s:option(Value, "listen_local", "Socket File")
+svc = s:option(Value, "listen_local", "Socket File", "listen at Unix domain socket FILE (default /var/run/knxd)")
 svc.optional = true
+svc.placeholder = "/var/run/knxd"
 svc.datatype = "string"
 
 svc = s:option(Value, "eibaddr", "EIB HW Addr")

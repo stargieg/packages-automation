@@ -14,4 +14,15 @@ $Id$
 <%+header%>
 	<h2><a id="content" name="content">!</a></h2>
 	<p>Hostname: <%=luci.sys.hostname()%></p>
+	<h2><a id="content" name="content">Geplante Aufgaben</a></h2>
+	</p>Um 6:30 ein</p>
+	<p>30 6 * * * linknxwritevalue.lua 2_bel_de_1_hw_R301 100</p>
+	</p>Um 7:45 aus</p>
+	<p>45 7 * * * linknxwritevalue.lua 2_bel_de_1_hw_R301 0</p>
+	</p>Um 17:00 ein 50 Prozent</p>
+	<p>0 17 * * * linknxwritevalue.lua 2_bel_de_1_hw_R301 50</p>
+	</p>Um 20:30 fast aus 10 Prozent</p>
+	<p>30 20 * * * linknxwritevalue.lua 2_bel_de_1_hw_R301 10</p>
+	</p>Um 21:30 fast aus</p>
+	<p>30 21 * * * linknxwritevalue.lua 2_bel_de_1_hw_R301 0</p>
 <%+footer%>

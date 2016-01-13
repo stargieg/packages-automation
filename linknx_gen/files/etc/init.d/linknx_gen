@@ -1,7 +1,7 @@
 #!/bin/sh /etc/rc.common
 # Copyright (C) 2012 Patrick Grimm
 
-START=95
+START=99
 
 load_uci() {
 	/usr/bin/linknxloaddata.lua
@@ -9,6 +9,7 @@ load_uci() {
 }
 
 start() {
+	/etc/init.d/linknx stop
 	mkdir -p /var/lib/linknx/persist
 	mkdir -p /var/lib/linknx/rrd
 	mkdir -p /var/lib/linknx/tmp
@@ -16,15 +17,18 @@ start() {
 	if [ "$(uci -q get linknx_exp.@daemon[0].log)" == 1 ] ; then
 		uci set linknx.args.options='--daemon=/var/lib/linknx/linknx.log --pid-file=/var/run/linknx.pid'
 	else
-		uci set linknx.args.options='--pid-file=/var/run/linknx.pid'
+		uci set linknx.args.options='--daemon=/dev/null --pid-file=/var/run/linknx.pid'
 	fi
 	uci commit
 	rm -f /var/lib/linknx/linknx.xml
-	cp /etc/linknx/config.socket.xml /var/lib/linknx/linknx.xml
+	rm -f /var/run/linknx
+	rm -f /var/run/linknx.sock
+	ln -s /etc/linknx/config.socket.xml /var/lib/linknx/linknx.xml &>/dev/null
 	/etc/init.d/linknx restart
 	sleep 3
-	load_uci
+	load_uci &>/dev/null
 	chmod 777 /var/run/linknx.sock
+	ln -s /var/run/linknx /var/run/linknx.sock &> /dev/null
 }
 
 reload() {
