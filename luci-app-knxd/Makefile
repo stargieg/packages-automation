@@ -46,7 +46,7 @@ define Package/luci-app-knxd/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/knxd.lua $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/knxd.lua $(1)/usr/lib/lua/luci/model/cbi
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/knx_diag.htm $(1)/usr/lib/lua/luci/view
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/knxd_diag.htm $(1)/usr/lib/lua/luci/view
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) files/etc/uci-defaults/luci-app-knxd $(1)/etc/uci-defaults/
 endef
