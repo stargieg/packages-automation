@@ -44,8 +44,10 @@ endef
 define Package/luci-app-linknx/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/linknx.lua $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx.lua $(1)/usr/lib/lua/luci/model/cbi
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/linknx_diag.htm $(1)/usr/lib/lua/luci/view
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) files/etc/uci-defaults/luci-app-linknx $(1)/etc/uci-defaults/
 endef
