@@ -111,13 +111,16 @@ end
 svc = s:option(Value, "daemon", "Logfile")
 svc.optional = true
 svc.datatype = "string"
+svc.placeholder = "/var/log/knxd.log"
 
 svc = s:option(Value, "trace", "set trace level")
 svc.optional = true
 svc.datatype = "portrange"
+svc.placeholder = 7
 
 svc = s:option(Value, "error", "set error level")
 svc.optional = true
 svc.datatype = "portrange"
+svc.placeholder = 7
 
 return m
