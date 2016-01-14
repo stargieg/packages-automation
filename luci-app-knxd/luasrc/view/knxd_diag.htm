@@ -24,7 +24,7 @@
 			legend.parentNode.style.display = 'block';
 			legend.style.display = 'inline';
 
-			stxhr.post('<%=url('admin/services')%>/knxd_diag_' + tool, { token: '<%=token%>' },
+			stxhr.get('<%=luci.dispatcher.build_url("admin", "services")%>/knxd_diag_' + tool, { token: '<%=token%>' },
 				function(x)
 				{
 					if (x.responseText)
@@ -42,8 +42,10 @@
 		}
 	}
 
-	function write_addr(tool, addr, value)
+	function write_addr(tool, addr_el, value_el)
 	{
+		var addr = addr_el.value
+		var value = value_el.value
 		var legend = document.getElementById('diag-rc-legend');
 		var output = document.getElementById('diag-rc-output');
 
@@ -53,11 +55,9 @@
 				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
 				'<%:Waiting for command to complete...%>'
 			;
-
 			legend.parentNode.style.display = 'block';
 			legend.style.display = 'inline';
-
-			stxhr.post('<%=url('admin/services')%>/knxd_diag_' + tool + '/' + addr, { token: '<%=token%>' },
+			stxhr.post('<%=luci.dispatcher.build_url("admin", "services")%>/knxd_diag_' + tool, { tool: tool, addr: addr, value: value },
 				function(x)
 				{
 					if (x.responseText)
@@ -77,7 +77,7 @@
 
 //]]></script>
 
-<form method="post" action="<%=url('admin/service/knxd_diag')%>">
+<form method="post" action="<%luci.dispatcher.build_url("admin", "services", "knxd_diag")%>">
 	<div class="cbi-map">
 		<h2 name="content"><%:KNX Diagnostics%></h2>
 
@@ -86,18 +86,22 @@
 
 			<br />
 
-			<div style="width:30%; float:left">
+			<div style="width:20%; float:left">
 				<input type="button" value="<%:vbusmonitor%>" class="cbi-button cbi-button-apply" onclick="update_status('vbusmonitor')" />
 			</div>
 
-			<div style="width:33%; float:left">
+			<div style="width:25%; float:left">
 				<input type="button" value="<%:groupsocketlisten%>" class="cbi-button cbi-button-apply" onclick="update_status('groupsocketlisten')" />
 			</div>
 
-			<div style="width:33%; float:left;">
-				<input style="margin: 5px 0" type="text" value="0/0/1" name="addr" /><br />
-				<input style="margin: 5px 0" type="text" value="1" name="value" /><br />
-				<input type="button" value="<%:groupswrite%>" class="cbi-button cbi-button-apply" onclick="write_addr(this.form.addr,this.form.value)" />
+			<div style="width:25%; float:left;">
+				<input type="button" value="Sende an" class="cbi-button cbi-button-apply" onclick="write_addr('groupswrite',this.form.addr,this.form.value)" /><br />
+				<input style="margin: 5px 0" type="text" value="0/0/1" name="addr">  Adresse</input>
+				<input style="margin: 5px 0" type="text" value="1" name="value">  Wert</input>
+			</div>
+
+			<div style="width:25%; float:left">
+				<input type="button" value="<%:proto%>" class="cbi-button cbi-button-apply" onclick="update_status('proto')" />
 			</div>
 
 			<br style="clear:both" /><br />
