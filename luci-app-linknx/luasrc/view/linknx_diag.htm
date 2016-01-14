@@ -1,0 +1,147 @@
+<%#
+ Copyright 2015 Patrick Grimm <patrick@lunatiki.de>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+	var stxhr = new XHR();
+
+	function update_status(tool)
+	{
+		var legend = document.getElementById('diag-rc-legend');
+		var output = document.getElementById('diag-rc-output');
+
+		if (legend && output)
+		{
+			output.innerHTML =
+				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<%:Waiting for command to complete...%>'
+			;
+
+			legend.parentNode.style.display = 'block';
+			legend.style.display = 'inline';
+
+			stxhr.get('<%=luci.dispatcher.build_url("admin", "services")%>/linknx_diag_' + tool, { token: '<%=token%>' },
+				function(x)
+				{
+					if (x.responseText)
+					{
+						legend.style.display = 'none';
+						output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					}
+					else
+					{
+						legend.style.display = 'none';
+						output.innerHTML = '<span class="error"><%:Bad address!%></span>';
+					}
+				}
+			);
+		}
+	}
+
+	function read_addr(tool, addr_el)
+	{
+		var addr = addr_el.value
+		var legend = document.getElementById('diag-rc-legend');
+		var output = document.getElementById('diag-rc-output');
+
+		if (legend && output)
+		{
+			output.innerHTML =
+				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<%:Waiting for command to complete...%>'
+			;
+			legend.parentNode.style.display = 'block';
+			legend.style.display = 'inline';
+			stxhr.get('<%=luci.dispatcher.build_url("admin", "services")%>/linknx_diag_' + tool, { tool: tool, addr: addr },
+				function(x)
+				{
+					if (x.responseText)
+					{
+						legend.style.display = 'none';
+						output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					}
+					else
+					{
+						legend.style.display = 'none';
+						output.innerHTML = '<span class="error"><%:Bad address specified!%></span>';
+					}
+				}
+			);
+		}
+	}
+
+	function write_addr(tool, addr_el, value_el)
+	{
+		var addr = addr_el.value
+		var value = value_el.value
+		var legend = document.getElementById('diag-rc-legend');
+		var output = document.getElementById('diag-rc-output');
+
+		if (legend && output)
+		{
+			output.innerHTML =
+				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<%:Waiting for command to complete...%>'
+			;
+			legend.parentNode.style.display = 'block';
+			legend.style.display = 'inline';
+			stxhr.get('<%=luci.dispatcher.build_url("admin", "services")%>/linknx_diag_' + tool, { tool: tool, addr: addr, value: value },
+				function(x)
+				{
+					if (x.responseText)
+					{
+						legend.style.display = 'none';
+						output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					}
+					else
+					{
+						legend.style.display = 'none';
+						output.innerHTML = '<span class="error"><%:Bad address specified!%></span>';
+					}
+				}
+			);
+		}
+	}
+
+//]]></script>
+
+<form method="post" action="<%luci.dispatcher.build_url("admin", "services", "linknx_diag")%>">
+	<div class="cbi-map">
+		<h2 name="content"><%:linknx Diagnostics%></h2>
+
+		<fieldset class="cbi-section">
+			<legend><%:linknx Tools%></legend>
+
+			<br />
+
+			<div style="width:25%; float:left;">
+				<input type="button" value="Lese von" class="cbi-button cbi-button-apply" onclick="read_addr('read',this.form.r_addr)" /><br />
+				<input style="margin: 5px 0" type="text" value="linknx_object" name="r_addr">  Linknx Object</input>
+			</div>
+
+			<div style="width:25%; float:left;">
+				<input type="button" value="Schreibe auf" class="cbi-button cbi-button-apply" onclick="write_addr('write',this.form.s_addr,this.form.value)" /><br />
+				<input style="margin: 5px 0" type="text" value="linknx_object" name="s_addr">  Linknx Object</input>
+				<input style="margin: 5px 0" type="text" value="1" name="value">  Wert</input>
+			</div>
+
+			<div style="width:25%; float:left">
+				<input type="button" value="<%:proto%>" class="cbi-button cbi-button-apply" onclick="update_status('proto')" />
+			</div>
+
+			<br style="clear:both" /><br />
+
+		</fieldset>
+	</div>
+
+	<fieldset class="cbi-section" style="display:none">
+		<legend id="diag-rc-legend"><%:Collecting data...%></legend>
+		<span id="diag-rc-output"></span>
+	</fieldset>
+</form>
+
+<%+footer%>
