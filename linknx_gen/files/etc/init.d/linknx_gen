@@ -27,7 +27,7 @@ start() {
 	/etc/init.d/linknx restart
 	sleep 3
 	load_uci &>/dev/null
-	chmod 777 /var/run/linknx.sock
+	chmod 777 /var/run/linknx
 	ln -s /var/run/linknx /var/run/linknx.sock &> /dev/null
 }
 
