@@ -23,13 +23,14 @@ function index()
 	end
 
 	local page
-	page = entry({"admin", "services", "knxd"}, cbi("knxd"), "knxd")
+	page = entry({"admin", "services", "knxd"}, cbi("knxd"))
 	page.dependent = true
+	page.title  = _("knxd")
 	page.order = 10
 
 	page = node("admin", "services", "knxd_diag")
 	page.target = template("knxd_diag")
-	page.title  = _("KNX Diagnostics")
+	page.title  = _("knxd Diagnostics")
 	page.order  = 11
 
 	page = entry({"admin", "services", "knxd_diag_vbusmonitor"}, call("knxd_diag_vbusmonitor"), nil)
