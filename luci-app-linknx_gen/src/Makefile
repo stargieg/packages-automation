@@ -1,7 +1,7 @@
 
 CFLAGS += -Wall -std=gnu99 -pedantic
 OBJ = ubus-linknx.o
-LIB = -lz -lubus -lubox -lblobmsg_json
+LIB = -lubus -lubox -lblobmsg_json
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
