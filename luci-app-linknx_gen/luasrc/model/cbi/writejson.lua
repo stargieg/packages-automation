@@ -115,7 +115,7 @@ if name and value and group and tagname then
 		el[el_i].id = name
 		el[el_i].value = value
 		s = nixio.socket('unix', 'stream', none)
-		s:connect('/var/run/linknx.sock')
+		s:connect('/var/run/linknx')
 		write_linknx(name,value)
 		s:close()
 		if acktime and ack then

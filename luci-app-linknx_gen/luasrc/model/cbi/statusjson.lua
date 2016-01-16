@@ -255,7 +255,7 @@ else
 
 	local nixio	= require "nixio"
 	uds = nixio.socket('unix', 'stream', none)
-	if uds:connect('/var/run/linknx.sock') then
+	if uds:connect('/var/run/linknx') then
 		has_xmlsocket = true
 	end
 	

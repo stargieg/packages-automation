@@ -5,7 +5,7 @@ local uci = require "luci.model.uci"
 local x = uci.cursor()
 local nixio = require "nixio"
 local s = nixio.socket('unix', 'stream', none)
-s:connect('/var/run/linknx.sock')
+s:connect('/var/run/linknx')
 
 function writerule(id,varname,varval)
 	s:send("<write><config><rules><rule id="..id.."><condition type=or><condition type=object id="..varname.." value="..varval.." trigger='true'></condition></condition><actionlist><action type=shell-cmd cmd='/etc/linknx/linknxwrapper.sh "..id.." "..varval.."'/></actionlist></rule></rules></config></write>\n\4")

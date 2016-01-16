@@ -6,14 +6,14 @@ local io    = require "io"
 local uci = require "luci.model.uci"
 local nixio = require "nixio"
 -- s = nixio.socket('unix', 'stream', none)
--- s:connect('/var/run/linknx.sock')
+-- s:connect('/var/run/linknx')
 local sendcounter = 0
 
 function writeval(txt,varval)
 	print(txt..' '..varval)
 	if not s then
 		s = nixio.socket('unix', 'stream', none)
-		s:connect('/var/run/linknx.sock')
+		s:connect('/var/run/linknx')
 		s:send("<write>")
 	end
 	--s:send("<write><object id="..txt.." value="..varval.."/></write>\r\n\4")

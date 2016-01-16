@@ -9,7 +9,7 @@ local io    = require "io"
 local nixio = require "nixio"
 local fs    = require "nixio.fs"
 local s = nixio.socket('unix', 'stream', none)
-s:connect('/var/run/linknx.sock')
+s:connect('/var/run/linknx')
 
 
 function logger_err(msg)

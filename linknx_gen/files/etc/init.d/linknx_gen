@@ -22,13 +22,11 @@ start() {
 	uci commit
 	rm -f /var/lib/linknx/linknx.xml
 	rm -f /var/run/linknx
-	rm -f /var/run/linknx.sock
 	ln -s /etc/linknx/config.socket.xml /var/lib/linknx/linknx.xml &>/dev/null
 	/etc/init.d/linknx restart
 	sleep 3
 	load_uci &>/dev/null
 	chmod 777 /var/run/linknx
-	ln -s /var/run/linknx /var/run/linknx.sock &> /dev/null
 }
 
 reload() {

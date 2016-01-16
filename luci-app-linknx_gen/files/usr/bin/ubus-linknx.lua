@@ -136,7 +136,7 @@ if name and value and group and tagname then
 	elseif tagname == 'linknx' then
 		logger_info("linknx var:"..name.." val:"..value.." : "..group)
 		s = nixio.socket('unix', 'stream', none)
-		s:connect('/var/run/linknx.sock')
+		s:connect('/var/run/linknx')
 		write_linknx(name,value)
 		s:close()
 		if acktime and ack then
