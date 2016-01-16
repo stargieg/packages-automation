@@ -6,6 +6,9 @@ PKG_NAME:=luci-app-linknx_gen
 PKG_VERSION:=0.2.0
 PKG_RELEASE:=1
 
+PKG_SOURCE:=linknx.tgz
+PKG_SOURCE_URL:=http://firmware-ga.lunatiki.de/firmwares/
+
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -20,14 +23,15 @@ define Package/luci-app-linknx_gen
 endef
 
 define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
+	mkdir -p $(PKG_BUILD_DIR)/linknx
 	$(CP) ./luasrc $(PKG_BUILD_DIR)/
-	#$(CP) ./src $(PKG_BUILD_DIR)/
+	$(CP) ./src $(PKG_BUILD_DIR)/
+	$(TAR) -C $(PKG_BUILD_DIR) -xzf $(DL_DIR)/$(PKG_SOURCE)
 endef
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
-	#$(MAKE) -C $(PKG_BUILD_DIR)/src  CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)"
+	$(MAKE) -C $(PKG_BUILD_DIR)/src  CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)"
 	#$(MAKE) -C ./senchasdk/linknx INSTALL_DIR="$(PKG_BUILD_DIR)"
 endef
 
@@ -61,14 +65,15 @@ define Package/luci-app-linknx_gen/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	#$(INSTALL_BIN) ./files/etc/init.d/ws-mirror-server-linknx $(1)/etc/init.d
 	#$(INSTALL_DIR) $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/etc/init.d/ubus-linknx $(1)/etc/init.d
-	#$(INSTALL_DIR) $(1)/usr/sbin
-	#$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ubus-linknx $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/etc/init.d/ubus-linknx $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ubus-linknx $(1)/usr/sbin
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknx-uci-event.sh $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/ubus-linknx.lua $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/www/luci-static/linknx
 	$(INSTALL_DATA) ./files/www/linknx.html $(1)/www
+	$(CP) $(PKG_BUILD_DIR)/linknx/* $(1)/www/luci-static/linknx
 #	$(CP) $(PKG_BUILD_DIR)/production/* $(1)/www/luci-static/linknx
 #	$(CP) $(PKG_BUILD_DIR)/testing/* $(1)/www/luci-static/linknx
 endef
