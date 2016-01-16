@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx
 PKG_VERSION:=0.2.0
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -47,6 +47,7 @@ define Package/luci-app-linknx/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/linknx.lua $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx.lua $(1)/usr/lib/lua/luci/model/cbi
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx_xml.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/linknx_diag.htm $(1)/usr/lib/lua/luci/view
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) files/etc/uci-defaults/luci-app-linknx $(1)/etc/uci-defaults/

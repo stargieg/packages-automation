@@ -20,27 +20,27 @@ function index()
 	local page = entry({"admin", "services", "linknx_load"}, cbi("linknx/linknx"))
 	page.dependent = true
 	page.title  = _("linknx Import")
-	page.order = 14
+	page.order = 15
 	local page = entry({"admin", "services", "linknx_groups"}, cbi("linknx/groups", {autoapply=false}))
 	page.dependent = true
 	page.title  = _("linknx Gruppen")
-	page.order = 15
+	page.order = 16
 	local page = entry({"admin", "services", "linknx_varlist"}, cbi("linknx/varlist", {autoapply=false}))
 	page.dependent = true
 	page.title  = _("linknx Variablenliste")
-	page.order = 16
+	page.order = 17
 	local page = entry({"admin", "services", "linknx_types"}, cbi("linknx/types", {autoapply=false}))
 	page.dependent = true
 	page.title  = _("linknx Variablentypen")
-	page.order = 17
+	page.order = 18
 	local page = entry({"admin", "services", "linknx_rules"}, cbi("linknx/rules", {autoapply=false}))
 	page.dependent = true
 	page.title  = _("linknx Variablenregeln")
-	page.order = 18
+	page.order = 19
 	--local page = entry({"admin", "services", "linknx_medialist"}, cbi("linknx/medialist", {autoapply=false}))
 	--page.dependent = true
 	--page.title  = _("linknx Multimedia")
-	--page.order = 19
+	--page.order = 20
 
 	local page  = node()
 	page.lock   = true

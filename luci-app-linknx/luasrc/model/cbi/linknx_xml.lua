@@ -17,8 +17,8 @@ end
 
 function f.handle(self, state, data)
 	if state == FORM_VALID then
-		if data.crons then
-			fs.writefile(conffile, data.crons:gsub("\r\n", "\n"))
+		if data.linknx_xml then
+			fs.writefile(conffile, data.linknx_xml:gsub("\r\n", "\n"))
 			--TODO reload linkx
 		end
 	end
