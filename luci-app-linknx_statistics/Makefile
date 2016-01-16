@@ -15,7 +15,7 @@ define Package/luci-app-linknx_statistics
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Linknx LuCI Statistics Application
-  DEPENDS:=+luci-app-statistics
+  DEPENDS:=+luci-app-statistics +linknx_gen
 endef
 
 define Build/Prepare
