@@ -29,6 +29,8 @@ function index()
 	page.dependent = true
 	page.title  = _("linknx Variablenliste")
 	page.order = 17
+	page.leaf = true
+	page.subindex = true
 	local page = entry({"admin", "services", "linknx_types"}, cbi("linknx/types", {autoapply=false}))
 	page.dependent = true
 	page.title  = _("linknx Variablentypen")
