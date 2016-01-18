@@ -1,11 +1,10 @@
-# $Id: Makefile 2010-02-04 23:25:21Z pg $
-
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx_statistics
-PKG_VERSION:=0.2.0
+PKG_VERSION:=0.2.1
 PKG_RELEASE:=1
-
+PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_LINKNX_STATISTICS_SRCDIET
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -15,7 +14,25 @@ define Package/luci-app-linknx_statistics
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Linknx LuCI Statistics Application
-  DEPENDS:=+luci-app-statistics +linknx_gen
+  DEPENDS:=+luci-mod-admin-full \
+           +luci-app-statistics \
+           +linknx_gen \
+           +luci-lib-nixio \
+           +luci-lib-json
+endef
+
+define Package/luci-app-linknx_statistics/config
+  config LUCI_APP_LINKNX_STATISTICS_SRCDIET
+    bool "linknx_statistics Minify Lua sources"
+    default n
+endef
+
+define SrcDiet
+  $(FIND) $(1) -type f -name '*.lua' | while read src; do \
+    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
+      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    then mv "$$$$src.o" "$$$$src"; fi; \
+  done
 endef
 
 define Build/Prepare
@@ -27,7 +44,7 @@ define Build/Configure
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
+	$(if $(CONFIG_LUCI_APP_LINKNX_STATISTICS_SRCDIET),$(call SrcDiet,$(PKG_BUILD_DIR)/luasrc/),true);
 endef
 
 define Package/luci-app-linknx_statistics/postinst

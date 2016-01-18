@@ -3,9 +3,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-knxd
-PKG_VERSION:=0.2.0
+PKG_VERSION:=0.2.1
 PKG_RELEASE:=1
-
+PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_KNXD_SRCDIET
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -16,7 +17,21 @@ define Package/luci-app-knxd
   SUBMENU:=3. Applications
   TITLE:=Eib KNX deamon
   URL:=https://github.com/knxd/knxd/wiki
-  DEPENDS:=+knxd +luci-mod-admin-full
+  DEPENDS:=+knxd +knxd-tools +luci-mod-admin-full
+endef
+
+define Package/luci-app-knxd/config
+  config LUCI_APP_KNXD_SRCDIET
+    bool "knxd Minify Lua sources"
+    default n
+endef
+
+define SrcDiet
+  $(FIND) $(1) -type f -name '*.lua' | while read src; do \
+    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
+      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    then mv "$$$$src.o" "$$$$src"; fi; \
+  done
 endef
 
 define Build/Prepare
@@ -28,7 +43,7 @@ define Build/Configure
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
+	$(if $(CONFIG_LUCI_APP_KNXD_SRCDIET),$(call SrcDiet,$(PKG_BUILD_DIR)/luasrc/),true);
 endef
 
 define Package/luci-app-knxd/postinst

@@ -1,11 +1,10 @@
-# $Id: Makefile 1146 2005-06-05 13:32:28Z nbd $
-
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx
-PKG_VERSION:=0.2.0
-PKG_RELEASE:=3
-
+PKG_VERSION:=0.2.1
+PKG_RELEASE:=1
+PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_LINKNX_SRCDIET
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -19,6 +18,20 @@ define Package/luci-app-linknx
   DEPENDS:=+linknx +luci-mod-admin-full +luci-lib-nixio
 endef
 
+define Package/luci-app-linknx/config
+  config LUCI_APP_LINKNX_SRCDIET
+    bool "linknx Minify Lua sources"
+    default n
+endef
+
+define SrcDiet
+  $(FIND) $(1) -type f -name '*.lua' | while read src; do \
+    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
+      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    then mv "$$$$src.o" "$$$$src"; fi; \
+  done
+endef
+
 define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
 	$(CP) ./luasrc $(PKG_BUILD_DIR)/
@@ -28,13 +41,12 @@ define Build/Configure
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
+	$(if $(CONFIG_LUCI_APP_LINKNX_SRCDIET),$(call SrcDiet,$(PKG_BUILD_DIR)/luasrc/),true);
 endef
 
 define Package/luci-app-linknx/postinst
 #!/bin/sh
 [ -n "${IPKG_INSTROOT}" ] || {
-	( . /etc/uci-defaults/luci-app-linknx ) && rm -f /etc/uci-defaults/luci-app-linknx
 	rm -f /tmp/luci-indexcache
 	exit 0
 }
