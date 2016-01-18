@@ -1,8 +1,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-modbus
-PKG_RELEASE:=0.0.3
-
+PKG_VERSION:=0.2.1
+PKG_RELEASE:=1
+PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_MODBUS_SRCDIET
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
@@ -12,11 +14,21 @@ define Package/luci-app-modbus
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Modbus Device
-  DEPENDS:=+modbus-uci +luci-base
+  DEPENDS:=+modbus-uci +luci-mod-admin-full +luci-lib-nixio
 endef
 
-define Package/luci-app-modbus/description
-  Modbus Device
+define Package/luci-app-modbus/config
+  config LUCI_APP_MODBUS_SRCDIET
+    bool "modbus Minify Lua sources"
+    default n
+endef
+
+define SrcDiet
+  $(FIND) $(1) -type f -name '*.lua' | while read src; do \
+    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
+      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    then mv "$$$$src.o" "$$$$src"; fi; \
+  done
 endef
 
 define Build/Prepare
@@ -28,7 +40,7 @@ define Build/Configure
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR)/luasrc
+	$(if $(CONFIG_LUCI_APP_MODBUS_SRCDIET),$(call SrcDiet,$(PKG_BUILD_DIR)/luasrc/),true);
 endef
 
 define Package/luci-app-modbus/postinst
