@@ -12,6 +12,10 @@ You may obtain a copy of the License at
 $Id$
 ]]--
 
+
+local util = require "luci.util"
+local fs = require "nixio.fs"
+
 require("luci.tools.webadmin")
 local uci = luci.model.uci.cursor()
 
@@ -29,9 +33,19 @@ s:option(DummyValue, "dv1", nil, "tpuarts:/dev/ttyACM0 connects to the KNX bus o
 s:option(DummyValue, "dv1", nil, "usb:[bus[:device[:config[:interface]]]] connects over a KNX USB interface")
 
 svc = s:option(Value, "url", "URL")
-svc:value("usb:")
 svc:value("ip:")
-svc:value("tpuarts:/dev/ttyACM0")
+for line in util.execi("findknxusb 2>/dev/null") do
+	if string.find(line, 'device:') then
+		local split = util.split(line,"(%s+)",nil,true)
+		if #split and split[2] then
+			svc:value("usb:"..split[2])
+		end
+	end
+end
+for device in fs.glob("/dev/ttyACM[0-9]*") do
+	svc:value("tpuarts:"..device)
+end
+
 function svc.validate(self, value, section)
 	if string.find(value, 'ip:') then
 		local mcast=string.match(value, "(%d+.%d+.%d+.%d+)") or "224.0.23.12"
