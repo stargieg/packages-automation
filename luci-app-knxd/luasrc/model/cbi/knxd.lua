@@ -20,6 +20,7 @@ require("luci.tools.webadmin")
 local uci = luci.model.uci.cursor()
 
 m = Map("knxd", "KNX Server", "KNX Server for RS232, USB, EIB/IP Routing and EIB/IP Tunnelling")
+m.on_after_commit = function() luci.sys.call("/etc/init.d/knxd restart") end
 
 s = m:section(NamedSection, "args", "KNX Interface")
 s:option(DummyValue, "dv1", nil,"Supported Hardware: https://web.archive.org/web/20140331121456/http://sourceforge.net/apps/trac/bcusdk/wiki/SupportedHardware")
