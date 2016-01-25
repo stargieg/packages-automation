@@ -14,6 +14,8 @@ $Id$
 
 module("luci.controller.knxd", package.seeall)
 
+local uci = require("luci.model.uci").cursor()
+
 function index()
 	local uci = require("luci.model.uci").cursor()
 	local fs = require("nixio.fs")
@@ -47,7 +49,16 @@ function index()
 end
 
 function knxd_diag_vbusmonitor()
-	local cmd = "knxtool vbusmonitor1 ip:127.0.0.1 2>&1"
+	local listen_tcp = uci:get( "knxd", "args", "listen_tcp" )
+	local listen_local = uci:get( "knxd", "args", "listen_local" )
+	if listen_tcp then
+		local cmd = "knxtool vbusmonitor1 ip:127.0.0.1:"..listen_tcp.." 2>&1"
+	elseif listen_local then
+		local cmd = "knxtool vbusmonitor1 local:"..listen_local.." 2>&1"
+	else
+		return
+	end
+
 	luci.http.prepare_content("text/plain")
 	luci.http.write(cmd)
 	local util = io.popen(cmd)
@@ -64,7 +75,16 @@ function knxd_diag_vbusmonitor()
 end
 
 function knxd_diag_groupsocketlisten()
-	local cmd = "knxtool groupsocketlisten ip:127.0.0.1 2>&1"
+	local listen_tcp = uci:get( "knxd", "args", "listen_tcp" )
+	local listen_local = uci:get( "knxd", "args", "listen_local" )
+	if listen_tcp then
+		local cmd = "knxtool groupsocketlisten ip:127.0.0.1:"..listen_tcp.." 2>&1"
+	elseif listen_local then
+		local cmd = "knxtool groupsocketlisten local:"..listen_local.." 2>&1"
+	else
+		return
+	end
+
 	luci.http.prepare_content("text/plain")
 	luci.http.write(cmd)
 	local util = io.popen(cmd)
@@ -87,10 +107,21 @@ function knxd_diag_groupswrite()
 		--TODO err mesg
 		return
 	end
-	local cmd = "knxtool groupswrite ip:127.0.0.1 "..addr.." "..value
+	local listen_tcp = uci:get( "knxd", "args", "listen_tcp" )
+	local listen_local = uci:get( "knxd", "args", "listen_local" )
+	local cmd
+	if listen_tcp then
+		cmd = "knxtool groupswrite ip:127.0.0.1:"..listen_tcp.." "..addr.." "..value
+	elseif listen_local then
+		cmd = "knxtool groupswrite local:"..listen_local.." "..addr.." "..value
+	else
+		cmd = "knx is not listen on 127.0.0.1 or local socket"
+	end
 	luci.http.prepare_content("text/plain")
 	luci.http.write(cmd)
+	luci.http.write("\n")
 	luci.http.write(" ret: ")
+	luci.http.write("\n")
 	local util = io.popen(cmd)
 	if util then
 		while true do
