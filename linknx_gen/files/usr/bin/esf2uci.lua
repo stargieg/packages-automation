@@ -68,7 +68,7 @@ function find_type (pvar)
 	local ret3 = nil
 	local ret4 = nil
 	local prio = 0
-	uci:foreach("linknx_expr", "typeexpr", function(s)
+	uci:foreach("linknx_exp", "typeexpr", function(s)
 		typeexpr = string.gsub(s.typeexpr,"%*","")
 		if string.find(pvar,'_stat_pos') then
 			ret1 = nil
