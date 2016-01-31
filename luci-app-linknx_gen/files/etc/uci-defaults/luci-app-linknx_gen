@@ -12,7 +12,7 @@ EOF
 
 #cp /www/linknx.html /www/index.html
 /usr/bin/linknx-uci-event.sh
-echo "*/30 * * * * /usr/bin/linknx-uci-event.sh clean" >> /etc/crontabs/root
+grep -q "linknx-uci-event.sh" /etc/crontabs/root || echo "*/30 * * * * /usr/bin/linknx-uci-event.sh clean" >> /etc/crontabs/root
 
 mkdir /home
 ##(echo n; echo p; echo 3; echo 250; echo; echo w) | fdisk /dev/sda
