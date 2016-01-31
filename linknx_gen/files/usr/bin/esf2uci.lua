@@ -17,6 +17,14 @@ function unlock()
 	os.execute("lock -u /var/run/test.lock")
 end
 
+function logger_err(msg)
+	os.execute("logger -p error -t ubus-linknx "..msg)
+end
+
+function logger_info(msg)
+	os.execute("logger -p info -t ubus-linknx "..msg)
+end
+
 function fromESF (s)
 	s = s .. '.'        -- ending dot
 	s_len = string.len(s)
@@ -155,13 +163,13 @@ if esf_file then
 					table.insert(uci_event,grp_event)
 				else
 					if not grp and grp_type then
-						print("NO Group"..s)
+						logger_err("NO Group: "..s)
 					end
 					if not grp_type and grp then
-						print("NO Type"..s)
+						logger_err("NO Type: "..s)
 					end
 					if not grp_type and not grp then
-						print("NO GroupType"..s)
+						logger_err("NO GroupType: "..s)
 					end
 				end
 			end
