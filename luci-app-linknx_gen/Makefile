@@ -79,8 +79,7 @@ define Package/luci-app-linknx_gen/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/etc/uci-defaults/luci-app-linknx_gen $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/etc/init.d/ws-mirror-server-linknx $(1)/etc/init.d
-	#$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/ws-mirror-server-linknx $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ubus-linknx $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ubus-linknx $(1)/usr/sbin
