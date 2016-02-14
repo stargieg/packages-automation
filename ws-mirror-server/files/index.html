@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="auto">
+ <head>
+  <meta charset="utf-8">
+  <title>libwebsockets - Chat</title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <link rel="stylesheet" href="cascade.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 854px)" href="mobile.css" type="text/css" />
+  <link rel="shortcut icon" href="favicon.ico">
+ </head>
+
+ <body class="lang_autoChat">
+  <header>
+   <div class="fill">
+    <div class="container">
+     <a class="brand" href="#">libwebsockets Chat Server</a>
+     <ul class="nav">
+     </ul>
+    </div>
+   </div>
+  </header>
+<div id="maincontent" class="container">
+<h3>Detected Browser: <div id="brow">...</div></h3>
+<a>console:</a></br>
+<a># ubus listen</a></br>
+<a># ubus send chat '{ "id": "1234","nick": "icke","msg": "und er" }'</a></br>
+<table>
+	<tr>
+		<td width="400" id="wsdi_statustd" align="center"><div id="wsdi_status">Not initialized</div><a id="wsdi_http" href="" target="_blank"></a></td>
+	</tr>
+</table>
+<h2>Nick Liste<h2>
+<ol id="nick_list">
+</ol>
+<table>
+	<tr>
+		<td align="center"><input type="text" id="nick"></input>  <input class="cbi-button" type="button" id="nick" value="Update Nick" onclick="set_nick();" ></input></td>
+	</tr>
+</table>
+<h2>Chat Console<h2>
+<ol id="number">
+</ol>
+<table>
+	<tr>
+		<td align="center"><input type="text" id="txtinput"></input>  <input class="cbi-button" type="button" id="offset" value="Send" onclick="socket_send();" ></input></td>
+	</tr>
+</table>
+
+<script type="text/javascript" src="chat.js"></script>
+
+
+   <footer>
+   </footer>
+   </div>
+  </div>
+ </body>
+</html>
