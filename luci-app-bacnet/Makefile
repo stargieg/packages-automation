@@ -53,9 +53,9 @@ endef
 
 define Package/luci-app-bacnet/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/* $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/* $(1)/usr/lib/lua/luci/model/cbi
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/bacnet
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/bacnet/* $(1)/usr/lib/lua/luci/model/cbi/bacnet
 endef
 
 $(eval $(call BuildPackage,luci-app-bacnet))
