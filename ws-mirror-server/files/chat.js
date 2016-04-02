@@ -207,7 +207,7 @@ document.getElementById("number").removeChild(document.getElementById("number").
 
 	try {
 		socket_di.onopen = function(evt) {
-			CONFIG.id   = evt.timeStamp;
+			CONFIG.id   = Math.floor((Math.random() * 1000000000) + 1);
 			document.getElementById("wsdi_statustd").style.backgroundColor = "#40ff40";
 			document.getElementById("wsdi_status").textContent = " websocket connection opened ";
 		}
