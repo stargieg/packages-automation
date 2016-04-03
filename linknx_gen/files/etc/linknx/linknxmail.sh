@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /etc/functions.sh
+. /lib/functions.sh
 
 varname="$1"
 val="$2"

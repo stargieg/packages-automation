@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /etc/functions.sh
+. /lib/functions.sh
 
 local rule_id=$1
 local object_value=$2
