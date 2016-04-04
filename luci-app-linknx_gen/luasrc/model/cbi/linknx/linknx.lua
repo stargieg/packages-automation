@@ -15,6 +15,10 @@ $Id$
 
 require("luci.tools.webadmin")
 m = Map("linknx_exp", "EIB AppServer", "EIB/KNX AppServer for logic timeshedule and IO API")
+m.on_after_commit = function() 
+	luci.sys.call("/usr/bin/esf2uci.lua")
+	luci.sys.call("/etc/init.d/linknx_gen restart")
+end
 
 s = m:section(TypedSection, "daemon", "Daemon")
 s.addremove = true

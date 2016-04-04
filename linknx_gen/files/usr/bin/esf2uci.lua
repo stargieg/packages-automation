@@ -195,7 +195,8 @@ if esf_file then
 			-- print("N"..s)
 			uci:section("linknx_varlist_"..uci_group[i], "pvar", nil, {
 				name    =s,
-				tagname ="ISP1-LINKNX",
+				--TODO read Tagname from uci
+				tagname ="linknx",
 				addr    =uci_addr[i],
 				group   =uci_group[i],
 				comment =uci_comment[i],

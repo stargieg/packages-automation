@@ -2,10 +2,10 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx_gen
 PKG_VERSION:=0.2.3
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 PKG_BUILD_DEPENDS += lua/host luci-base/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_LINKNX_GEN_SRCDIET
-PKG_SOURCE:=linknx.tgz
+PKG_SOURCE:=linknx-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://firmware-ga.lunatiki.de/firmwares/
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
