@@ -15,12 +15,12 @@ $Id$
 require("luci.sys")
 require("luci.util")
 require("luci.tools.webadmin")
-require("luci.fs")
+require("nixio.fs")
 local arg1 = arg[1]
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
 
-if not luci.fs.access("/etc/config/bacnet_bo") then
+if not nixio.fs.access("/etc/config/bacnet_bo") then
 	if not luci.sys.exec("touch /etc/config/bacnet_bo") then
 		return
 	end

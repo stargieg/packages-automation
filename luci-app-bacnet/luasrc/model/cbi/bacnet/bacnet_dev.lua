@@ -13,7 +13,7 @@ $Id$
 ]]--
 
 local fs  = require "nixio.fs"
-local lfs  = require "luci.fs"
+local lfs  = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
 local sys = require "luci.sys"
 local uci_state = require "luci.model.uci".cursor_state()
