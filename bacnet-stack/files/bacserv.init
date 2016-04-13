@@ -18,11 +18,11 @@ start_dev() {
 	config_get iface $cfg iface "lan"
 	network_get_device ifname "$iface"
 	procd_set_param command "$BIN"
-	export BACNET_IFACE="$ifname"
-	export BACNET_DATALINK="$bacdl"
+	procd_set_param env BACNET_IFACE="$ifname"
+	procd_set_param env BACNET_DATALINK="$bacdl"
 	[ "$bacdl" == "bip" ] && {
 		config_get port $cfg port "47808"
-		export BACNET_IP_PORT="$port"
+		procd_set_param env BACNET_IP_PORT="$port"
 	}
 	procd_add_reload_interface_trigger "$iface"
 	procd_close_instance
