@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=modbus-uci
 PKG_VERSION:=0.5
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 PKG_BUILD_DEPENDS:=libmodbus
@@ -36,10 +36,6 @@ endef
 define Package/bacnet-stack/postinst
 #!/bin/sh
 
-if [ -z $${IPKG_INSTROOT} ] ; then
-	( . /etc/uci-defaults/modbus ) && rm /etc/uci-defaults/modbus
-fi
-
 [ -n $${IPKG_INSTROOT} ] || {
 	/etc/init.d/modbus enable
 	/etc/init.d/modbus restart
@@ -49,7 +45,6 @@ endef
 define Package/modbus-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/modbus.config $(1)/etc/config/modbus
-	$(INSTALL_BIN) ./files/modbus.defaults $(1)/etc/uci-defaults/modbus
 	$(INSTALL_BIN) ./files/modbus.init $(1)/etc/init.d/modbus
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/modbus-uci $(1)/usr/sbin/modbus-uci
