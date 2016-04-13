@@ -2,59 +2,34 @@
 # Copyright (C) 2013 Patrick Grimm
 
 START=60
-SERVER="bacserv"
+USE_PROCD=1
 SERVER_BIN="/usr/sbin/bacserv"
 
 start_dev() {
 	local cfg=$1
 	config_get enable $cfg enable "0"
-	[ "$enable" == "0" ] && return
+	[ "$enable" == "1" ] || return
+	config_get bacdl $cfg bacdl "bip"
+	BIN="$SERVER_BIN-$bacdl"
+	[ -f "$BIN" ] || return
+	procd_open_instance
+	procd_set_param respawn
+	procd_set_param stderr 1
 	config_get iface $cfg iface "lan"
 	network_get_device ifname "$iface"
-	config_get bacdl $cfg bacdl "bip"
-	SRV="$SERVER-$bacdl"
-	BIN="$SERVER_BIN-$bacdl"
+	procd_set_param command "$BIN"
 	export BACNET_IFACE="$ifname"
 	export BACNET_DATALINK="$bacdl"
 	[ "$bacdl" == "bip" ] && {
 		config_get port $cfg port "47808"
 		export BACNET_IP_PORT="$port"
 	}
-	export UCI_SECTION=$cfg
-	start-stop-daemon -S -x $BIN \
-		-p /var/run/${SERVER}-${cfg}.pid \
-		-m -b --
+	procd_add_reload_interface_trigger "$iface"
+	procd_close_instance
 }
 
-stop_dev() {
-	local cfg=$1
-	config_get bacdl $cfg bacdl 'bip'
-	SRV="$SERVER-$bacdl"
-	BIN="$SERVER_BIN-$bacdl"
-	[ -f /var/run/${SRV}.pid ] && {
-		pid=$(cat /var/run/${SERVER}-${cfg}.pid)
-		kill $pid
-		sleep 1
-		kill -9 $pid 2>/dev/null
-		rm -f /var/run/${SERVER}-${cfg}.pid
-	}
-}
-
-start() {
+start_service() {
 	. /lib/functions/network.sh
 	config_load bacnet_dev
 	config_foreach start_dev dev
 }
-
-stop() {
-	. /lib/functions/network.sh
-	config_load bacnet_dev
-	config_foreach stop_dev dev
-}
-
-restart() {
-	stop
-	sleep 2
-	start
-}
-
