@@ -25,50 +25,66 @@ if not lfs.access("/etc/config/bacnet_dev") then
 end
 
 local m = Map("bacnet_dev", "Bacnet Device", "Bacnet Device Configuration")
+m.on_after_commit = function() luci.sys.call("/etc/init.d/bacserv restart") end
 
 local s = m:section(TypedSection, "dev", 'Device Nummer')
 s.addremove = true
 s.anonymous = false
 
-local active = s:option(DummyValue, "_active", translate("Started") )
-function active.cfgvalue(self, section)
-	local pid = fs.readfile("/var/run/bacserv-%s.pid" % section)
-	if pid and #pid > 0 and tonumber(pid) ~= nil then
-		return (sys.process.signal(pid, 0))
-			and translatef("yes (%i)", pid)
-			or  translate("no")
-	end
-	return translate("no").." "..section
-end
+s:option(DummyValue, "dv1", nil, "supported Netzwerk Layers are:")
+s:option(DummyValue, "dv1", nil, "BACnetIPv4 opkg install bacnet-stack-bip")
+s:option(DummyValue, "dv1", nil, "BACnetIPv6 opkg #WIP")
+s:option(DummyValue, "dv1", nil, "BACnet Ethernet (linklocal and fast) opkg install bacnet-stack-ethernet")
+s:option(DummyValue, "dv1", nil, "BACnet MSTP (serial RS485) opkg install bacnet-stack-mstp")
 
-local updown = s:option(Button, "_updown", translate("Start/Stop") )
-updown._state = false
-function updown.cbid(self, section)
-	local pid = fs.readfile("/var/run/bacserv-%s.pid" % section)
-	self._state = pid and #pid > 0 and sys.process.signal(pid, 0)
-	self.option = self._state and "stop" or "start"
-	
-	return AbstractValue.cbid(self, section)
-end
-function updown.cfgvalue(self, section)
-	self.title = self._state and "stop" or "start"
-	self.inputstyle = self._state and "reset" or "reload"
-end
-function updown.write(self, section, value)
-	if self.option == "stop" then
-		sys.call("/etc/init.d/bacserv stop %s" % section)
-	else
-		sys.call("/etc/init.d/bacserv start %s" % section)
-	end
-end
+-- local active = s:option(DummyValue, "_active", translate("Started") )
+-- function active.cfgvalue(self, section)
+-- 	local pid = fs.readfile("/var/run/bacserv-%s.pid" % section)
+-- 	if pid and #pid > 0 and tonumber(pid) ~= nil then
+-- 		return (sys.process.signal(pid, 0))
+-- 			and translatef("yes (%i)", pid)
+-- 			or  translate("no")
+-- 	end
+-- 	return translate("no").." "..section
+-- end
+
+-- local updown = s:option(Button, "_updown", translate("Start/Stop") )
+-- updown._state = false
+-- function updown.cbid(self, section)
+-- 	local pid = fs.readfile("/var/run/bacserv-%s.pid" % section)
+-- 	self._state = pid and #pid > 0 and sys.process.signal(pid, 0)
+-- 	self.option = self._state and "stop" or "start"
+-- 	
+-- 	return AbstractValue.cbid(self, section)
+-- end
+-- function updown.cfgvalue(self, section)
+-- 	self.title = self._state and "stop" or "start"
+-- 	self.inputstyle = self._state and "reset" or "reload"
+-- end
+-- function updown.write(self, section, value)
+-- 	if self.option == "stop" then
+-- 		sys.call("/etc/init.d/bacserv stop %s" % section)
+-- 	else
+-- 		sys.call("/etc/init.d/bacserv start %s" % section)
+-- 	end
+-- end
 
 s:option(Flag, "enable", "enable")
 
 sva = s:option(Value, "bacdl", "Netzwerk Layer")
-sva:value('bip','BACnet IPv4')
-sva:value('bip6','BACnet IPv6')
-sva:value('ethernet','BACnet Ethernet')
-sva:value('mstp','BACnet MSTP (RS485/RS232)')
+if lfs.access("/usr/sbin/bacserv-bip") then
+	sva:value('bip','BACnet IPv4')
+end
+if lfs.access("/usr/sbin/bacserv-bip6") then
+	sva:value('bip6','BACnet IPv6')
+end
+if lfs.access("/usr/sbin/bacserv-ethernet") then
+	sva:value('ethernet','BACnet Ethernet')
+end
+if lfs.access("/usr/sbin/bacserv-mstp") then
+	sva:value('mstp','BACnet MSTP (RS485/RS232)')
+end
+
 
 sva = s:option(Value, "iface", "Netzwerk Interface")
 uci:foreach("network", "interface",
