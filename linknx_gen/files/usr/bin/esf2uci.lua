@@ -103,11 +103,13 @@ end
 
 
 
+local uci_tagname
 local esf_file
 uci:foreach("linknx_exp", "daemon", function(s)
 	if s.esf then
 		if nixio.fs.access(s.esf) then
 			esf_file = s.esf
+			uci_tagname = s.tagname or "linknx"
 		end
 	end
 end)
@@ -116,7 +118,6 @@ local esf
 local uci_addr = {}
 local uci_adr_int = {}
 local uci_pvar = {}
-local uci_tagname = {}
 local uci_group = {}
 local uci_type = {}
 local uci_comment = {}
@@ -186,7 +187,7 @@ if esf_file then
 				if string.find(sec.name,uci_adr_int[i]) then
 					old_pvar = sec.name
 					old_pvarr = sec
-					--TODO e.g. Name von 1/1/1 geaendert. Loechen und neu anlegen?
+					--TODO e.g. Name von 1/1/1 geaendert. Löschen und neu anlegen?
 					--oder nur warnen?
 				end
 			end
@@ -195,8 +196,7 @@ if esf_file then
 			-- print("N"..s)
 			uci:section("linknx_varlist_"..uci_group[i], "pvar", nil, {
 				name    =s,
-				--TODO read Tagname from uci
-				tagname ="linknx",
+				tagname =uci_tagname,
 				addr    =uci_addr[i],
 				group   =uci_group[i],
 				comment =uci_comment[i],

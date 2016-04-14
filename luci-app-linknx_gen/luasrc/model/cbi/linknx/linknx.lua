@@ -26,7 +26,7 @@ s.anonymous = true
 
 s:option(Flag, "disable", "Disable")
 s:option(Flag, "log", "Log info and error to ")
-s:option(Value, "tagname", "Linknx Name e.g. ISP1-LINKNX")
+s:option(Value, "tagname", "Linknx Name e.g. linknx")
 s:option(FileUpload, "esf", "/etc/linknx/linknximport.esf")
 
 return m
