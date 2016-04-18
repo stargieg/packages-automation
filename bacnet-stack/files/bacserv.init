@@ -12,19 +12,37 @@ start_dev() {
 	config_get bacdl $cfg bacdl "bip"
 	BIN="$SERVER_BIN-$bacdl"
 	[ -f "$BIN" ] || return
+	config_get iface $cfg iface "lan"
+	network_get_device ifname "$iface"
 	procd_open_instance
 	procd_set_param respawn
 	procd_set_param stderr 1
-	config_get iface $cfg iface "lan"
-	network_get_device ifname "$iface"
 	procd_set_param command "$BIN"
-	procd_set_param env BACNET_IFACE="$ifname"
-	procd_set_param env BACNET_DATALINK="$bacdl"
-	[ "$bacdl" == "bip" ] && {
+	if [ "$bacdl" == "bip" ] ; then 
 		config_get port $cfg port "47808"
-		procd_set_param env BACNET_IP_PORT="$port"
-	}
-	procd_add_reload_interface_trigger "$iface"
+		procd_set_param env \
+		BACNET_DATALINK="$bacdl" \
+		BACNET_IFACE="$ifname" \
+		BACNET_IP_PORT="$port"
+	else
+		procd_set_param env \
+		BACNET_DATALINK="$bacdl" \
+		BACNET_IFACE="$ifname"
+	fi
+	#procd_add_reload_interface_trigger "$iface"
+	procd_add_reload_trigger "network" \
+							"bacnet_ai" \
+							"bacnet_ao" \
+							"bacnet_av" \
+							"bacnet_bi" \
+							"bacnet_bo" \
+							"bacnet_bv" \
+							"bacnet_dev" \
+							"bacnet_mi" \
+							"bacnet_mo" \
+							"bacnet_mv" \
+							"bacnet_nc" \
+							"bacnet_tl"
 	procd_close_instance
 }
 

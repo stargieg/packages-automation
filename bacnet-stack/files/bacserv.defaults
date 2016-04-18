@@ -13,29 +13,7 @@ if [ "$(uci get system.@system[0].hostname)" == "OpenWrt" ]; then
 	uci set bacnet_dev.1.id=$((rand+1))
 	uci commit
 	echo OpenWrt-$rand > /proc/sys/kernel/hostname
-	(
-	sleep 3
 	uci set network.lan.proto=dhcp
+	uci set dhcp.lan.ignore=1
 	uci commit
-	/etc/init.d/network restart
-	/etc/init.d/dnsmasq restart
-	/etc/init.d/bacserv restart
-	/etc/init.d/avahi-daemon restart
-	) &
 fi
-
-[ "$(uci get ucitrack.@bacnet_dev[0] 2>/dev/null)" != "bacnet_dev" ] && \
-uci batch <<-EOF >/dev/null 2>/dev/null
-	add ucitrack bacnet_dev
-	set ucitrack.@bacnet_dev[-1].init="bacserv"
-	add ucitrack bacnet_av
-	set ucitrack.@bacnet_av[-1].init="bacserv"
-	add ucitrack bacnet_mv
-	set ucitrack.@bacnet_mv[-1].init="bacserv"
-	add ucitrack bacnet_nc
-	set ucitrack.@bacnet_nc[-1].init="bacserv"
-	add ucitrack bacnet_bi
-	set ucitrack.@bacnet_bi[-1].init="bacserv"
-	commit ucitrack
-EOF
-
