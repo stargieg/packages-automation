@@ -62,9 +62,9 @@ define Package/luci-app-linknx_statistics/install
 	$(INSTALL_DIR) $(1)/usr/share/collectd
 	$(INSTALL_DATA) ./files/usr/share/collectd/linknx.db $(1)/usr/share/collectd
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/etc/uci-defaults/linknx-statistics $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) ./files/usr/bin/* $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/linknx-collectd-cmd.lua $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/luci_statistics
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/luci_statistics/linknx_statistics.lua $(1)/usr/lib/lua/luci/controller/luci_statistics
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/statistics/rrdtool/definitions
