@@ -19,7 +19,7 @@ require("luci.fs")
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
 
-if not luci.fs.access("/etc/config/modbus") then
+if not nixio.fs.access("/etc/config/modbus") then
 	if not luci.sys.exec("touch /etc/config/modbus") then
 		return
 	end
