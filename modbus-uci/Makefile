@@ -44,7 +44,7 @@ endef
 
 define Package/modbus-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/modbus.config $(1)/etc/config/modbus
+	$(INSTALL_DATA) ./files/modbus.config $(1)/etc/config/modbus
 	$(INSTALL_BIN) ./files/modbus.init $(1)/etc/init.d/modbus
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/modbus-uci $(1)/usr/sbin/modbus-uci
