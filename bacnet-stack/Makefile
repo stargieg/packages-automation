@@ -136,8 +136,7 @@ fi
 endef
 
 define Package/bacnet-stack-uci/install
-	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/bacserv.defaults $(1)/etc/uci-defaults/bacserv
+	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config
 	$(INSTALL_BIN) ./files/bacserv.init $(1)/etc/init.d/bacserv
 	$(INSTALL_DATA) ./files/bacnet_dev.config $(1)/etc/config/bacnet_dev
 	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_ai
@@ -155,16 +154,22 @@ define Package/bacnet-stack-uci/install
 endef
 
 define Package/bacnet-stack-bip/install
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/bacserv_bip.defaults $(1)/etc/uci-defaults/bacserv_bip
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-bip
 endef
 
 define Package/bacnet-stack-ethernet/install
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/bacserv_ethernet.defaults $(1)/etc/uci-defaults/bacserv_ethernet
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-ethernet
 endef
 
 define Package/bacnet-stack-mstp/install
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/bacserv_mstp.defaults $(1)/etc/uci-defaults/bacserv_mstp
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-mstp
 endef

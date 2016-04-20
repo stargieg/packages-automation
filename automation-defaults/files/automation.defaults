@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+setup_system() {
+	local cfg=$1
+	if [ -z "$hostname" ] || [ "$hostname" == "OpenWrt" ] ; then
+		# Set Hostname
+		rand="$(echo -n $(head -n 1 /dev/urandom 2>/dev/null | md5sum | cut -b 1-4))"
+		rand="$(printf "%d" "0x$rand")"
+		hostname="$hostname-$rand"
+		uci_set system $cfg hostname "$hostname"
+		uci_set system $cfg hostname_rand "$rand"
+		echo $hostname > /proc/sys/kernel/hostname
+		# Set Timezone
+		uci_set system $cfg zonename "Europe/Berlin"
+		uci_set system $cfg timezone "CET-1CEST,M3.5.0,M10.5.0/3"
+		uci_set network lan.proto=dhcp
+		uci_set dhcp lan ignore 1
+		uci_set dhcp lan dhcpv6 "disabled"
+		uci_set dhcp lan ra "disabled"
+	fi
+}
+
+#Load dhcp config
+config_load system
+#Setup system hostname,timezone,location,latlon
+config_foreach setup_system system
+
+#Save
+uci_commit system
+uci_commit dhcp
