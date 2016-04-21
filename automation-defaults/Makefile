@@ -6,14 +6,10 @@ PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/automation-defaults/Default
+define Package/automation-defaults
   SECTION:=net
   CATEGORY:=Network
   TITLE:=automation-defaults
-endef
-
-define Package/automation-defaults/Default/description
-  automation-defaults
 endef
 
 define Package/automation-defaults/postinst
