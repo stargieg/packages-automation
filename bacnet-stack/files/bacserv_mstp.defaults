@@ -12,14 +12,14 @@ setup_bacnet() {
 	local cfg=$1
 	dev_idx=$(($cfg+1))
 	config_get bacdl $cfg bacdl
-	echo $bacdl
 	if [ "$bacdl" == "mstp" ] ; then
 		has_mstp=1
-	fi
-	config_get name $cfg name
-	if [ -z "$name" ] || [ "$name" == "openwrt-router-mstp" ] ; then
-		uci_set bacnet_dev $cfg name "$hostname-mstp"
-		uci_set bacnet_dev $cfg id "$hostname_rand"
+		config_get name $cfg name
+		if [ -z "$name" ] || [ "$name" == "openwrt-router-mstp" ] ; then
+			uci_set bacnet_dev $cfg name "$hostname-mstp"
+			uci_set bacnet_dev $cfg id "$hostname_rand"
+			uci_commit bacnet_dev
+		fi
 	fi
 }
 
@@ -27,8 +27,6 @@ local hostname
 local hostname_rand
 config_load system
 config_foreach setup_system system
-echo "Host: $hostname"
-echo "Rand: $hostname_rand"
 
 if [ -z "hostname_rand" ] ; then
 	hostname_rand="$(echo -n $(head -n 1 /dev/urandom 2>/dev/null | md5sum | cut -b 1-4))"
@@ -36,8 +34,8 @@ if [ -z "hostname_rand" ] ; then
 	hostname="$hostname-$hostname_rand"
 fi
 
-local has_mstp
-local dev_idx = 0
+local has_mstp=''
+local dev_idx=0
 config_load bacnet_dev
 config_foreach setup_bacnet dev
 if [ -z "$has_mstp" ] ; then
@@ -54,4 +52,5 @@ if [ -z "$has_mstp" ] ; then
 	uci_set bacnet_dev $cfg net "0"
 	uci_set bacnet_dev $cfg iface "/dev/ttyUSB0"
 	uci_set bacnet_dev $cfg bacdl "mstp"
+	uci_commit bacnet_dev
 fi
