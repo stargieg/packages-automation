@@ -1,0 +1,118 @@
+if PACKAGE_bacnet-stack-ethernet
+
+config BACNET_STACK_ETHERNET_AI
+	bool "Enable Analog Input Object"
+	default y
+
+config BACNET_STACK_ETHERNET_AI_MAX
+	string
+	prompt "Max Analog Input Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_AO
+	bool "Enable Analog Output Object"
+	default y
+
+config BACNET_STACK_ETHERNET_AO_MAX
+	string
+	prompt "Max Analog Output Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_AV
+	bool "Enable Analog Value Object"
+	default y
+
+config BACNET_STACK_ETHERNET_AV_MAX
+	string
+	prompt "Max Analog Value Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_BI
+	bool "Enable Binary Input Object"
+	default y
+
+config BACNET_STACK_ETHERNET_BI_MAX
+	string
+	prompt "Max Binary Input Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_BO
+	bool "Enable Binary Output Object"
+	default y
+
+config BACNET_STACK_ETHERNET_BO_MAX
+	string
+	prompt "Max Binary Output Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_BV
+	bool "Enable Binary Value Object"
+	default y
+
+config BACNET_STACK_ETHERNET_BV_MAX
+	string
+	prompt "Max Binary Value Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_MSI
+	bool "Enable Multistate Input Object"
+	default y
+
+config BACNET_STACK_ETHERNET_MSI_MAX
+	string
+	prompt "Max Multistate Input Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_MSO
+	bool "Enable Multistate Output Object"
+	default y
+
+config BACNET_STACK_ETHERNET_MSO_MAX
+	string
+	prompt "Max Multistate Output Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_MSV
+	bool "Enable Multistate Value Object"
+	default y
+
+config BACNET_STACK_ETHERNET_MSV_MAX
+	string
+	prompt "Max Multistate Value Object"
+	default "512"
+
+config BACNET_STACK_ETHERNET_NC
+	bool "Enable Intrinsic Reporting"
+	default y
+
+config BACNET_STACK_ETHERNET_NC_MAX
+	string
+	prompt "Max Notification Classes"
+	default "16"
+
+config BACNET_STACK_ETHERNET_TRENDLOG
+	bool "Enable Trendlog Object"
+	default y
+
+config BACNET_STACK_ETHERNET_TRENDLOG_MAX
+	string
+	prompt "Max Trendlog Object"
+	default "16"
+
+config BACNET_STACK_ETHERNET_FILE
+	bool "Enable File Object"
+	default y
+
+config BACNET_STACK_ETHERNET_TIME
+	bool "Enable Time Master"
+	default y
+
+config BACNET_STACK_ETHERNET_BBMD
+	bool "Enable BBMD"
+	default y
+
+config BACNET_STACK_ETHERNET_BBMD_CLIENT
+	bool "Enable BBMD Client"
+	default y
+
+endif

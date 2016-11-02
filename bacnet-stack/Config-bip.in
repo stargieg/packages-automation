@@ -1,0 +1,118 @@
+if PACKAGE_bacnet-stack-bip
+
+config BACNET_STACK_BIP_AI
+	bool "Enable Analog Input Object"
+	default y
+
+config BACNET_STACK_BIP_AI_MAX
+	string
+	prompt "Max Analog Input Object"
+	default "512"
+
+config BACNET_STACK_BIP_AO
+	bool "Enable Analog Output Object"
+	default y
+
+config BACNET_STACK_BIP_AO_MAX
+	string
+	prompt "Max Analog Output Object"
+	default "512"
+
+config BACNET_STACK_BIP_AV
+	bool "Enable Analog Value Object"
+	default y
+
+config BACNET_STACK_BIP_AV_MAX
+	string
+	prompt "Max Analog Value Object"
+	default "512"
+
+config BACNET_STACK_BIP_BI
+	bool "Enable Binary Input Object"
+	default y
+
+config BACNET_STACK_BIP_BI_MAX
+	string
+	prompt "Max Binary Input Object"
+	default "512"
+
+config BACNET_STACK_BIP_BO
+	bool "Enable Binary Output Object"
+	default y
+
+config BACNET_STACK_BIP_BO_MAX
+	string
+	prompt "Max Binary Output Object"
+	default "512"
+
+config BACNET_STACK_BIP_BV
+	bool "Enable Binary Value Object"
+	default y
+
+config BACNET_STACK_BIP_BV_MAX
+	string
+	prompt "Max Binary Value Object"
+	default "512"
+
+config BACNET_STACK_BIP_MSI
+	bool "Enable Multistate Input Object"
+	default y
+
+config BACNET_STACK_BIP_MSI_MAX
+	string
+	prompt "Max Multistate Input Object"
+	default "512"
+
+config BACNET_STACK_BIP_MSO
+	bool "Enable Multistate Output Object"
+	default y
+
+config BACNET_STACK_BIP_MSO_MAX
+	string
+	prompt "Max Multistate Output Object"
+	default "512"
+
+config BACNET_STACK_BIP_MSV
+	bool "Enable Multistate Value Object"
+	default y
+
+config BACNET_STACK_BIP_MSV_MAX
+	string
+	prompt "Max Multistate Value Object"
+	default "512"
+
+config BACNET_STACK_BIP_NC
+	bool "Enable Intrinsic Reporting"
+	default y
+
+config BACNET_STACK_BIP_NC_MAX
+	string
+	prompt "Max Notification Classes"
+	default "16"
+
+config BACNET_STACK_BIP_TRENDLOG
+	bool "Enable Trendlog Object"
+	default y
+
+config BACNET_STACK_BIP_TRENDLOG_MAX
+	string
+	prompt "Max Trendlog Object"
+	default "16"
+
+config BACNET_STACK_BIP_FILE
+	bool "Enable File Object"
+	default y
+
+config BACNET_STACK_BIP_TIME
+	bool "Enable Time Master"
+	default y
+
+config BACNET_STACK_BIP_BBMD
+	bool "Enable BBMD"
+	default y
+
+config BACNET_STACK_BIP_BBMD_CLIENT
+	bool "Enable BBMD Client"
+	default y
+
+endif
