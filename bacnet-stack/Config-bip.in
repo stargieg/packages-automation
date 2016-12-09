@@ -101,7 +101,7 @@ config BACNET_STACK_BIP_TRENDLOG_MAX
 
 config BACNET_STACK_BIP_FILE
 	bool "Enable File Object"
-	default y
+	default n
 
 config BACNET_STACK_BIP_TIME
 	bool "Enable Time Master"
@@ -113,6 +113,6 @@ config BACNET_STACK_BIP_BBMD
 
 config BACNET_STACK_BIP_BBMD_CLIENT
 	bool "Enable BBMD Client"
-	default y
+	default n
 
 endif

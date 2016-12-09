@@ -9,7 +9,7 @@ start_dev() {
 	local cfg=$1
 	config_get enable $cfg enable "0"
 	[ "$enable" == "1" ] || return
-	config_get bacdl $cfg bacdl "bip"
+	config_get bacdl $cfg bacdl "bip6"
 	BIN="$SERVER_BIN-$bacdl"
 	[ -f "$BIN" ] || return
 	config_get iface $cfg iface "lan"
@@ -18,7 +18,7 @@ start_dev() {
 	procd_set_param respawn
 	procd_set_param stderr 1
 	procd_set_param command "$BIN"
-	if [ "$bacdl" == "bip" ] ; then 
+	if [ "$bacdl" == "bip" ] || [ "$bacdl" == "bip6" ] ; then
 		config_get port $cfg port "47808"
 		procd_set_param env \
 		UCI_SECTION="$cfg" \

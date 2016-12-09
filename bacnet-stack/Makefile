@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2016-12-03-1
-PKG_SOURCE_VERSION:=385b07ca3525c0c5e0e70d0a82d0a28ca7c14b2d
+PKG_VERSION:=2016-12-03-7
+PKG_SOURCE_VERSION:=5dcaf8c41a8b58bcf66439ea3b51bd149692951a
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
@@ -20,7 +20,7 @@ define Package/bacnet-stack/Default
   CATEGORY:=Network
   TITLE:=BACnet Protocol Stack UCI Fork
   URL:=http://bacnet-stack.sourceforge.net/
-  DEPENDS:=+libpthread +librt +libuci
+  DEPENDS:=+libpthread +librt +libuci +libubox
 endef
 
 define Package/bacnet-stack/Default/description
@@ -111,11 +111,13 @@ define Package/bacnet-stack-mstp/config
   source "$(SOURCE)/Config-mstp.in"
 endef
 
-TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
-MAKE_VARS += BUILD=drelease
+MAKE_VARS += BUILD=release
 MAKE_VARS += BACNET_PORT=linux
 MAKE_VARS += UCI_LIB_DIR="$(STAGING_DIR)/usr/lib"
 MAKE_VARS += UCI_INCLUDE_DIR="$(STAGING_DIR)/usr/include"
+MAKE_VARS += CC="$(TARGET_CC)"
+MAKE_VARS += AR="$(TARGET_AR)"
+MAKE_VARS += MAKE_DEFINE="$(TARGET_CFLAGS)"
 
 ifeq ($(BUILD_VARIANT),bip)
 MAKE_VARS += BACDL_DEFINE=-DBACDL_BIP=1
@@ -330,7 +332,7 @@ define Package/bacnet-stack-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config
 	$(INSTALL_BIN) ./files/bacserv.init $(1)/etc/init.d/bacserv
 	$(INSTALL_DATA) ./files/bacnet_dev.config $(1)/etc/config/bacnet_dev
-	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_ai
+	$(INSTALL_DATA) ./files/bacnet_ai.config $(1)/etc/config/bacnet_ai
 	$(INSTALL_DATA) ./files/bacnet_ao.config $(1)/etc/config/bacnet_ao
 	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
 	$(INSTALL_DATA) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
@@ -353,7 +355,7 @@ endef
 
 define Package/bacnet-stack-bip6/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/bacserv_bip.defaults $(1)/etc/uci-defaults/bacserv_bip
+	$(INSTALL_BIN) ./files/bacserv_bip6.defaults $(1)/etc/uci-defaults/bacserv_bip6
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-bip6
 endef

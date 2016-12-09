@@ -17,7 +17,7 @@ setup_bacnet() {
 		config_get name $cfg name
 		if [ -z "$name" ] || [ "$name" == "openwrt-router-bip6" ] ; then
 			uci_set bacnet_dev $cfg name "$hostname-bip6"
-			uci_set bacnet_dev $cfg id "$hostname_rand"
+			uci_set bacnet_dev $cfg Id "$hostname_rand"
 			uci_commit bacnet_dev
 		fi
 	fi
@@ -42,12 +42,12 @@ if [ -z "$has_bip" ] ; then
 	cfg=$dev_idx
 	uci_add bacnet_dev dev $cfg
 	uci_set bacnet_dev $cfg enable "1"
-	uci_set bacnet_dev $cfg description "Openwrt Router $hostname_rand"
-	uci_set bacnet_dev $cfg modelname "Openwrt Router"
+	uci_set bacnet_dev $cfg description "Linux Embedded Development Environment on ID $hostname_rand"
+	uci_set bacnet_dev $cfg modelname "LEDE"
 	uci_set bacnet_dev $cfg location "Europe"
 	uci_set bacnet_dev $cfg app_ver "12.09"
 	uci_set bacnet_dev $cfg name "$hostname-bip6"
-	uci_set bacnet_dev $cfg id "$hostname_rand"
+	uci_set bacnet_dev $cfg Id "$hostname_rand"
 	uci_set bacnet_dev $cfg port "47808"
 	uci_set bacnet_dev $cfg net "0"
 	uci_set bacnet_dev $cfg iface "lan"

@@ -101,7 +101,7 @@ config BACNET_STACK_MSTP_TRENDLOG_MAX
 
 config BACNET_STACK_MSTP_FILE
 	bool "Enable File Object"
-	default y
+	default n
 
 config BACNET_STACK_MSTP_TIME
 	bool "Enable Time Master"
@@ -109,10 +109,10 @@ config BACNET_STACK_MSTP_TIME
 
 config BACNET_STACK_MSTP_BBMD
 	bool "Enable BBMD"
-	default y
+	default n
 
 config BACNET_STACK_MSTP_BBMD_CLIENT
 	bool "Enable BBMD Client"
-	default y
+	default n
 
 endif
