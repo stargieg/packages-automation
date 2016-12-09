@@ -5,7 +5,7 @@
 setup_system() {
 	local cfg=$1
 	config_get hostname $cfg hostname
-	if [ -z "$hostname" ] || [ "$hostname" == "OpenWrt" ] ; then
+	if [ -z "$hostname" ] || [ "$hostname" == "OpenWrt" ] || [ "$hostname" == "lede" ]; then
 		# Set Hostname
 		rand="$(echo -n $(head -n 1 /dev/urandom 2>/dev/null | md5sum | cut -b 1-4))"
 		rand="$(printf "%d" "0x$rand")"
@@ -17,9 +17,16 @@ setup_system() {
 		uci_set system $cfg zonename "Europe/Berlin"
 		uci_set system $cfg timezone "CET-1CEST,M3.5.0,M10.5.0/3"
 		uci_set network lan proto "dhcp"
+		uci_add network interface lan6
+		uci_set network lan6 ifname "@lan"
+		uci_set network lan6 proto "dhcpv6"
+		uci_set network lan6 reqaddress "try"
+		uci_set network lan6 reqprefix "auto"
 		uci_set dhcp lan ignore 1
-		uci_set dhcp lan dhcpv6 "disabled"
-		uci_set dhcp lan ra "disabled"
+		uci_set dhcp @dnsmasq[0] rebind_protection "0"
+		uci_remove dhcp lan dhcpv6
+		uci_remove dhcp lan ra
+		uci_set firewall @zone[0] network "lan lan6"
 	fi
 }
 
@@ -30,4 +37,5 @@ config_foreach setup_system system
 
 #Save
 uci_commit system
+uci_commit network
 uci_commit dhcp
