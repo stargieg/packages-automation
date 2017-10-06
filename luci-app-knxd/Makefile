@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-knxd
-PKG_VERSION:=0.2.2
+PKG_VERSION:=0.2.3
 PKG_RELEASE:=1
 PKG_BUILD_DEPENDS += lua/host luci-base/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_KNXD_SRCDIET
@@ -15,7 +15,7 @@ define Package/luci-app-knxd
   SUBMENU:=3. Applications
   TITLE:=Eib KNX deamon
   URL:=https://github.com/knxd/knxd/wiki
-  DEPENDS:=+knxd +knxd-tools +luci-mod-admin-full +luci-lib-nixio
+  DEPENDS:=+knxd +luci-mod-admin-full +luci-lib-nixio
 endef
 
 define Package/luci-app-knxd/config

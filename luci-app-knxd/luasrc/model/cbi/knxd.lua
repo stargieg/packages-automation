@@ -83,11 +83,17 @@ function svc.validate(self, value, section)
 	return nil, "unknow KNX url: "..value
 end
 
-svc = s:option(Flag, "Server", "Server","starts an EIBnet/IP multicast server")
+svc = s:option(Flag, "ServerEn", "ServerEn","Enable starts an EIBnet/IP multicast server")
 svc.optional = true
 
+svc = s:option(Value, "Server", "Server","starts an EIBnet/IP multicast server")
+svc:depends("ServerEn",1)
+svc.optional = true
+svc.placeholder = "224.0.23.12"
+svc.datatype = "ip4addr"
+
 svc = s:option(Flag, "Discovery", "Discovery","enable the EIBnet/IP server to answer discovery and description requests (SEARCH, DESCRIPTION)")
-svc:depends("Server",1)
+svc:depends("ServerEn",1)
 svc.optional = true
 
 svc = s:option(Value, "Name", "Name for ETS Discover", "name of the EIBnet/IP server (default is 'knxd')")
@@ -96,11 +102,11 @@ svc.placeholder = "OpenWrt"
 svc.datatype = "string"
 
 svc = s:option(Flag, "Tunnelling", "Tunnelling for ETS", "enable EIBnet/IP Tunneling in the EIBnet/IP server")
-svc:depends("Server",1)
+svc:depends("ServerEn",1)
 svc.optional = true
 
 svc = s:option(Flag, "Routing", "EIBnet/IP Routing in the EIBnet/IP server")
-svc:depends("Server",1)
+svc:depends("ServerEn",1)
 svc.optional = true
 s:option(Flag, "GroupCache", "caching of group communication networkstate").optional = true
 
