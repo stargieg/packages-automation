@@ -5,7 +5,7 @@
 setup_system() {
 	local cfg=$1
 	config_get hostname $cfg hostname
-	if [ -z "$hostname" ] || [ "$hostname" == "OpenWrt" ] || [ "$hostname" == "lede" ]; then
+	if [ -z "$hostname" ] || [ "$hostname" == "OpenWrt" ] || [ "$hostname" == "LEDE" ]; then
 		# Set Hostname
 		rand="$(echo -n $(head -n 1 /dev/urandom 2>/dev/null | md5sum | cut -b 1-4))"
 		rand="$(printf "%d" "0x$rand")"
