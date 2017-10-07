@@ -39,7 +39,8 @@ for line in util.execi("findknxusb 2>/dev/null") do
 	if string.find(line, 'device:') then
 		local split = util.split(line,"(%s+)",nil,true)
 		if #split and split[2] then
-			svc:value("usb:"..split[2])
+			usbid = util.split(split[2],":",nil,true)
+			svc:value("usb:"..usbid[1]..":"..usbid[2]..":"..usbid[3])
 		end
 	end
 end
