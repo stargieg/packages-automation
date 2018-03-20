@@ -15,7 +15,7 @@ $Id$
 require("luci.sys")
 require("luci.util")
 require("luci.tools.webadmin")
-require("luci.fs")
+require("nixio.fs")
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
 
