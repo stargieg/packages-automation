@@ -276,7 +276,7 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 }
 
 void load_bacnet(char *idx) {
-	const char *tagname;
+	char *tagname;
 	int port;
 	const char *ipaddr;
 	int unit_id_tag = 1;
@@ -470,6 +470,8 @@ void load_bacnet(char *idx) {
 							//value_time = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"value_time",0);
 							uci_change_ext[j] = true;
 							uci_change[j] = true;
+							ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
+								"write",0);
 							ucix_del(uct_b, pv_section[j], cur_pv->idx,"write");
 						}
 					}
