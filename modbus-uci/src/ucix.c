@@ -261,18 +261,16 @@ time_t check_uci_update(const char *config, time_t mtime)
 		}
 	}
 
-/*	snprintf(path, sizeof(path), "/tmp/.uci/%s", config);
+	snprintf(path, sizeof(path), "/tmp/.uci/%s", config);
 	if( stat(path, &s) > -1 ) {
 		if( (f_mtime == 0) || (s.st_mtime > f_mtime) ) {
 			f_mtime = s.st_mtime;
 		}
-	} */
-	if( (mtime == 0) || (f_mtime > mtime) ) {
-		return f_mtime;
-	} else {
-		f_mtime = 0;
 	}
-	return f_mtime;
+	if( (mtime == 0) || (f_mtime > mtime) )
+		return f_mtime;
+
+	return 0;
 }
 
 /* Add tuple */
