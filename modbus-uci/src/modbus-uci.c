@@ -381,10 +381,8 @@ void load_bacnet(char *idx) {
 			usleep(1000);
 			if (cur_pv->unit_id > 0) {
 				unit_id = cur_pv->unit_id;
-				printf("cur_pv->unit_id %i ", unit_id);
 			} else {
 				unit_id = unit_id_tag;
-				printf("unit_id_tag %i ", unit_id);
 			}
 			/*
 			printf("idx %s ", idx);
