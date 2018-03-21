@@ -38,7 +38,7 @@ sva = s:option(Value, "ipaddr", "IP Adresse")
 sva = s:option(Value, "port", "TCP Port")
 sva:value('502')
 
-sva = s:option(Value, "station_id", "Slave ID")
+sva = s:option(Value, "unit_id", "Unit ID")
 sva:value('1')
 sva:value('255')
 

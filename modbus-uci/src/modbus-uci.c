@@ -55,7 +55,7 @@ struct station_tuple {
 	char tagname[16];
 	int port;
 	char ipaddr[16];
-	int station_id;
+	int unit_id;
 	struct station_tuple *next;
 };
 
@@ -75,6 +75,7 @@ struct pv_tuple {
 	char section[16];
 	int section_idx;
 	char type[16];
+	int unit_id;
 	int addr;
 	int si_unit;
 	char dead_limit[18];
@@ -108,6 +109,7 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 	bool disable;
 	const char *tagname;
 	const char *name;
+	int unit_id;
 	int addr;
 	int si_unit;
 	int Out_Of_Service;
@@ -135,7 +137,7 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 	tagname = ucix_get_option(itr_pv->ctx, itr_pv->section, sec_idx, "tagname");
 	if ( tagname != NULL ) {
 		if (strcmp(tagname, itr_pv->tagname)) {
-			printf("ignore wrong tagneame %s,%s\n",tagname, itr_pv->tagname);
+			printf("ignore wrong tagname %s,%s\n",tagname, itr_pv->tagname);
 			return;
 		}
 	} else {
@@ -148,6 +150,8 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 		printf("no addr %s,%s\n",itr_pv->section,sec_idx);
 		return;
 	}
+
+	unit_id = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx, "unit_id",0);
 
 	if( (t = (pv_tuple_t *)malloc(sizeof(pv_tuple_t))) != NULL ) {
 		strncpy(t->idx, sec_idx, sizeof(t->idx));
@@ -214,6 +218,7 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 		}
 
 
+		t->unit_id = unit_id;
 		t->addr = addr;
 		si_unit = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
 			"si_unit",0);
@@ -274,7 +279,7 @@ void load_bacnet(char *idx) {
 	const char *tagname;
 	int port;
 	const char *ipaddr;
-	//int station_id;
+	int unit_id_tag = 1;
 	struct uci_context *uctx_m;
 /*	char pv_section[16][32] = {
 		"bacnet_bi","bacnet_ao","bacnet_av","bacnet_ai","bacnet_mv"
@@ -298,6 +303,7 @@ void load_bacnet(char *idx) {
 	uint16_t *tab_reg;
 	int offset = 2;
 	int max_offset = 2;
+	int unit_id = 0;
 	int addr = 0;
 	int rc = -1;
 	int rewrite = 1;
@@ -322,8 +328,8 @@ void load_bacnet(char *idx) {
 			"port",502);
 		ipaddr = ucix_get_option(uctx_m, section, idx,
 			"ipaddr");
-		//station_id = ucix_get_option_int(uctx_m, section, idx,
-		//	"station_id",255);
+		unit_id_tag = ucix_get_option_int(uctx_m, section, idx,
+			"unit_id",1);
 	} else {
 		return;
 	}
@@ -373,9 +379,17 @@ void load_bacnet(char *idx) {
 		j = 0;
 		for( cur_pv = itr_b.list; cur_pv; cur_pv = cur_pv->next ) {
 			usleep(1000);
+			if (cur_pv->unit_id > 0) {
+				unit_id = cur_pv->unit_id;
+				printf("cur_pv->unit_id %i ", unit_id);
+			} else {
+				unit_id = unit_id_tag;
+				printf("unit_id_tag %i ", unit_id);
+			}
 			/*
 			printf("idx %s ", idx);
 			printf("tagname %s ", tagname);
+			printf("unit_id %i ", unit_id);
 			printf("idx %s ", cur_pv->idx);
 			printf("addr %i ", cur_pv->addr);
 			printf("si_unit %i ", cur_pv->si_unit);
@@ -392,6 +406,7 @@ void load_bacnet(char *idx) {
 				fprintf(stderr, "New Connection tcp %s:%i\n",ipaddr, port);
 				mctx = modbus_new_tcp(ipaddr, port);
 			}
+			modbus_set_slave(mctx, unit_id);
 			if (modbus_connect(mctx) == -1) {
 				fprintf(stderr, "Connection to tcp %s:%i failed: %s\n",
 					ipaddr, port, modbus_strerror(errno));
