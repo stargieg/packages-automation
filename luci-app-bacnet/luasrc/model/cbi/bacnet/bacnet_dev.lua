@@ -103,7 +103,7 @@ sva:value('0','BAC0')
 sva:value('1','BAC1')
 sva:value('2','BAC2')
 
-s:option(Value, "id", "Device ID")
+s:option(Value, "Id", "Device ID")
 s:option(Value, "app_ver", "Device Version")
 s:option(Value, "name", "Device Name")
 s:option(Value, "modelname", "Model Name")
