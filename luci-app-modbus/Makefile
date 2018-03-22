@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-modbus
-PKG_VERSION:=0.2.1
+PKG_VERSION:=0.6
 PKG_RELEASE:=1
 PKG_BUILD_DEPENDS += lua/host luci-base/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_MODBUS_SRCDIET

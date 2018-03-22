@@ -49,6 +49,13 @@
 #define BITVAL(x,y) (((x)>>(y)) & 1)
 #define BITFLIP(x,y) ((x)^=(y))
 
+/* Proto */
+enum {
+    TCP,
+    TCP_PI,
+    RTU
+};
+
 /* value/name tuples */
 struct station_tuple {
 	char idx[18];
@@ -145,8 +152,8 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 		return;
 	}
 
-	addr = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx, "addr",0);
-	if ( addr == 0 ) {
+	addr = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx, "addr",-1);
+	if ( addr < 0 ) {
 		printf("no addr %s,%s\n",itr_pv->section,sec_idx);
 		return;
 	}
@@ -278,7 +285,16 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 void load_bacnet(char *idx) {
 	const char *tagname;
 	int port;
-	const char *ipaddr;
+	const char *port6;
+	const char *backend;
+	int use_backend=TCP;
+	const char *ip4addr;
+	const char *ip6addr;
+	const char *ttydev;
+	int baud=115200;
+	char parity_bit;
+	int data_bit=8;
+	int stop_bit=1;
 	int unit_id_tag = 1;
 	struct uci_context *uctx_m;
 	char pv_section[16][32] = {
@@ -314,14 +330,67 @@ void load_bacnet(char *idx) {
 
 	uctx_m = ucix_init(section);
 	if(uctx_m) {
-		tagname = ucix_get_option(uctx_m, section, idx,
-			"tagname");
-		port = ucix_get_option_int(uctx_m, section, idx,
-			"port",502);
-		ipaddr = ucix_get_option(uctx_m, section, idx,
-			"ipaddr");
-		unit_id_tag = ucix_get_option_int(uctx_m, section, idx,
-			"unit_id",1);
+		if (ucix_get_option_int(uctx_m, section, idx, "enable",0) == 1) {
+			tagname = ucix_get_option(uctx_m, section, idx,
+				"tagname");
+			unit_id_tag = ucix_get_option_int(uctx_m, section, idx,
+				"unit_id",1);
+			backend = ucix_get_option(uctx_m, section, idx,
+				"backend");
+			if (strcmp(backend, "tcp") == 0) {
+				use_backend = TCP;
+				ip4addr = ucix_get_option(uctx_m, section, idx,
+					"ip4addr");
+				if (ip4addr==NULL) {
+					return;
+				}
+				port = ucix_get_option_int(uctx_m, section, idx,
+					"port",502);
+			} else if (strcmp(backend, "tcppi") == 0) {
+				use_backend = TCP_PI;
+				ip6addr = ucix_get_option(uctx_m, section, idx,
+					"ip6addr");
+				if (ip6addr==NULL) {
+					return;
+				}
+				port6 = ucix_get_option(uctx_m, section, idx,
+					"port");
+				if (port6==NULL) {
+					return;
+				}
+			} else if (strcmp(backend, "rtu") == 0) {
+				use_backend = RTU;
+				ttydev = ucix_get_option(uctx_m, section, idx,
+					"ttydev");
+				if (ttydev==NULL) {
+					return;
+				}
+				baud = ucix_get_option_int(uctx_m, section, idx,
+					"baud",115200);
+				const char *uci_parity_bit;
+				uci_parity_bit = ucix_get_option(uctx_m, section, idx,
+					"parity_bit");
+				if (uci_parity_bit==NULL) {
+					parity_bit = 'N';
+				} else if (strcmp(uci_parity_bit, "N") == 0) {
+					parity_bit = 'N';
+				} else if (strcmp(uci_parity_bit, "O") == 0) {
+					parity_bit = 'O';
+				} else if (strcmp(uci_parity_bit, "E") == 0) {
+					parity_bit = 'E';
+				} else {
+					return;
+				}
+				data_bit = ucix_get_option_int(uctx_m, section, idx,
+					"data_bit",8);
+				stop_bit = ucix_get_option_int(uctx_m, section, idx,
+					"stop_bit",1);
+			} else {
+				return;
+			}
+		} else {
+			return;
+		}
 	} else {
 		return;
 	}
@@ -343,8 +412,14 @@ void load_bacnet(char *idx) {
 				pv_type[n], (void *)load_pv, &itr_b);
 		}
 	}
-	mctx = modbus_new_tcp(ipaddr, port);
 
+	if (use_backend == TCP) {
+		mctx = modbus_new_tcp(ip4addr, port);
+	} else if (use_backend == TCP_PI) {
+		mctx = modbus_new_tcp_pi(ip6addr, port6);
+	} else if (use_backend == RTU) {
+		mctx = modbus_new_rtu(ttydev, baud, parity_bit, data_bit, stop_bit);
+	}
 	// loop forever
 	for (;;) {
 		usleep(100000);
@@ -391,13 +466,21 @@ void load_bacnet(char *idx) {
 			uci_change[j] = NULL;
 			uct_b = ucix_init(pv_section[j]);
 			if (!mctx) {
-				fprintf(stderr, "New Connection tcp %s:%i\n",ipaddr, port);
-				mctx = modbus_new_tcp(ipaddr, port);
+				if (use_backend == TCP) {
+					fprintf(stderr, "New Connection tcp %s:%i\n",ip4addr, port);
+					mctx = modbus_new_tcp(ip4addr, port);
+				} else if (use_backend == TCP_PI) {
+					fprintf(stderr, "New Connection tcp %s:%s\n",ip6addr, port6);
+					mctx = modbus_new_tcp_pi(ip6addr, port6);
+				} else if (use_backend == RTU) {
+					fprintf(stderr, "New Connection serial %s\n",ttydev);
+					mctx = modbus_new_rtu(ttydev, baud, parity_bit, data_bit, stop_bit);
+				}
 			}
 			modbus_set_slave(mctx, unit_id);
 			if (modbus_connect(mctx) == -1) {
-				fprintf(stderr, "Connection to tcp %s:%i failed: %s\n",
-					ipaddr, port, modbus_strerror(errno));
+				fprintf(stderr, "Connection failed: %s\n",
+					modbus_strerror(errno));
 				modbus_free(mctx);
 				sleep(3);
 			} else {

@@ -3,8 +3,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=modbus-uci
-PKG_VERSION:=0.5
-PKG_RELEASE:=2
+PKG_VERSION:=0.6
+PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 PKG_BUILD_DEPENDS:=libmodbus

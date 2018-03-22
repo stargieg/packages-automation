@@ -72,6 +72,10 @@ uci:foreach("icinga", "station",
 			sva:value(section.tagname)
 	end)
 
+local sva = s:taboption("io", Value, "unit_id", "Unit ID")
+sva:value('1')
+sva:value('255')
+sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 local sva = s:taboption("io", Value, "resolution", "Auflösung")
 sva:value("dword","1 Bit aus 1 Register")

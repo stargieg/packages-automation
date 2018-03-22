@@ -76,6 +76,10 @@ sva:value("0")
 local sva = s:taboption("main", Value, "max_value", "Max Present Value")
 sva:value("100")
 
+local sva = s:taboption("io", Value, "unit_id", "Unit ID")
+sva:value('1')
+sva:value('255')
+sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 local sva = s:taboption("io", Value, "resolution", "Auflösung")
 sva:value("doublefloat","2 Register zu Fliesspunkt")

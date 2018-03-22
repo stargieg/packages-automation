@@ -62,6 +62,10 @@ uci:foreach("modbus", "station",
 	end)
 sva:value("icinga")
 
+local sva = s:taboption("io", Value, "unit_id", "Unit ID")
+sva:value('1')
+sva:value('255')
+sva.rmempty = true
 s:option(Value, "addr", "Addr")
 s:option(Value, "value", "Value")
 s:option(DynamicList, "state", "Stats")
