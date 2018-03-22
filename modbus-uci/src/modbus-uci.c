@@ -95,7 +95,7 @@ struct pv_tuple {
 struct pv_itr_ctx {
 	struct pv_tuple *list;
 	struct uci_context *ctx;
-	char *tagname;
+	const char *tagname;
 	char *section;
 	int section_idx;
 	char *type;
@@ -276,17 +276,11 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 }
 
 void load_bacnet(char *idx) {
-	char *tagname;
+	const char *tagname;
 	int port;
 	const char *ipaddr;
 	int unit_id_tag = 1;
 	struct uci_context *uctx_m;
-/*	char pv_section[16][32] = {
-		"bacnet_bi","bacnet_ao","bacnet_av","bacnet_ai","bacnet_mv"
-	};
-	char pv_type[16][32] = {
-		"bi","ao","av","ai","mv"
-	}; */
 	char pv_section[16][32] = {
 		"bacnet_bi","bacnet_ao","bacnet_av","bacnet_ai","bacnet_mv"
 	};
@@ -294,11 +288,10 @@ void load_bacnet(char *idx) {
 		"bi","ao","av","ai","mv"
 	};
 	int section_n=5;
-	//int uct_section[16];
 	char *section;
 	struct uci_context *uct_b;
 	char *type;
-	char *value;
+	const char *value;
 	modbus_t *mctx;
 	uint16_t *tab_reg;
 	int offset = 2;
@@ -313,7 +306,6 @@ void load_bacnet(char *idx) {
 	bool newval;
 	time_t chk_mtime[16];
 	time_t mtime_bacnet[16];
-	//time_t value_time = 0;
 	int pimage[65535];
 	bool pimage_read[65535];
 
@@ -338,11 +330,10 @@ void load_bacnet(char *idx) {
 	itr_b.list = NULL;
 	pv_tuple_t *cur_pv;
 	for( n=0; n<section_n; n++ ) {
-		printf("section %s\n",pv_section[n]);
 		uct_b = ucix_init(pv_section[n]);
 		if(uct_b) {
 			type = pv_type[n];
-			printf("section %s type %s\n",pv_section[n],type);
+			fprintf(stderr,"load section %s type %s\n",pv_section[n],type);
 			itr_b.section = pv_section[n];
 			itr_b.section_idx = n;
 			itr_b.ctx = uct_b;
@@ -354,7 +345,6 @@ void load_bacnet(char *idx) {
 	}
 	mctx = modbus_new_tcp(ipaddr, port);
 
-	printf("loop forever %s\n", idx);
 	// loop forever
 	for (;;) {
 		usleep(100000);
@@ -411,11 +401,11 @@ void load_bacnet(char *idx) {
 				modbus_free(mctx);
 				sleep(3);
 			} else {
-				if(chk_mtime[j] != 0) {
-					write = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"write",0);
-					if (write != 0) {
+				write = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"write",0);
+				if (write != 0) {
+					if(chk_mtime[j] != 0) {
 						value = ucix_get_option(uct_b, pv_section[j], cur_pv->idx,"value");
-						printf("bac change %i %s=%s\n",(int)chk_mtime[j],cur_pv->name,value);
+						fprintf(stderr,"bac change %i %s=%s\n",(int)chk_mtime[j],cur_pv->name,value);
 						if ( value != NULL ) {
 							offset = 1;
 							strncpy(cur_pv->value, value, sizeof(cur_pv->value));
@@ -429,20 +419,15 @@ void load_bacnet(char *idx) {
 								cur_pv->value_int = val_i;
 								tab_reg[0] = val_i;
 							} else if (cur_pv->modtype == MODDWORD) {
-								printf("bac change %i %s=%s\n",(int)chk_mtime[j],cur_pv->name,value);
 								val_i = atoi(cur_pv->value);
 								bitv = cur_pv->bit;
 								if (pimage_read[addr]) {
 									cur_pv->value_int = pimage[addr];
-									printf("pimage MODDWORD 1 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 								}
 								if (val_i > 0) {
 									SETBIT(cur_pv->value_int,bitv);
-									printf("MODDWORD 1 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 								} else {
-									printf("MODDWORD 0 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 									CLEARBIT(cur_pv->value_int,bitv);
-									printf("MODDWORD 0 mod %u %s=%i\n", cur_pv->value_time, cur_pv->name, cur_pv->value_int);
 								}
 								tab_reg[0] = cur_pv->value_int;
 							} else if (cur_pv->modtype == MODUINT) {
@@ -467,14 +452,12 @@ void load_bacnet(char *idx) {
 							}
 							rc = modbus_write_registers(mctx, addr, offset, tab_reg);
 							modbus_close(mctx);
-							//value_time = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"value_time",0);
-							uci_change_ext[j] = true;
-							uci_change[j] = true;
-							ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
-								"write",0);
-							ucix_del(uct_b, pv_section[j], cur_pv->idx,"write");
 						}
 					}
+					uci_change_ext[j] = true;
+					uci_change[j] = true;
+					ucix_del(uct_b, pv_section[j], cur_pv->idx,"write");
+					ucix_save_state(uct_b);
 				}
 				if (!uci_change_ext[j]) {
 					offset = 1;
@@ -529,7 +512,6 @@ void load_bacnet(char *idx) {
 						newval=true;
 					}
 					if ( rewrite == 0) {
-						printf("MODDOUBLEFLOAT rewrite %s\n", cur_pv->name);
 						sprintf(cur_pv->value,"%f",pval_f);
 						newval=true;
 					}
@@ -683,4 +665,3 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
-
