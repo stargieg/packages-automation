@@ -391,6 +391,7 @@ void load_bacnet(char *idx) {
 		} else {
 			return;
 		}
+		ucix_cleanup(uctx_m);
 	} else {
 		return;
 	}
@@ -689,6 +690,8 @@ void load_bacnet(char *idx) {
 				mtime_bacnet[j] = time(NULL);
 				uci_change[j] = NULL;
 			}
+			if(uct_b)
+				ucix_cleanup(uct_b);
 		}
 		rewrite++;
 	}
