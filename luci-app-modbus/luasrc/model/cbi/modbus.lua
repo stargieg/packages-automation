@@ -57,10 +57,10 @@ sva:depends("backend","tcpip")
 
 sva = s:option(Value, "ttydev", "Pfad zur tty Geraetedatei")
 for device in nixio.fs.glob("/dev/ttyS[0-9]*") do
-	svc:value(device)
+	sva:value(device)
 end
 for device in nixio.fs.glob("/dev/ttyUSB[0-9]*") do
-	svc:value(device)
+	sva:value(device)
 end
 sva:depends("backend","rtu")
 sva = s:option(Value, "baud", "Uebertragungsrate")
