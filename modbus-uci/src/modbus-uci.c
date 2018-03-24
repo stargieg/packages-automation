@@ -82,6 +82,7 @@ struct pv_tuple {
 	char section[16];
 	int section_idx;
 	char type[16];
+	int func;
 	int unit_id;
 	int addr;
 	int si_unit;
@@ -95,6 +96,7 @@ struct pv_tuple {
 	int modtype;
 	int bit;
 	bool Out_Of_Service;
+	int err_counter;
 	struct station_tuple *next;
 };
 
@@ -118,6 +120,8 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 	const char *name;
 	int unit_id;
 	int addr;
+	int func;
+	int func_def;
 	int si_unit;
 	int Out_Of_Service;
 	const char *dead_limit;
@@ -157,6 +161,12 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 		printf("no addr %s,%s\n",itr_pv->section,sec_idx);
 		return;
 	}
+	if (strcmp("ai", itr_pv->type) == 0)
+		func_def=4;
+	else
+		func_def=3;
+
+	func = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx, "func",func_def);
 
 	unit_id = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx, "unit_id",0);
 
@@ -227,6 +237,7 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 
 		t->unit_id = unit_id;
 		t->addr = addr;
+		t->func = func;
 		si_unit = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
 			"si_unit",0);
 		t->si_unit = si_unit;
@@ -283,14 +294,14 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 }
 
 void load_bacnet(char *idx) {
-	const char *tagname;
+	char tagname[128];
 	int port;
-	const char *port6;
+	char port6[128];
 	const char *backend;
 	int use_backend=TCP;
-	const char *ip4addr;
-	const char *ip6addr;
-	const char *ttydev;
+	char ip4addr[128];
+	char ip6addr[128];
+	char ttydev[128];
 	int baud=115200;
 	char parity_bit;
 	int data_bit=8;
@@ -314,6 +325,7 @@ void load_bacnet(char *idx) {
 	int max_offset = 2;
 	int unit_id = 0;
 	int addr = 0;
+	int func = 7;
 	int rc = -1;
 	int rewrite = 1;
 	float val_f, pval_f,val_fab;
@@ -324,6 +336,8 @@ void load_bacnet(char *idx) {
 	time_t mtime_bacnet[16];
 	int pimage[65535];
 	bool pimage_read[65535];
+	int input_reg[65535];
+	bool input_reg_read[65535];
 
 
 	section = "modbus";
@@ -331,38 +345,43 @@ void load_bacnet(char *idx) {
 	uctx_m = ucix_init(section);
 	if(uctx_m) {
 		if (ucix_get_option_int(uctx_m, section, idx, "enable",0) == 1) {
-			tagname = ucix_get_option(uctx_m, section, idx,
-				"tagname");
+			snprintf(tagname, sizeof(tagname),
+				"%s", ucix_get_option(uctx_m, section, idx,
+				"tagname"));
 			unit_id_tag = ucix_get_option_int(uctx_m, section, idx,
 				"unit_id",1);
 			backend = ucix_get_option(uctx_m, section, idx,
 				"backend");
 			if (strcmp(backend, "tcp") == 0) {
 				use_backend = TCP;
-				ip4addr = ucix_get_option(uctx_m, section, idx,
-					"ip4addr");
-				if (ip4addr==NULL) {
+				snprintf(ip4addr, sizeof(ip4addr),
+				"%s", ucix_get_option(uctx_m, section, idx,
+					"ip4addr"));
+				if (strcmp(ip4addr,"") == 0) {
 					return;
 				}
 				port = ucix_get_option_int(uctx_m, section, idx,
 					"port",502);
-			} else if (strcmp(backend, "tcppi") == 0) {
+			} else if (strcmp(backend, "tcp_pi") == 0) {
 				use_backend = TCP_PI;
-				ip6addr = ucix_get_option(uctx_m, section, idx,
-					"ip6addr");
-				if (ip6addr==NULL) {
+				snprintf(ip6addr, sizeof(ip6addr),
+				"%s", ucix_get_option(uctx_m, section, idx,
+					"ip6addr"));
+				if (strcmp(ip6addr,"") == 0) {
 					return;
 				}
-				port6 = ucix_get_option(uctx_m, section, idx,
-					"port");
-				if (port6==NULL) {
+				snprintf(port6, sizeof(port6),
+				"%s", ucix_get_option(uctx_m, section, idx,
+					"port"));
+				if (strcmp(port6,"") == 0) {
 					return;
 				}
 			} else if (strcmp(backend, "rtu") == 0) {
 				use_backend = RTU;
-				ttydev = ucix_get_option(uctx_m, section, idx,
-					"ttydev");
-				if (ttydev==NULL) {
+				snprintf(ttydev, sizeof(ttydev),
+				"%s", ucix_get_option(uctx_m, section, idx,
+					"ttydev"));
+				if (strcmp(ttydev,"") == 0) {
 					return;
 				}
 				baud = ucix_get_option_int(uctx_m, section, idx,
@@ -403,7 +422,7 @@ void load_bacnet(char *idx) {
 		uct_b = ucix_init(pv_section[n]);
 		if(uct_b) {
 			type = pv_type[n];
-			fprintf(stderr,"load section %s type %s\n",pv_section[n],type);
+			fprintf(stderr,"%s load section %s type %s\n",tagname,pv_section[n],type);
 			itr_b.section = pv_section[n];
 			itr_b.section_idx = n;
 			itr_b.ctx = uct_b;
@@ -411,22 +430,19 @@ void load_bacnet(char *idx) {
 			itr_b.type = type;
 			ucix_for_each_section_type(uct_b, pv_section[n], 
 				pv_type[n], (void *)load_pv, &itr_b);
+			ucix_cleanup(uct_b);
 		}
 	}
 
-	if (use_backend == TCP) {
-		mctx = modbus_new_tcp(ip4addr, port);
-	} else if (use_backend == TCP_PI) {
-		mctx = modbus_new_tcp_pi(ip6addr, port6);
-	} else if (use_backend == RTU) {
-		mctx = modbus_new_rtu(ttydev, baud, parity_bit, data_bit, stop_bit);
-	}
 	// loop forever
 	for (;;) {
-		usleep(100000);
+		usleep(10000);
 		for( m=0; m<65535; m++ ) {
 			if (pimage_read[m]) {
 				pimage_read[m]=NULL;
+			}
+			if (input_reg_read[m]) {
+				input_reg_read[m]=NULL;
 			}
 		}
 		for( l=0; l<section_n; l++ ) {
@@ -438,15 +454,39 @@ void load_bacnet(char *idx) {
 				mtime_bacnet[l] = chk_mtime[l];
 			}
 		}
-		if (rewrite>1000) { 
-			rewrite=0;
-			fprintf(stderr,"rewrite %i\n", rewrite);
+		if (mctx == NULL) {
+			if (use_backend == TCP) {
+				fprintf(stderr, "New Connection tcp %s:%i\n",ip4addr, port);
+				mctx = modbus_new_tcp(ip4addr, port);
+			} else if (use_backend == TCP_PI) {
+				fprintf(stderr, "New Connection tcp_pi %s:%s\n",ip6addr, port6);
+				mctx = modbus_new_tcp_pi(ip6addr, port6);
+			} else if (use_backend == RTU) {
+				fprintf(stderr, "New Connection serial %s\n",ttydev);
+				mctx = modbus_new_rtu(ttydev, baud, parity_bit, data_bit, stop_bit);
+			}
+			if (mctx == NULL) {
+				fprintf(stderr, "Unable to allocate libmodbus context\n");
+			} else {
+				modbus_set_slave(mctx, unit_id_tag);
+				if (modbus_connect(mctx) == -1) {
+					fprintf(stderr, "Connection failed: %s\n",
+						modbus_strerror(errno));
+					modbus_close(mctx);
+					modbus_free(mctx);
+					sleep(3);
+					mctx=NULL;
+				}
+			}
 		}
 		j = 0;
 		for( cur_pv = itr_b.list; cur_pv; cur_pv = cur_pv->next ) {
-			usleep(1000);
+			usleep(100);
 			if (cur_pv->unit_id > 0) {
 				unit_id = cur_pv->unit_id;
+				if (mctx) {
+					modbus_set_slave(mctx, unit_id);
+				}
 			} else {
 				unit_id = unit_id_tag;
 			}
@@ -466,25 +506,7 @@ void load_bacnet(char *idx) {
 			j = cur_pv->section_idx;
 			uci_change[j] = NULL;
 			uct_b = ucix_init(pv_section[j]);
-			if (!mctx) {
-				if (use_backend == TCP) {
-					fprintf(stderr, "New Connection tcp %s:%i\n",ip4addr, port);
-					mctx = modbus_new_tcp(ip4addr, port);
-				} else if (use_backend == TCP_PI) {
-					fprintf(stderr, "New Connection tcp %s:%s\n",ip6addr, port6);
-					mctx = modbus_new_tcp_pi(ip6addr, port6);
-				} else if (use_backend == RTU) {
-					fprintf(stderr, "New Connection serial %s\n",ttydev);
-					mctx = modbus_new_rtu(ttydev, baud, parity_bit, data_bit, stop_bit);
-				}
-			}
-			modbus_set_slave(mctx, unit_id);
-			if (modbus_connect(mctx) == -1) {
-				fprintf(stderr, "Connection failed: %s\n",
-					modbus_strerror(errno));
-				modbus_free(mctx);
-				sleep(3);
-			} else {
+			if (mctx) {
 				write = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"write",0);
 				if (write != 0) {
 					if(chk_mtime[j] != 0) {
@@ -505,8 +527,11 @@ void load_bacnet(char *idx) {
 							} else if (cur_pv->modtype == MODDWORD) {
 								val_i = atoi(cur_pv->value);
 								bitv = cur_pv->bit;
-								if (pimage_read[addr]) {
+								if (pimage_read[addr] && (cur_pv->func == 3)) {
 									cur_pv->value_int = pimage[addr];
+								}
+								if (input_reg_read[addr] && (cur_pv->func == 4)) {
+									cur_pv->value_int = input_reg[addr];
 								}
 								if (val_i > 0) {
 									SETBIT(cur_pv->value_int,bitv);
@@ -534,8 +559,9 @@ void load_bacnet(char *idx) {
 								pimage_read[n]=true;
 								k++;
 							}
-							rc = modbus_write_registers(mctx, addr, offset, tab_reg);
-							modbus_close(mctx);
+							if (cur_pv->func == 3) {
+								rc = modbus_write_registers(mctx, addr, offset, tab_reg);
+							}
 						}
 					}
 					uci_change_ext[j] = true;
@@ -548,24 +574,43 @@ void load_bacnet(char *idx) {
 					if (cur_pv->modtype == MODDOUBLEFLOAT) {
 						offset = 2;
 					}
-					if (pimage_read[addr]) {
-						k=0;
-						for (n=addr;n<addr+offset;n++) {
-							tab_reg[k]=pimage[n];
-							k++;
+					if (cur_pv->func == 3) {
+						if (pimage_read[addr]) {
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								tab_reg[k]=pimage[n];
+								k++;
+							}
+							rc=k;
+						} else {
+							rc = modbus_read_registers(mctx, addr, offset, tab_reg);
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								pimage[n]=tab_reg[k];
+								pimage_read[n]=true;
+								k++;
+							}
 						}
-						rc=k;
-					} else {
-						rc = modbus_read_registers(mctx, addr, offset, tab_reg);
-						k=0;
-						for (n=addr;n<addr+offset;n++) {
-							pimage[n]=tab_reg[k];
-							pimage_read[n]=true;
-							k++;
+					} else if (cur_pv->func == 4) {
+						if (input_reg_read[addr]) {
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								tab_reg[k]=input_reg[n];
+								k++;
+							}
+							rc=k;
+						} else {
+							rc = modbus_read_input_registers(mctx, addr, offset, tab_reg);
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								input_reg[n]=tab_reg[k];
+								input_reg_read[n]=true;
+								k++;
+							}
 						}
 					}
-					modbus_close(mctx);
 					if (rc != -1 && cur_pv->Out_Of_Service == 1) {
+						cur_pv->err_counter = 0;
 						cur_pv->value_time = time(NULL);
 						cur_pv->Out_Of_Service = 0;
 						ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
@@ -573,11 +618,18 @@ void load_bacnet(char *idx) {
 						uci_change[j] = true;
 					}
 				}
-				uci_change_ext[j] = NULL;
 			}
+			uci_change_ext[j] = NULL;
 			if (rc == -1) {
-				mctx=NULL;
-				if (cur_pv->Out_Of_Service == 0) {
+				if (mctx) {
+					fprintf(stderr,"Return err -1 modbus close conection\n");
+					modbus_close(mctx);
+					modbus_free(mctx);
+					mctx=NULL;
+				}
+				if (cur_pv->err_counter <= 2) cur_pv->err_counter++;
+				if (cur_pv->Out_Of_Service == 0 && cur_pv->err_counter > 2) {
+					fprintf(stderr,"Out_Of_Service %s %s\n",pv_section[j],cur_pv->idx);
 					cur_pv->Out_Of_Service = 1;
 					uct_b = ucix_init(pv_section[j]);
 					ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
@@ -585,6 +637,7 @@ void load_bacnet(char *idx) {
 					uci_change[j] = true;
 				}
 			} else {
+				cur_pv->err_counter=0;
 				newval=false;
 				if (cur_pv->modtype == MODDOUBLEFLOAT) {
 					val_f = cur_pv->value_float;
@@ -693,7 +746,12 @@ void load_bacnet(char *idx) {
 			if(uct_b)
 				ucix_cleanup(uct_b);
 		}
-		rewrite++;
+		if (mctx) {
+			rewrite++;
+			if (rewrite>1000) {
+				rewrite=0;
+			}
+		}
 	}
 }
 

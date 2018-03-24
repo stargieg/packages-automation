@@ -12,20 +12,20 @@ You may obtain a copy of the License at
 $Id$
 ]]--
 
-require("luci.sys")
-require("luci.util")
-require("luci.tools.webadmin")
-require("nixio.fs")
-local uci = luci.model.uci.cursor()
-local uci_state = luci.model.uci.cursor_state()
+local fs  = require "nixio.fs"
+local lfs  = require "nixio.fs"
+local uci = require "luci.model.uci".cursor()
+local sys = require "luci.sys"
+local uci_state = require "luci.model.uci".cursor_state()
 
-if not nixio.fs.access("/etc/config/modbus") then
+if not lfs.access("/etc/config/modbus") then
 	if not luci.sys.exec("touch /etc/config/modbus") then
 		return
 	end
 end
 
-m = Map("modbus", "Modbus Device", "Modbus Device Configuration")
+local m = Map("modbus", "Modbus Device", "Modbus Device Configuration")
+m.on_after_commit = function() luci.sys.call("/etc/init.d/modbus restart") end
 
 s = m:section(TypedSection, "station", 'Station')
 s.addremove = true
@@ -35,25 +35,25 @@ s:option(Flag, "enable", "enable")
 
 s:option(Value, "tagname", "Tag Name benutzt in bacnet objects")
 
-sva = s:option(Value, "unit_id", "Standart Unit ID")
+sva = s:option(Value, "unit_id", "Standart Unit ID wenn im Bacnet objekt nicht definiert")
 sva:value('1')
 sva:value('255')
 
 sva = s:option(Value, "backend", "Schnitstelle")
 sva:value("tcp","Modbus TCP/IPv4")
-sva:value("tcpip","Modbus TCP/IPv6")
+sva:value("tcp_pi","Modbus TCP/IPv6")
 sva:value("rtu","Modbus RTU (RS485/RS232)")
 
 sva = s:option(Value, "ip4addr", "IPv4 Adresse")
 sva:depends("backend","tcp")
 
 sva = s:option(Value, "ip6addr", "IPv6 Adresse")
-sva:depends("backend","tcpip")
+sva:depends("backend","tcp_pi")
 
 sva = s:option(Value, "port", "TCP Port")
 sva:value('502')
 sva:depends("backend","tcp")
-sva:depends("backend","tcpip")
+sva:depends("backend","tcp_pi")
 
 sva = s:option(Value, "ttydev", "Pfad zur tty Geraetedatei")
 for device in nixio.fs.glob("/dev/ttyS[0-9]*") do

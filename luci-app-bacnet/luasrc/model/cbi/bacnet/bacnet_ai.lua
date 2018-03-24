@@ -80,6 +80,12 @@ local sva = s:taboption("io", Value, "unit_id", "Unit ID")
 sva:value('1')
 sva:value('255')
 sva.rmempty = true
+local sva = s:taboption("io", Value, "func", "Funktions Code")
+sva:value('1',"Spulen (Coils)")
+sva:value('2',"Diskrete Eingäng (Disc Inputs)")
+sva:value('3',"Halteregister (Holding Register)")
+sva:value('4',"Eingaberegister (Input Register) Default")
+sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 local sva = s:taboption("io", Value, "resolution", "Auflösung")
 sva:value("doublefloat","2 Register zu Fliesspunkt")
