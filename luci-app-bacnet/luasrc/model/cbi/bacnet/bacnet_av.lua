@@ -95,7 +95,7 @@ sva:value("0.1","1 Register * 0.1")
 sva:value("1","1 Register * 1")
 sva:value("10","1 Register * 10")
 
-local sva = s:taboption("io", Value, "unsigned", "Ohne Vorzeichen (z.B. Zähler)")
+local sva = s:taboption("io", Flag, "unsigned", "Ohne Vorzeichen (z.B. Zähler)")
 
 
 local sva = s:taboption("main", Value, "value", "Value")
