@@ -14,3 +14,7 @@ start_service() {
 	procd_add_reload_trigger "network" "modbus"
 	procd_close_instance
 }
+
+stop_service() {
+	killall modbus-uci
+}
