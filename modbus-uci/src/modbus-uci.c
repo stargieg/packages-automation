@@ -91,13 +91,14 @@ struct pv_tuple {
 	char value[18];
 	float value_float;
 	int value_int;
+	int value_bit;
 	int value_time;
 	float res;
 	int modtype;
 	int bit;
 	bool Out_Of_Service;
 	int err_counter;
-	struct station_tuple *next;
+	struct pv_tuple *next;
 };
 
 /* structure to hold tuple-list and uci context during iteration */
@@ -130,6 +131,7 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 	const char *res;
 	int bitv=0;
 	int val_i;
+	int val_b;
 	int usign=0;
 	float val_f;
 	time_t value_time;
@@ -162,9 +164,15 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 		return;
 	}
 	if (strcmp("ai", itr_pv->type) == 0)
-		func_def=4;
+		func_def=MODBUS_FC_READ_INPUT_REGISTERS;
+	else if (strcmp("bi", itr_pv->type) == 0)
+		func_def=MODBUS_FC_READ_DISCRETE_INPUTS;
+	else if (strcmp("bv", itr_pv->type) == 0)
+		func_def=MODBUS_FC_READ_COILS;
+	else if (strcmp("bo", itr_pv->type) == 0)
+		func_def=MODBUS_FC_READ_COILS;
 	else
-		func_def=3;
+		func_def=MODBUS_FC_READ_HOLDING_REGISTERS;
 
 	func = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx, "func",func_def);
 
@@ -181,17 +189,26 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 			strncpy(t->name, name, sizeof(t->name));
 		}
 
-		res = ucix_get_option(itr_pv->ctx, itr_pv->section, sec_idx,
+		if (func > 2) {
+			res = ucix_get_option(itr_pv->ctx, itr_pv->section, sec_idx,
 			"resolution");
-		usign = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
+			usign = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
 			"unsigned",0);
+		} else {
+			res = NULL;
+			usign = 0;
+		}
 
-		if (res == NULL) {
+		if ((res == NULL) && (func > 2)) {
 			if (usign==0) {
 				t->modtype = MODINT;
 			} else {
 				t->modtype = MODUINT;
 			}
+			t->bit = 0;
+			t->res = 1;
+		} else if ((res == NULL) && (func <= 2)) {
+			t->modtype = MODBIT;
 			t->bit = 0;
 			t->res = 1;
 		} else if (!strcmp(res, "doublefloat")) {
@@ -264,10 +281,12 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 			strncpy(t->value, value, sizeof(t->value));
 			val_f = strtof(value,NULL);
 			val_i = atoi(value);
+			val_b = atoi(value);
 			if (t->modtype == MODDOUBLEFLOAT) {
 				t->value_float=val_f;
 			} else if (t->modtype == MODBIT) {
 				t->value_int = val_i;
+				t->value_bit = val_b;
 			} else if (t->modtype == MODDWORD) {
 				if ( val_i > 0 ) {
 					SETBIT(val_i,bitv);
@@ -309,27 +328,27 @@ void load_bacnet(char *idx) {
 	int unit_id_tag = 1;
 	struct uci_context *uctx_m;
 	char pv_section[16][32] = {
-		"bacnet_bi","bacnet_ao","bacnet_av","bacnet_ai","bacnet_mv"
+		"bacnet_bi","bacnet_bo","bacnet_bv","bacnet_ai","bacnet_ao","bacnet_av","bacnet_mv"
 	};
 	char pv_type[16][32] = {
-		"bi","ao","av","ai","mv"
+		"bi","bo","bv","ai","ao","av","mv"
 	};
-	int section_n=5;
+	int section_n=7;
 	char *section;
 	struct uci_context *uct_b;
 	char *type;
 	const char *value;
-	modbus_t *mctx;
-	uint16_t *tab_reg;
+	modbus_t *mctx = NULL;
+	uint8_t *tab_bit = NULL;
+	uint16_t *tab_reg = NULL;
 	int offset = 2;
 	int max_offset = 2;
 	int unit_id = 0;
 	int addr = 0;
-	int func = 7;
 	int rc = -1;
 	int rewrite = 1;
 	float val_f, pval_f,val_fab;
-	int j,k,l,m,n,write,bitv,val_i;
+	int j,k,l,m,n,write,bitv,val_i,val_b;
 	bool uci_change[16],uci_change_ext[16];
 	bool newval;
 	time_t chk_mtime[16];
@@ -338,6 +357,10 @@ void load_bacnet(char *idx) {
 	bool pimage_read[65535];
 	int input_reg[65535];
 	bool input_reg_read[65535];
+	int coil[65535];
+	bool coil_read[65535];
+	int disc_input[65535];
+	bool disc_input_read[65535];
 
 
 	section = "modbus";
@@ -438,6 +461,12 @@ void load_bacnet(char *idx) {
 	for (;;) {
 		usleep(10000);
 		for( m=0; m<65535; m++ ) {
+			if (coil_read[m]) {
+				coil_read[m]=NULL;
+			}
+			if (disc_input_read[m]) {
+				disc_input_read[m]=NULL;
+			}
 			if (pimage_read[m]) {
 				pimage_read[m]=NULL;
 			}
@@ -502,6 +531,8 @@ void load_bacnet(char *idx) {
 			addr = cur_pv->addr;
 			tab_reg = (uint16_t *) malloc(max_offset * sizeof(uint16_t));
 			memset(tab_reg, 0, max_offset * sizeof(uint16_t));
+			tab_bit = (uint8_t *) malloc(max_offset * sizeof(uint8_t));
+			memset(tab_bit, 0, max_offset * sizeof(uint8_t));
 			rc= -1;
 			j = cur_pv->section_idx;
 			uci_change[j] = NULL;
@@ -516,22 +547,21 @@ void load_bacnet(char *idx) {
 							offset = 1;
 							strncpy(cur_pv->value, value, sizeof(cur_pv->value));
 							val_f = strtof(cur_pv->value,NULL);
+							val_i = atoi(cur_pv->value);
+							val_b = atoi(cur_pv->value);
 							if (cur_pv->modtype == MODDOUBLEFLOAT) {
 								cur_pv->value_float = val_f;
 								offset = 2;
 								modbus_set_float(val_f, tab_reg);
 							} else if (cur_pv->modtype == MODBIT) {
-								val_i = atoi(cur_pv->value);
 								cur_pv->value_int = val_i;
 								tab_reg[0] = val_i;
+								cur_pv->value_bit = val_b;
+								tab_bit[0] = val_b;
 							} else if (cur_pv->modtype == MODDWORD) {
-								val_i = atoi(cur_pv->value);
 								bitv = cur_pv->bit;
-								if (pimage_read[addr] && (cur_pv->func == 3)) {
+								if (pimage_read[addr]) {
 									cur_pv->value_int = pimage[addr];
-								}
-								if (input_reg_read[addr] && (cur_pv->func == 4)) {
-									cur_pv->value_int = input_reg[addr];
 								}
 								if (val_i > 0) {
 									SETBIT(cur_pv->value_int,bitv);
@@ -553,14 +583,23 @@ void load_bacnet(char *idx) {
 								tab_reg[0] = val_i;
 								cur_pv->value_int = val_i;
 							}
-							k=0;
-							for (n=addr;n<addr+offset;n++) {
-								pimage[n]=tab_reg[k];
-								pimage_read[n]=true;
-								k++;
-							}
-							if (cur_pv->func == 3) {
+							if (cur_pv->func == MODBUS_FC_READ_HOLDING_REGISTERS) {
+								k=0;
+								for (n=addr;n<addr+offset;n++) {
+									pimage[n]=tab_reg[k];
+									pimage_read[n]=true;
+									k++;
+								}
 								rc = modbus_write_registers(mctx, addr, offset, tab_reg);
+							}
+							if (cur_pv->func == MODBUS_FC_READ_COILS) {
+								k=0;
+								for (n=addr;n<addr+offset;n++) {
+									coil[n]=tab_bit[k];
+									coil_read[n]=true;
+									k++;
+								}
+								rc = modbus_write_bits(mctx, addr, offset, tab_bit);
 							}
 						}
 					}
@@ -574,7 +613,41 @@ void load_bacnet(char *idx) {
 					if (cur_pv->modtype == MODDOUBLEFLOAT) {
 						offset = 2;
 					}
-					if (cur_pv->func == 3) {
+					if (cur_pv->func == MODBUS_FC_READ_COILS) {
+						if (coil_read[addr]) {
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								tab_bit[k]=coil[n];
+								k++;
+							}
+							rc=k;
+						} else {
+							rc = modbus_read_bits(mctx, addr, offset, tab_bit);
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								coil[n]=tab_bit[k];
+								coil_read[n]=true;
+								k++;
+							}
+						}
+					} else if (cur_pv->func == MODBUS_FC_READ_DISCRETE_INPUTS) {
+						if (disc_input_read[addr]) {
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								tab_bit[k]=disc_input[n];
+								k++;
+							}
+							rc=k;
+						} else {
+							rc = modbus_read_input_bits(mctx, addr, offset, tab_bit);
+							k=0;
+							for (n=addr;n<addr+offset;n++) {
+								disc_input[n]=tab_bit[k];
+								disc_input_read[n]=true;
+								k++;
+							}
+						}
+					} else if (cur_pv->func == MODBUS_FC_READ_HOLDING_REGISTERS) {
 						if (pimage_read[addr]) {
 							k=0;
 							for (n=addr;n<addr+offset;n++) {
@@ -591,7 +664,7 @@ void load_bacnet(char *idx) {
 								k++;
 							}
 						}
-					} else if (cur_pv->func == 4) {
+					} else if (cur_pv->func == MODBUS_FC_READ_INPUT_REGISTERS) {
 						if (input_reg_read[addr]) {
 							k=0;
 							for (n=addr;n<addr+offset;n++) {
@@ -618,142 +691,122 @@ void load_bacnet(char *idx) {
 						uci_change[j] = true;
 					}
 				}
-			}
-			uci_change_ext[j] = NULL;
-			if (rc == -1) {
-				if (mctx) {
-					fprintf(stderr,"Return err -1 modbus close conection\n");
-					modbus_close(mctx);
-					modbus_free(mctx);
-					mctx=NULL;
-				}
-				if (cur_pv->err_counter <= 2) cur_pv->err_counter++;
-				if (cur_pv->Out_Of_Service == 0 && cur_pv->err_counter > 2) {
-					fprintf(stderr,"Out_Of_Service %s %s\n",pv_section[j],cur_pv->idx);
-					cur_pv->Out_Of_Service = 1;
-					uct_b = ucix_init(pv_section[j]);
-					ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
-						"Out_Of_Service",1);
-					uci_change[j] = true;
-				}
-			} else {
-				cur_pv->err_counter=0;
-				newval=false;
-				if (cur_pv->modtype == MODDOUBLEFLOAT) {
-					val_f = cur_pv->value_float;
-					pval_f = modbus_get_float(&tab_reg[0]);
-					val_fab = val_f - pval_f;
-					if ( val_fab > 0.001 ) {
-						cur_pv->value_float = pval_f;
-						sprintf(cur_pv->value,"%f",pval_f);
-						newval=true;
+				uci_change_ext[j] = NULL;
+				if (rc == -1) {
+					if (mctx) {
+						fprintf(stderr,"Return err -1 modbus close conection\n");
+						modbus_close(mctx);
+						modbus_free(mctx);
+						mctx=NULL;
+						sleep(3);
 					}
-					if ( rewrite == 0) {
-						sprintf(cur_pv->value,"%f",pval_f);
-						newval=true;
-					}
-				} else if (cur_pv->modtype == MODBIT) {
-					val_i = tab_reg[0];
-					if ( cur_pv->value_int != val_i ) {
-						cur_pv->value_int = val_i;
-						if (val_i > 0 ) {
-							sprintf(cur_pv->value,"%i",1);
-						} else {
-							sprintf(cur_pv->value,"%i",0);
-						}
-						newval=true;
-					}
-					if ( rewrite == 0) {
-						cur_pv->value_int = val_i;
-						if ( val_i > 0 ) {
-							sprintf(cur_pv->value,"%i",1);
-						} else {
-							sprintf(cur_pv->value,"%i",0);
-						}
-						newval=true;
-					}
-				} else if ( cur_pv->modtype == MODDWORD ) {
-					val_i = tab_reg[0];
-					if ( cur_pv->value_int != val_i ) {
-						cur_pv->value_int = val_i;
-						bitv=cur_pv->bit;
-						if (BITVAL(val_i, bitv)) {
-							sprintf(cur_pv->value,"%i",1);
-						} else {
-							sprintf(cur_pv->value,"%i",0);
-						}
-						newval=true;
-					}
-					if ( rewrite == 0) {
-						cur_pv->value_int = val_i;
-						bitv=cur_pv->bit;
-						if (BITVAL(val_i, bitv)) {
-							sprintf(cur_pv->value,"%i",1);
-						} else {
-							sprintf(cur_pv->value,"%i",0);
-						}
-						newval=true;
-					}
-				} else if ( cur_pv->modtype == MODUINT ) {
-					val_i = tab_reg[0];
-					if ( cur_pv->value_int != val_i ) {
-						cur_pv->value_int = val_i;
-						pval_f = (float)val_i;
-						sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
-						newval=true;
-					}
-					if ( rewrite == 0) {
-						cur_pv->value_int = tab_reg[0];
-						pval_f = (float)tab_reg[0];
-						sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
-						newval=true;
+					if (cur_pv->err_counter <= 2) cur_pv->err_counter++;
+					if (cur_pv->Out_Of_Service == 0 && cur_pv->err_counter > 2) {
+						fprintf(stderr,"Out_Of_Service %s %s\n",pv_section[j],cur_pv->idx);
+						cur_pv->Out_Of_Service = 1;
+						uct_b = ucix_init(pv_section[j]);
+						ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
+							"Out_Of_Service",1);
+						uci_change[j] = true;
 					}
 				} else {
-					val_i = tab_reg[0];
-					if (val_i > 32767)
-						val_i = val_i - 65536;
-					if ( cur_pv->value_int != val_i ) {
-						cur_pv->value_int = val_i;
-						pval_f = (float)val_i;
-						sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
-						newval=true;
+					cur_pv->err_counter=0;
+					newval=false;
+					if (cur_pv->modtype == MODDOUBLEFLOAT) {
+						val_f = cur_pv->value_float;
+						pval_f = modbus_get_float(&tab_reg[0]);
+						val_fab = val_f - pval_f;
+						if (( val_fab > 0.001 ) || (rewrite == 0)) {
+							cur_pv->value_float = pval_f;
+							sprintf(cur_pv->value,"%f",pval_f);
+							newval=true;
+						}
+					} else if (cur_pv->modtype == MODBIT) {
+						if (cur_pv->func <= 2) {
+							val_b = tab_bit[0];
+							if ((cur_pv->value_bit != val_b) || (rewrite == 0)) {
+								cur_pv->value_bit = val_b;
+								if (val_b > 0 ) {
+									sprintf(cur_pv->value,"%i",1);
+								} else {
+									sprintf(cur_pv->value,"%i",0);
+								}
+								newval=true;
+							}
+						} else {
+							val_i = tab_reg[0];
+							if ((cur_pv->value_int != val_i) || (rewrite == 0)) {
+								cur_pv->value_int = val_i;
+								if (val_i > 0 ) {
+									sprintf(cur_pv->value,"%i",1);
+								} else {
+									sprintf(cur_pv->value,"%i",0);
+								}
+								newval=true;
+							}
+						}
+					} else if ( cur_pv->modtype == MODDWORD ) {
+						val_i = tab_reg[0];
+						if (( cur_pv->value_int != val_i ) || (rewrite == 0)) {
+							cur_pv->value_int = val_i;
+							bitv=cur_pv->bit;
+							if (BITVAL(val_i, bitv)) {
+								sprintf(cur_pv->value,"%i",1);
+							} else {
+								sprintf(cur_pv->value,"%i",0);
+							}
+							newval=true;
+						}
+					} else if ( cur_pv->modtype == MODUINT ) {
+						val_i = tab_reg[0];
+						if (( cur_pv->value_int != val_i ) || (rewrite == 0)) {
+							cur_pv->value_int = val_i;
+							pval_f = (float)val_i;
+							sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
+							newval=true;
+						}
+					} else {
+						val_i = tab_reg[0];
+						if (val_i > 32767)
+							val_i = val_i - 65536;
+						if (( cur_pv->value_int != val_i ) || (rewrite == 0)) {
+							cur_pv->value_int = val_i;
+							pval_f = (float)val_i;
+							sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
+							newval=true;
+						}
 					}
-					if ( rewrite == 0) {
-						cur_pv->value_int = tab_reg[0];
-						pval_f = (float)tab_reg[0];
-						sprintf(cur_pv->value,"%f",pval_f*cur_pv->res);
-						newval=true;
-					}
-				}
-				if (newval) {
-					ucix_add_option(uct_b, pv_section[j], cur_pv->idx,
-						"value",cur_pv->value);
-					ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
-						"value_time",cur_pv->value_time);
-					if (cur_pv->Out_Of_Service == 1) {
+					if (newval) {
+						ucix_add_option(uct_b, pv_section[j], cur_pv->idx,
+							"value",cur_pv->value);
 						ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
-							"Out_Of_Service",0);
+							"value_time",cur_pv->value_time);
+						if (cur_pv->Out_Of_Service == 1) {
+							ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
+								"Out_Of_Service",0);
+						}
+						uci_change[j] = true;
 					}
-					uci_change[j] = true;
+					free(tab_reg);
 				}
-				free(tab_reg);
+				if (uci_change[j]) {
+					ucix_commit(uct_b, pv_section[j]);
+					mtime_bacnet[j] = time(NULL);
+					uci_change[j] = NULL;
+				}
+				if(uct_b)
+					ucix_cleanup(uct_b);
 			}
-			if (uci_change[j]) {
-				ucix_commit(uct_b, pv_section[j]);
-				mtime_bacnet[j] = time(NULL);
-				uci_change[j] = NULL;
-			}
-			if(uct_b)
-				ucix_cleanup(uct_b);
-		}
-		if (mctx) {
-			rewrite++;
-			if (rewrite>1000) {
-				rewrite=0;
+			if (mctx) {
+				rewrite++;
+				if (rewrite>1000) {
+					rewrite=0;
+				}
 			}
 		}
 	}
 }
+
 
 void load_station(const char *sec_idx, struct station_itr_ctx *itr)
 {
@@ -768,6 +821,7 @@ void load_station(const char *sec_idx, struct station_itr_ctx *itr)
 		itr->list = t;
 	}
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -795,14 +849,14 @@ int main(int argc, char *argv[])
 			printf ("fork(%s)\n",idx);
 			pid_t pid=fork();
 			//int pid = 0;
-			/* only execute this if child */
+			// only execute this if child
 			if (pid==0) {
 				load_bacnet(idx);
 				exit(0);
 			} else {
-				/* only the parent waits */
+				// only the parent waits
 				//wait(&status);
-				/* only the parent sleep */
+				// only the parent sleep
 				sleep(1);
 			}
 		}
