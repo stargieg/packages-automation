@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2018-03-26-2
-PKG_SOURCE_VERSION:=bcb5cb44d3e2bf1fa9f2028fa7863a6e5746b1f8
+PKG_VERSION:=2018-03-29-1
+PKG_SOURCE_VERSION:=69b179e2ebd1d962f9813086a0f420409f91d80c
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
@@ -93,6 +93,18 @@ endef
 
 define Package/bacnet-stack-mstp/description
   This package is built with MSTP support.
+endef
+
+define Package/bacnet-stack-router
+$(call Package/bacnet-stack/Default)
+  TITLE+= (ROUTER BIP MSTP)
+  MENU:=1
+  VARIANT:=router
+  DEPENDS+= +bacnet-stack-uci
+endef
+
+define Package/bacnet-stack-router/description
+  This package is built with Routing MSTP BIP support.
 endef
 
 define Package/bacnet-stack-bip/config
@@ -295,6 +307,21 @@ define Build/Compile
 endef
 endif
 
+ifeq ($(BUILD_VARIANT),router)
+MAKE_VARS += BACDL_DEFINE=-DBACDL_BIP=1
+MAKE_VARS += BACNET_DEFINES="\
+-DBACAPP_ALL \
+-DPRINT_ENABLED=1 \
+-DBACNET_PROPERTY_LISTS=1 \
+-DBAC_UCI \
+"
+define Build/Compile
+	+$(MAKE_VARS) $(MAKE) $(PKG_JOBS) \
+		-C $(PKG_BUILD_DIR) \
+		router
+endef
+endif
+
 ifeq ($(BUILD_VARIANT),utils)
 MAKE_VARS += BACDL_DEFINE=-DBACDL_BIP=1
 MAKE_VARS += BACNET_DEFINES="\
@@ -374,6 +401,14 @@ define Package/bacnet-stack-mstp/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-mstp
 endef
 
+define Package/bacnet-stack-router/install
+	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/bacserv_router.defaults $(1)/etc/uci-defaults/bacserv_router
+	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/router $(1)/usr/sbin/bacserv-router
+	$(INSTALL_BIN) ./files/bacrouter.init $(1)/etc/init.d/bacrouter
+endef
+
 define Package/bacnet-stack-utils/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacarf $(1)/usr/bin/
@@ -405,4 +440,5 @@ $(eval $(call BuildPackage,bacnet-stack-bip))
 $(eval $(call BuildPackage,bacnet-stack-bip6))
 $(eval $(call BuildPackage,bacnet-stack-ethernet))
 $(eval $(call BuildPackage,bacnet-stack-mstp))
+$(eval $(call BuildPackage,bacnet-stack-router))
 $(eval $(call BuildPackage,bacnet-stack-utils))
