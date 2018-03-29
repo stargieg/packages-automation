@@ -1,0 +1,56 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2013 Patrick Grimm
+
+START=60
+USE_PROCD=1
+SERVER_BIN="/usr/sbin/bacserv-router"
+
+start_dev() {
+	local cfg=$1
+	config_get enable_rt $cfg enable_rt "0"
+	[ "$enable_rt" == "1" ] || return
+	config_get bacdl $cfg bacdl "bip"
+	config_get iface $cfg iface "lan"
+	network_get_device ifname "$iface"
+	if [ "$bacdl" == "bip" ] ; then
+		procd_append_param command --device "bip" "$iface"
+		config_get net $cfg net "1"
+		procd_append_param command --network "$net"
+		config_get port $cfg port "47808"
+		procd_append_param command --port "$port"
+	else if [ "$bacdl" == "mstp" ] ; then
+		procd_append_param command --device "mstp" "$iface"
+		config_get net $cfg net "2"
+		procd_append_param command --network "$net"
+		config_get mac $cfg mac "1"
+		config_get mac_master $cfg mac_master "127"
+		config_get mac_frames $cfg mac_frames "1"
+		procd_append_param command --mac "$mac" "$mac_master" "$mac_frames"
+		config_get baud $cfg baud "38400"
+		procd_append_param command --baud "$baud"
+		config_get parity $cfg parity "None"
+		procd_append_param command --parity "$parity"
+		config_get databits $cfg databits "8"
+		procd_append_param command --databits "$databits"
+		config_get stopbits $cfg stopbits "1"
+		procd_append_param command --stopbits "$stopbits"
+	fi
+}
+
+start_service() {
+	. /lib/functions/network.sh
+	config_load bacnet_dev
+	config_foreach start_dev dev
+	procd_open_instance
+	procd_set_param respawn
+	procd_set_param stderr 1
+	procd_set_param command "$BIN"
+	procd_open_trigger
+	#procd_add_interface_trigger "interface.*" $iface /etc/init.d/bacrouter restart
+	config_files="network bacnet_dev"
+	for file in "$config_files" ; do
+		procd_add_config_trigger "config.change" "$file" /etc/init.d/bacrouter restart
+	done
+	procd_close_trigger
+	procd_close_instance
+}
