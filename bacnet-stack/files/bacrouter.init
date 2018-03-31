@@ -32,9 +32,9 @@ start_dev() {
 		procd_append_param command --baud "$baud"
 		config_get parity_bit $cfg parity_bit "N"
 		procd_append_param command --parity "$parity_bit"
-		config_get databits $cfg data_bit "8"
+		config_get data_bit $cfg data_bit "8"
 		procd_append_param command --databits "$data_bit"
-		config_get stopbits $cfg stopbits "1"
+		config_get stop_bit $cfg stopbits "1"
 		procd_append_param command --stopbits "$stop_bit"
 	fi
 }
