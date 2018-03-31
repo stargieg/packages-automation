@@ -32,7 +32,7 @@ start_dev() {
 		BACNET_IFACE="$ifname"
 	fi
 	procd_open_trigger
-	procd_add_interface_trigger "interface.*" $iface /etc/init.d/bacserv restart
+	procd_add_raw_trigger "interface.*" 2000 /etc/init.d/bacserv restart
 	config_files="network bacnet_ai bacnet_ao bacnet_av bacnet_bi bacnet_bo \
 				bacnet_bv bacnet_dev bacnet_mi bacnet_mo bacnet_mv bacnet_nc \
 				bacnet_tl"
