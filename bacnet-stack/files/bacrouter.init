@@ -48,7 +48,7 @@ start_service() {
 	procd_set_param respawn
 	procd_set_param stderr 1
 	procd_open_trigger
-	#procd_add_interface_trigger "interface.*" $iface /etc/init.d/bacrouter restart
+	procd_add_raw_trigger "interface.*" 2000 /etc/init.d/bacrouter restart
 	config_files="network bacnet_dev"
 	for file in "$config_files" ; do
 		procd_add_config_trigger "config.change" "$file" /etc/init.d/bacrouter restart
