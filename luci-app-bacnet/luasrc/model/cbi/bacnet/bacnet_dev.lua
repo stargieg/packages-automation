@@ -72,7 +72,7 @@ s:option(DummyValue, "dv1", nil, "BACnet MSTP (serial RS485) opkg install bacnet
 s:option(Flag, "enable", "enable")
 
 sva = s:option(Value, "bacdl", "Netzwerk Layer")
-if lfs.access("/usr/sbin/bacserv-bip") then
+if lfs.access("/usr/sbin/bacserv-bip") or lfs.access("/usr/sbin/bacserv-router") then
 	sva:value('bip','BACnet IPv4')
 end
 if lfs.access("/usr/sbin/bacserv-bip6") then
@@ -81,7 +81,7 @@ end
 if lfs.access("/usr/sbin/bacserv-ethernet") then
 	sva:value('ethernet','BACnet Ethernet')
 end
-if lfs.access("/usr/sbin/bacserv-mstp") then
+if lfs.access("/usr/sbin/bacserv-mstp") or lfs.access("/usr/sbin/bacserv-router") then
 	sva:value('mstp','BACnet MSTP (RS485/RS232)')
 end
 
@@ -91,12 +91,52 @@ uci:foreach("network", "interface",
 	function(section)
 		sva:value(section[".name"])
 	end)
+if lfs.access("/usr/sbin/bacserv-mstp") or lfs.access("/usr/sbin/bacserv-router") then
+	for device in nixio.fs.glob("/dev/ttyS[0-9]*") do
+		sva:value(device)
+	end
+	for device in nixio.fs.glob("/dev/ttyUSB[0-9]*") do
+		sva:value(device)
+	end
+end
 
 sva = s:option(Value, "port", "UDP Port")
 sva:depends("bacdl","bip")
 sva:value('47808')
 sva:value('47809')
 sva:value('47810')
+
+sva = s:option(Value, "mac", "MAC Addresse")
+sva:depends("bacdl","mst")
+sva:value('127')
+sva = s:option(Value, "max_master", "Max Master")
+sva:depends("bacdl","mst")
+sva:value('127')
+sva = s:option(Value, "max_frames", "Max Frames")
+sva:depends("bacdl","mst")
+sva:value('1')
+sva = s:option(Value, "baud", "Uebertragungsrate")
+sva:value('9600')
+sva:value('19200')
+sva:value('38400')
+sva:value('57600')
+sva:value('115200')
+sva:depends("bacdl","mst")
+sva = s:option(Value, "parity_bit", "Parity Bit")
+sva:value('N')
+sva:value('O')
+sva:value('E')
+sva:depends("bacdl","mst")
+sva = s:option(Value, "data_bit", "Data Bit")
+sva:value('5')
+sva:value('6')
+sva:value('7')
+sva:value('8')
+sva:depends("bacdl","mst")
+sva = s:option(Value, "stop_bit", "Stop Bit")
+sva:value('1')
+sva:value('2')
+sva:depends("bacdl","mst")
 
 sva = s:option(Value, "net", "Net")
 sva:value('0','BAC0')
@@ -110,6 +150,8 @@ s:option(Value, "modelname", "Model Name")
 
 s:option(Value, "description", "Anzeige Name")
 s:option(Value, "location", "Einbau Ort")
+
+
 
 return m
 

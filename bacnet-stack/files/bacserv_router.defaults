@@ -45,6 +45,7 @@ if [ -z "hostname_rand" ] ; then
 	hostname="$hostname-$hostname_rand"
 fi
 
+local has_bip=''
 local has_mstp=''
 local dev_idx=0
 config_load bacnet_dev
