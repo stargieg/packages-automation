@@ -13,13 +13,15 @@ start_dev() {
 	config_get iface $cfg iface "lan"
 	network_get_device ifname "$iface"
 	if [ "$bacdl" == "bip" ] ; then
-		procd_append_param command --device "bip" "$iface"
+		procd_append_param command --device "bip"
+		procd_append_param command --interface "$ifname"
 		config_get net $cfg net "1"
 		procd_append_param command --network "$net"
 		config_get port $cfg port "47808"
 		procd_append_param command --port "$port"
-	else if [ "$bacdl" == "mstp" ] ; then
-		procd_append_param command --device "mstp" "$iface"
+	elif [ "$bacdl" == "mstp" ] ; then
+		procd_append_param command --device "mstp"
+		procd_append_param command --interface "$iface"
 		config_get net $cfg net "2"
 		procd_append_param command --network "$net"
 		config_get mac $cfg mac "1"
@@ -40,11 +42,11 @@ start_dev() {
 start_service() {
 	. /lib/functions/network.sh
 	config_load bacnet_dev
-	config_foreach start_dev dev
 	procd_open_instance
+	procd_set_param command "$SERVER_BIN"
+	config_foreach start_dev dev
 	procd_set_param respawn
 	procd_set_param stderr 1
-	procd_set_param command "$BIN"
 	procd_open_trigger
 	#procd_add_interface_trigger "interface.*" $iface /etc/init.d/bacrouter restart
 	config_files="network bacnet_dev"
