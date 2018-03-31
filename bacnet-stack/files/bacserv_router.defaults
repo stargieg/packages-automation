@@ -10,7 +10,7 @@ setup_system() {
 
 setup_bacnet() {
 	local cfg=$1
-	dev_idx=$(($cfg+1))
+	[ $cfg -gt $dev_idx ] && dev_idx=$cfg
 	config_get bacdl $cfg bacdl
 	if [ "$bacdl" == "bip" ] ; then
 		has_bip=1
@@ -34,8 +34,8 @@ setup_bacnet() {
 	fi
 }
 
-local hostname
-local hostname_rand
+hostname=''
+hostname_rand=''
 config_load system
 config_foreach setup_system system
 
@@ -45,12 +45,14 @@ if [ -z "hostname_rand" ] ; then
 	hostname="$hostname-$hostname_rand"
 fi
 
-local has_bip=''
-local has_mstp=''
-local dev_idx=0
+has_bip=''
+has_mstp=''
+dev_idx="-1"
+[ -f /etc/config/bacnet_dev ] || touch /etc/config/bacnet_dev
 config_load bacnet_dev
 config_foreach setup_bacnet dev
 if [ -z "$has_bip" ] ; then
+	dev_idx=$((dev_idx+1))
 	cfg=$dev_idx
 	uci_add bacnet_dev dev $cfg
 	uci_set bacnet_dev $cfg enable "1"
@@ -68,6 +70,7 @@ if [ -z "$has_bip" ] ; then
 	uci_commit bacnet_dev
 fi
 if [ -z "$has_mstp" ] ; then
+	dev_idx=$((dev_idx+1))
 	cfg=$dev_idx
 	uci_add bacnet_dev dev $cfg
 	uci_set bacnet_dev $cfg enable "1"
