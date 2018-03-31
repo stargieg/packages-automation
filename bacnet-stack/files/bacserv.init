@@ -37,7 +37,9 @@ start_dev() {
 				bacnet_bv bacnet_dev bacnet_mi bacnet_mo bacnet_mv bacnet_nc \
 				bacnet_tl"
 	for file in "$config_files" ; do
-		procd_add_config_trigger "config.change" "$file" /etc/init.d/bacserv restart
+		if [ -f /etc/config/$file ] ; then
+			procd_add_config_trigger "config.change" "$file" /etc/init.d/bacserv restart
+		fi
 	done
 	procd_close_trigger
 	procd_close_instance
