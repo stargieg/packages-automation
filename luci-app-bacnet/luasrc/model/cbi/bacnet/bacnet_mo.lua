@@ -36,11 +36,12 @@ events[6] = {5,"Ereignis"}
 events[7] = {6,"Ereignis"}
 events[8] = {7,"Alle Ereignis behandeln"}
 
-if arg1 then
-	m = Map("bacnet_mo_"..arg1, "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
-else
-	m = Map("bacnet_mo", "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
-end
+--if arg1 then
+--	m = Map("bacnet_mo_"..arg1, "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
+--else
+m = Map("bacnet_mo", "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
+--end
+m.on_after_commit = function() luci.sys.call("/bin/ubus call uci reload_config") end
 
 s = m:section(TypedSection, "mo", arg1 or 'Index')
 s.addremove = true
@@ -62,17 +63,21 @@ uci:foreach("modbus", "station",
 	end)
 sva:value("icinga")
 
-local sva = s:taboption("io", Value, "unit_id", "Unit ID")
-sva:value('1')
-sva:value('255')
+local sva = s:option(Value, "unit_id", "Unit ID")
+sva.placeholder = 1
+sva.datatype = "range(1, 255)"
 sva.rmempty = true
-sva.rmempty = true
+local sva = s:option(ListValue, "func", "Funktions Code")
 sva:value('1',"Spulen (Coils)")
 sva:value('2',"Diskrete Eingäng (Disc Inputs)")
-sva:value('3',"Halteregister (Holding Register) Default")
+sva:value('',"Halteregister (Holding Register) Default")
+sva:value('3',"Halteregister (Holding Register)")
 sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
-s:option(Value, "addr", "Addr")
+local sva = s:option(Value, "addr", "Addr")
+sva.placeholder = 1
+sva.datatype = "portrange"
+
 s:option(Value, "value", "Value")
 s:option(Value, "fb_value", "Feedback Value")
 s:option(DynamicList, "state", "Stats")

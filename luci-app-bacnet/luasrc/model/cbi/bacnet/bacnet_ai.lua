@@ -47,6 +47,7 @@ limits[4] = {3,"Low High"}
 --else
 m = Map("bacnet_ai", "Bacnet Analog Input", "Bacnet Analog Input Configuration")
 --end
+m.on_after_commit = function() luci.sys.call("/bin/ubus call uci reload_config") end
 
 local s = m:section(TypedSection, "ai", arg1 or 'Index')
 s.addremove = true
@@ -77,23 +78,28 @@ local sva = s:taboption("main", Value, "max_value", "Max Present Value")
 sva:value("100")
 
 local sva = s:taboption("io", Value, "unit_id", "Unit ID")
-sva:value('1')
-sva:value('255')
+sva.placeholder = 1
+sva.datatype = "range(1, 255)"
 sva.rmempty = true
-local sva = s:taboption("io", Value, "func", "Funktions Code")
+local sva = s:taboption("io", ListValue, "func", "Funktions Code")
 sva:value('1',"Spulen (Coils)")
 sva:value('2',"Diskrete Eingäng (Disc Inputs)")
 sva:value('3',"Halteregister (Holding Register)")
-sva:value('4',"Eingaberegister (Input Register) Default")
+sva:value("","Eingaberegister (Input Register) Default")
+sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
-local sva = s:taboption("io", Value, "resolution", "Auflösung")
+sva.placeholder = 1
+sva.datatype = "portrange"
+local sva = s:taboption("io", ListValue, "resolution", "Auflösung")
 sva:value("doublefloat","2 Register zu Fliesspunkt")
 sva:value("float","1 Register zu Fliesspunkt")
 sva:value("bit","1 Bit aus 1 Register")
 sva:value("0.1","1 Register * 0.1")
+sva:value("","1 Register * 1 Default")
 sva:value("1","1 Register * 1")
 sva:value("10","1 Register * 10")
+sva.rmempty = true
 
 local sva = s:taboption("io", Flag, "unsigned", "Ohne Vorzeichen (z.B. Zähler)")
 

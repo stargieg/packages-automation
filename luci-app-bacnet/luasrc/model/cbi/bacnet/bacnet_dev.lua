@@ -25,12 +25,9 @@ if not lfs.access("/etc/config/bacnet_dev") then
 end
 
 local m = Map("bacnet_dev", "Bacnet Device", "Bacnet Device Configuration")
-if lfs.access("/etc/init.d/bacserv") then
-m.on_after_commit = function() luci.sys.call("/etc/init.d/bacserv restart") end
-end
-if lfs.access("/etc/init.d/bacrouter") then
-m.on_after_commit = function() luci.sys.call("/etc/init.d/bacrouter restart") end
-end
+m.on_after_commit = function() luci.sys.call("/bin/ubus call uci reload_config") end
+
+
 
 local s = m:section(TypedSection, "dev", 'Device Nummer')
 s.addremove = true
@@ -117,42 +114,52 @@ sva = s:option(Value, "mac", "MAC Addresse")
 sva:depends("bacdl","mstp")
 sva.placeholder = 127
 sva.datatype = "range(0, 128)"
+sva.rmempty = true
 sva = s:option(Value, "max_master", "Max Master")
 sva:depends("bacdl","mstp")
 sva.placeholder = 127
 sva.datatype = "range(0, 128)"
+sva.rmempty = true
 sva = s:option(Value, "max_frames", "Max Frames")
 sva:depends("bacdl","mstp")
 sva.placeholder = 1
 sva.datatype = "range(1, 128)"
-sva = s:option(Value, "baud", "Uebertragungsrate")
+sva.rmempty = true
+sva = s:option(ListValue, "baud", "Uebertragungsrate")
 sva:value('9600')
 sva:value('19200')
 sva:value('38400')
+sva:value("","38400 Default")
 sva:value('57600')
 sva:value('115200')
 sva:depends("bacdl","mstp")
-sva = s:option(Value, "parity_bit", "Parity Bit")
+sva.rmempty = true
+sva = s:option(ListValue, "parity_bit", "Parity Bit")
+sva:value('','None Default')
 sva:value('N','None')
 sva:value('O','Odd')
 sva:value('E','Even')
 sva:depends("bacdl","mstp")
-sva = s:option(Value, "data_bit", "Data Bit")
+sva.rmempty = true
+sva = s:option(ListValue, "data_bit", "Data Bit")
 sva:value(5)
 sva:value(6)
 sva:value(7)
+sva:value("","8 Default")
 sva:value(8)
 sva:depends("bacdl","mstp")
-sva.datatype = "range(5, 8)"
-sva = s:option(Value, "stop_bit", "Stop Bit")
+sva.rmempty = true
+sva = s:option(ListValue, "stop_bit", "Stop Bit")
+sva:value("","1 Default")
 sva:value(1)
 sva:value(2)
 sva:depends("bacdl","mstp")
-sva.datatype = "range(1, 2)"
+sva.rmempty = true
 
 sva = s:option(Value, "net", "Net")
 sva.placeholder = 0
 sva.datatype = "portrange"
+sva.rmempty = true
 
 sva = s:option(Value, "Id", "Device ID")
 sva.placeholder = 4711

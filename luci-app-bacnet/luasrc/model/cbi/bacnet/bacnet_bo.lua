@@ -41,6 +41,7 @@ events[8] = {7,"Alle Ereignis behandeln"}
 --else
 m = Map("bacnet_bo", "Bacnet Binary Ouput", "Bacnet Binary Output Configuration")
 --end
+m.on_after_commit = function() luci.sys.call("/bin/ubus call uci reload_config") end
 
 local s = m:section(TypedSection, "bo", arg1 or 'Index')
 s.addremove = true
@@ -73,21 +74,27 @@ uci:foreach("icinga", "station",
 	end)
 
 local sva = s:taboption("io", Value, "unit_id", "Unit ID")
-sva:value('1')
-sva:value('255')
+sva.placeholder = 1
+sva.datatype = "range(1, 255)"
 sva.rmempty = true
-local sva = s:taboption("io", Value, "func", "Funktions Code")
-sva:value('1',"Spulen (Coils) Default")
+local sva = s:taboption("io", ListValue, "func", "Funktions Code")
+sva:value('',"Spulen (Coils) Default")
+sva:value('1',"Spulen (Coils)")
 sva:value('2',"Diskrete Eingäng (Disc Inputs)")
 sva:value('3',"Halteregister (Holding Register)")
 sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
-local sva = s:taboption("io", Value, "resolution", "Auflösung")
+sva.placeholder = 1
+sva.datatype = "portrange"
+local sva = s:taboption("io", ListValue, "resolution", "Auflösung")
 sva:value("dword","1 Bit aus 1 Register")
+sva:value("","1 Bit Default")
 sva:value("bit","1 Bit")
+sva.rmempty = true
 local sva = s:taboption("io", ListValue, "bit", "Bit 0-15")
 sva:depends("resolution","dword")
+sva:value("","Bit 0 Default")
 sva:value("0","Bit 0")
 sva:value("1","Bit 1")
 sva:value("2","Bit 2")
@@ -104,6 +111,7 @@ sva:value("12","Bit 12")
 sva:value("13","Bit 13")
 sva:value("14","Bit 14")
 sva:value("15","Bit 15")
+sva.rmempty = true
 
 local sva = s:taboption("main", Flag, "value", "Value")
 sva.rmempty = false

@@ -33,11 +33,12 @@ if not nixio.fs.access("/etc/config/bacnet_mv") then
 	end
 end
 
-if arg1 then
-	m = Map("bacnet_mv_"..arg1, "Bacnet Multisate Value", "Bacnet Multisate Value Configuration")
-else
-	m = Map("bacnet_mv", "Bacnet Multisate Value", "Bacnet Multisate Value Configuration")
-end
+--if arg1 then
+--	m = Map("bacnet_mv_"..arg1, "Bacnet Multisate Value", "Bacnet Multisate Value Configuration")
+--else
+m = Map("bacnet_mv", "Bacnet Multisate Value", "Bacnet Multisate Value Configuration")
+--end
+m.on_after_commit = function() luci.sys.call("/bin/ubus call uci reload_config") end
 
 s = m:section(TypedSection, "mv", arg1 or 'MV Index')
 s.addremove = true

@@ -26,11 +26,11 @@ if not nixio.fs.access("/etc/config/bacnet_nc") then
 	end
 end
 
-if arg1 then
-	m = Map("bacnet_nc_"..arg1, "Bacnet Notification Class", "Bacnet Notification Class Configuration")
-else
-	m = Map("bacnet_nc", "Bacnet Notification Class", "Bacnet Notification Class Configuration")
-end
+--if arg1 then
+--	m = Map("bacnet_nc_"..arg1, "Bacnet Notification Class", "Bacnet Notification Class Configuration")
+--else
+m = Map("bacnet_nc", "Bacnet Notification Class", "Bacnet Notification Class Configuration")
+--end
 
 s = m:section(TypedSection, "nc", arg1 or 'NC Index')
 s.addremove = true

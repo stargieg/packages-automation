@@ -39,7 +39,7 @@ sva = s:option(Value, "unit_id", "Standart Unit ID wenn im Bacnet objekt nicht d
 sva.placeholder = 1
 sva.datatype = "range(0, 128)"
 
-sva = s:option(Value, "backend", "Schnitstelle")
+sva = s:option(ListValue, "backend", "Schnitstelle")
 sva:value("tcp","Modbus TCP/IPv4")
 sva:value("tcp_pi","Modbus TCP/IPv6")
 sva:value("rtu","Modbus RTU (RS485/RS232)")
@@ -66,29 +66,35 @@ for device in nixio.fs.glob("/dev/ttyUSB[0-9]*") do
 	sva:value(device)
 end
 sva:depends("backend","rtu")
-sva = s:option(Value, "baud", "Uebertragungsrate")
+sva = s:option(ListValue, "baud", "Uebertragungsrate")
 sva:value('9600')
 sva:value('19200')
 sva:value('38400')
 sva:value('57600')
+sva:value('','115200 Default')
 sva:value('115200')
 sva:depends("backend","rtu")
-sva = s:option(Value, "parity_bit", "Parity Bit")
+sva.rmempty = true
+sva = s:option(ListValue, "parity_bit", "Parity Bit")
+sva:value('','None Default')
 sva:value('N','None')
 sva:value('O','Odd')
 sva:value('E','Even')
 sva:depends("backend","rtu")
-sva = s:option(Value, "data_bit", "Data Bit")
+sva.rmempty = true
+sva = s:option(ListValue, "data_bit", "Data Bit")
 sva:value(7)
+sva:value('','8 Default')
 sva:value(8)
 sva:depends("backend","rtu")
-sva.datatype = "range(7, 8)"
-sva = s:option(Value, "stop_bit", "Stop Bit")
+sva.rmempty = true
+sva = s:option(ListValue, "stop_bit", "Stop Bit")
+sva:value('','1 Default')
 sva:value(1)
 sva:value(1.5)
 sva:value(2)
 sva:depends("backend","rtu")
-sva.datatype = "range(1, 2)"
+sva.rmempty = true
 
 
 s:option(Value, "modelname", "Model Name")

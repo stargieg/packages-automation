@@ -15,8 +15,8 @@ start_service() {
 	procd_add_raw_trigger "interface.*" 2000 /etc/init.d/modbus restart
 	config_files="network modbus bacnet_ai bacnet_ao bacnet_av bacnet_bi \
 		bacnet_bo bacnet_bv bacnet_mi bacnet_mo bacnet_mv"
-	for file in "$config_files" ; do
-		if [ -f /etc/config/$file ] ; then
+	for file in $config_files ; do
+		if [ -f "/etc/config/$file" ] ; then
 			procd_add_config_trigger "config.change" "$file" /etc/init.d/modbus restart
 		fi
 	done
