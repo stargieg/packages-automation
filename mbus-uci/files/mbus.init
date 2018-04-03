@@ -1,0 +1,46 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2013 Patrick Grimm
+
+START=60
+USE_PROCD=1
+SERVER_BIN="/usr/sbin/mbus-uci"
+
+
+start_dev() {
+	local cfg=$1
+	config_get enable $cfg enable "0"
+	[ "$enable" == "1" ] || return
+	config_get backend $cfg backend "serial"
+	#BIN="$SERVER_BIN-$backend"
+	[ -f "$BIN" ] || return
+	config_get tagname $cfg tagname "mbus-$cfg"
+	config_get ttydev $cfg ttydev "/dev/ttyUSB0"
+	config_get baud $cfg baud "2400"
+	procd_open_instance
+	procd_set_param respawn
+	procd_set_param stderr 1
+	procd_set_param command "$BIN"
+		procd_set_param env \
+		PROC_TAGNAME="$tagname" \
+		PROC_TTYDEV="$ttydev" \
+		PROC_BAUD="$baud"
+	procd_open_trigger
+	procd_add_raw_trigger "interface.*" 2000 /etc/init.d/mbus restart
+	config_files="network mbus bacnet_ai bacnet_av"
+	for file in $config_files ; do
+		if [ -f "/etc/config/$file" ] ; then
+			procd_add_config_trigger "config.change" "$file" /etc/init.d/mbus restart
+		fi
+	done
+	procd_close_trigger
+	procd_close_instance
+}
+
+start_service() {
+	config_load mbus
+	config_foreach start_dev station
+}
+
+stop_service() {
+	killall mbus-uci
+}
