@@ -79,27 +79,27 @@ endef
 TARGET_CFLAGS += $(FPIC)
 
 define Build/InstallDev
-        $(INSTALL_DIR) $(1)/usr/include
-        $(CP) $(PKG_INSTALL_DIR)/usr/include/mbus $(1)/usr/include/
-        $(INSTALL_DIR) $(1)/usr/lib
-        $(CP) $(PKG_INSTALL_DIR)/usr/lib/libmbus.{so*,la} $(1)/usr/lib/
-        $(INSTALL_DIR) $(1)/usr/lib/pkgconfig
-        $(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libmbus.pc $(1)/usr/lib/pkgconfig/
+	$(INSTALL_DIR) $(1)/usr/include
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/mbus $(1)/usr/include/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libmbus.{so*,la} $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libmbus.pc $(1)/usr/lib/pkgconfig/
 endef
 
 define Package/libmbus/install
-        $(INSTALL_DIR) $(1)/usr/lib
-        $(CP) $(PKG_INSTALL_DIR)/usr/lib/libmbus.so* $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libmbus.so* $(1)/usr/lib/
 endef
 
 define Package/mbus-serial/install
-        $(INSTALL_DIR) $(1)/usr/bin
-        $(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/mbus-serial-* $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/mbus-serial-* $(1)/usr/bin/
 endef
 
 define Package/mbus-tcp/install
-        $(INSTALL_DIR) $(1)/usr/bin
-        $(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/mbus-tcp-* $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/mbus-tcp-* $(1)/usr/bin/
 endef
 
 $(eval $(call BuildPackage,libmbus))
