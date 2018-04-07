@@ -12,6 +12,7 @@ start_dev() {
 	[ "$enable" == "1" ] || return
 	config_get backend $cfg backend "serial"
 	#BIN="$SERVER_BIN-$backend"
+	BIN="$SERVER_BIN"
 	[ -f "$BIN" ] || return
 	config_get tagname $cfg tagname "mbus-$cfg"
 	config_get ttydev $cfg ttydev "/dev/ttyUSB0"
