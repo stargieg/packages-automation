@@ -21,7 +21,7 @@ setup_system() {
 		uci_set network lan6 ifname "@lan"
 		uci_set network lan6 proto "dhcpv6"
 		uci_set network lan6 reqaddress "try"
-		uci_set network lan6 reqprefix "auto"
+		uci_set network lan6 reqprefix "no"
 		# set multcast route to lan for knx ip
 		uci_add network route knxmcast
 		uci_set network knxmcast gateway "0.0.0.0"
