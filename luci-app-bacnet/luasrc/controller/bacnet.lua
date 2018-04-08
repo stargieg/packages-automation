@@ -40,6 +40,8 @@ function index()
 	page.dependent = true
 	local page = entry({"admin", "bacnet", "bacnet_nc"}, cbi("bacnet/bacnet_nc"), "Notification Class", 30)
 	page.dependent = true
+	local page = entry({"admin", "bacnet", "bacnet_tl"}, cbi("bacnet/bacnet_tl"), "Trendlog", 30)
+	page.dependent = true
 
 	local page = entry({"admin", "bacnet", "bacnetgroups"}, cbi("bacnet/groups", {autoapply=false}), "Bacnet Groups", 29)
 	page.dependent = true
