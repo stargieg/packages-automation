@@ -67,12 +67,6 @@ uci:foreach("modbus", "station",
 			sva:value(section.tagname)
 	end)
 
-local sva = s:taboption("io", Value, "icinga", "Icinga Zugrifsname")
-uci:foreach("icinga", "station",
-	function (section)
-			sva:value(section.tagname)
-	end)
-
 local sva = s:taboption("io", Value, "unit_id", "Unit ID")
 sva.placeholder = 1
 sva.datatype = "range(1, 255)"

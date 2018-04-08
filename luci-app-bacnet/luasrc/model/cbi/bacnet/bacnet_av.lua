@@ -70,12 +70,15 @@ uci:foreach("modbus", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
-sva:value("icinga")
+uci:foreach("mbus", "station",
+	function (section)
+			sva:value(section.tagname)
+	end)
 
 local sva = s:taboption("main", Value, "min_value", "Min Present Value")
-sva:value("0")
+sva.placeholder = 0
 local sva = s:taboption("main", Value, "max_value", "Max Present Value")
-sva:value("100")
+sva.placeholder = 100
 
 local sva = s:taboption("io", Value, "unit_id", "Unit ID")
 sva.placeholder = 1

@@ -61,7 +61,6 @@ uci:foreach("modbus", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
-sva:value("icinga")
 
 local sva = s:option(Value, "unit_id", "Unit ID")
 sva.placeholder = 1
