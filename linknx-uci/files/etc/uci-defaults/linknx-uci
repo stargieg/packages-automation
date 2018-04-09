@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+uci_add linknx station ; cfg="$CONFIG_SECTION"
+uci_set linknx $cfg tagname 'linknx'
+uci_set linknx $cfg enable '1'
+uci_set linknx $cfg description 'KNX Bus'
+#Save
+uci_commit linknx
