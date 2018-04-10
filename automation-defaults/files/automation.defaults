@@ -17,6 +17,7 @@ setup_system() {
 		uci_set system $cfg zonename "Europe/Berlin"
 		uci_set system $cfg timezone "CET-1CEST,M3.5.0,M10.5.0/3"
 		uci_set network lan proto "dhcp"
+		uci_set network lan delegate "0"
 		uci_add network interface lan6
 		uci_set network lan6 ifname "@lan"
 		uci_set network lan6 proto "dhcpv6"

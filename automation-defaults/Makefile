@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=automation-defaults
 PKG_VERSION:=2018-4-8
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
@@ -35,7 +35,7 @@ endef
 
 define Package/automation-defaults/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/automation.defaults $(1)/etc/uci-defaults/automation
+	$(INSTALL_BIN) ./files/automation.defaults $(1)/etc/uci-defaults/zautomation
 endef
 
 $(eval $(call BuildPackage,automation-defaults))
