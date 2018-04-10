@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2018-03-31-8
+PKG_VERSION:=2018-03-31-9
 PKG_SOURCE_VERSION:=ba42aacd7758a8d6b0937c05400c4b5efb5d3f04
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
@@ -342,11 +342,50 @@ define Build/Compile
 endef
 endif
 
-define Package/bacnet-stack/postinst
+define Package/bacnet-stack-bip/postinst
 #!/bin/sh
 
 if [ -z $${IPKG_INSTROOT} ] ; then
-	( . /etc/uci-defaults/bacserv ) && rm /etc/uci-defaults/bacserv
+	( . /etc/uci-defaults/zbacserv_bip ) && rm /etc/uci-defaults/zbacserv_bip
+fi
+
+[ -n $${IPKG_INSTROOT} ] || {
+	/etc/init.d/bacserv enable
+	/etc/init.d/bacserv restart
+}
+endef
+
+define Package/bacnet-stack-bip6/postinst
+#!/bin/sh
+
+if [ -z $${IPKG_INSTROOT} ] ; then
+	( . /etc/uci-defaults/zbacserv_bip6 ) && rm /etc/uci-defaults/zbacserv_bip6
+fi
+
+[ -n $${IPKG_INSTROOT} ] || {
+	/etc/init.d/bacserv enable
+	/etc/init.d/bacserv restart
+}
+endef
+
+define Package/bacnet-stack-ether/postinst
+#!/bin/sh
+
+if [ -z $${IPKG_INSTROOT} ] ; then
+	( . /etc/uci-defaults/zbacserv_ether ) && rm /etc/uci-defaults/zbacserv_ether
+fi
+
+[ -n $${IPKG_INSTROOT} ] || {
+	/etc/init.d/bacserv enable
+	/etc/init.d/bacserv restart
+}
+endef
+
+define Package/bacnet-stack-mstp/postinst
+#!/bin/sh
+
+if [ -z $${IPKG_INSTROOT} ] ; then
+	( . /etc/uci-defaults/zbacserv_mstp ) && rm /etc/uci-defaults/zbacserv_mstp
 fi
 
 [ -n $${IPKG_INSTROOT} ] || {
@@ -375,28 +414,28 @@ endef
 
 define Package/bacnet-stack-bip/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/bacserv_bip.defaults $(1)/etc/uci-defaults/bacserv_bip
+	$(INSTALL_BIN) ./files/bacserv_bip.defaults $(1)/etc/uci-defaults/zbacserv_bip
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-bip
 endef
 
 define Package/bacnet-stack-bip6/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/bacserv_bip6.defaults $(1)/etc/uci-defaults/bacserv_bip6
+	$(INSTALL_BIN) ./files/bacserv_bip6.defaults $(1)/etc/uci-defaults/zbacserv_bip6
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-bip6
 endef
 
 define Package/bacnet-stack-ethernet/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/bacserv_ethernet.defaults $(1)/etc/uci-defaults/bacserv_ethernet
+	$(INSTALL_BIN) ./files/bacserv_ethernet.defaults $(1)/etc/uci-defaults/zbacserv_ethernet
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-ethernet
 endef
 
 define Package/bacnet-stack-mstp/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/bacserv_mstp.defaults $(1)/etc/uci-defaults/bacserv_mstp
+	$(INSTALL_BIN) ./files/bacserv_mstp.defaults $(1)/etc/uci-defaults/zbacserv_mstp
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/bacserv $(1)/usr/sbin/bacserv-mstp
 endef
