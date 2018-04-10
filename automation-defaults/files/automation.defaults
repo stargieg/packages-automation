@@ -29,8 +29,8 @@ setup_system() {
 		uci_set network knxmcast target "224.0.23.12"
 		uci_set dhcp lan ignore 1
 		uci_set dhcp @dnsmasq[0] rebind_protection "0"
-		uci_remove dhcp lan dhcpv6
-		uci_remove dhcp lan ra
+		uci_set dhcp lan dhcpv6 "disabled"
+		uci_set dhcp lan ra "disabled"
 		uci_set firewall @zone[0] network "lan lan6"
 	fi
 }
