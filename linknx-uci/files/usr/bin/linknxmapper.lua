@@ -15,16 +15,12 @@ $Id$
 
 local argv = {}
 
-local io	= require "io"
-local sys 	= require("luci.sys")
---local ucil       = require "uci"
---local uci_state = ucil.cursor(nil, "/var/state")
---local uci       = ucil.cursor()
---local uci_state = uci.cursor_state()
+local io = require "io"
+local sys = require("luci.sys")
 local uci = luci.model.uci.cursor()
 local uci_state = luci.model.uci.cursor_state()
-local nixio	= require "nixio"
---local s		= nixio.socket('unix', 'stream', none)
+local nixio = require "nixio"
+--local s = nixio.socket('unix', 'stream', none)
 local json = require "luci.json"
 
 function logger_err(msg)
@@ -52,23 +48,12 @@ if not group then
 	return
 end
 
---function round(num, idp)
---  local mult = 10^(idp or 0)
---  return math.floor(num * mult + 0.5) / mult
---end
+logger_info(name.." "..value.." "..group.." "..dpt)
 
-logger_info(name.." "..value.." "..group.." "dpt)
---if string.find(name, '_hw_') then
---	if string.find(value, '%.') then
---		value = round(value)
---	end
---end
 if string.find(value, 'on') then
 	value = '1'
 elseif string.find(value, 'off') then
 	value = '0'
-end
-	value=ret_text
 end
 
 local el = {}
@@ -79,13 +64,13 @@ el.value=value
 logger_info(name.." "..value.." "..group)
 os.execute('ubus send linknx \''..json.encode(el)..'\'')
 
-uci_state:load("bacnet_"..group)
-uci_state:foreach("bacnet_"..group, group, function(s)
+uci:load("bacnet_"..group)
+uci:foreach("bacnet_"..group, group, function(s)
 	if s.name == name then
-		else
-			uci_state:set('bacnet_'..group,s[".name"],'value',value)
-		end
+		uci:set('bacnet_'..group,s[".name"],'value',value)
+		uci:set('bacnet_'..group,s[".name"],'Out_Of_Service','0')
+		uci:set('bacnet_'..group,s[".name"],'value_time',tostring(os.time()))
 	end
 end)
-uci_state:save('bacnet_'..group)
-nixio.fs.chmod('/var/state/bacnet_'..group,'666')
+uci:save('bacnet_'..group)
+--nixio.fs.chmod('/var/state/bacnet_'..group,'666')

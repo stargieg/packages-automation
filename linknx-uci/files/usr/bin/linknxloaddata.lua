@@ -21,16 +21,10 @@ function logger_info(msg)
 end
 
 
-function write(varname,addr,dpt,initv)
+function write(varname,addr,dpt)
 		local line
 		local init
-		--if initv then
-		--	init = initv
-		--	print(initv)
-		--else
-			init = 'persist'
-			--init = 'request'
-		--end
+		init = 'persist'
 		if dpt == "9.xxx" then
 			init = 0
 		end
@@ -65,11 +59,6 @@ function readval(varname)
 	else
 		res = string.gsub(res,'.*success..','')
 		res = string.gsub(res,'..read.*','')
-		--if string.find(res, '_hw_') then
-		--	if string.find(res, '%.') then
-		--		res = round(res)
-		--	end
-		--end
 		logger_info("read obj "..varname..":"..res)
 	end
 end
@@ -81,7 +70,7 @@ function writerule(id,varname,varval,group,dpt)
 		line=line.."<condition type='script'>"
 			line=line.."varname='"..varname.."';"
 			line=line.."group='"..group.."';"
-			line=line.."type='"..dpt.."';"
+			line=line.."dpt='"..dpt.."';"
 			line=line.."value=obj(varname);"
 			line=line.."os.execute('/usr/bin/linknxmapper.lua '..varname..' '..value..' '..group..' '..dpt);\n"
 			line=line.."return 1;\n"
@@ -107,43 +96,43 @@ function writerule(id,varname,varval,group,dpt)
 end
 
 function load_group(tagname)
-	local group = "ai"
-	logger_info("load "..group)
-	uci:foreach("bacnet_ai", "ai", function(s)
-		if tagname == s.tagname then
-			local name = s.name
-			local addr = s.addr
-			local initv = s.value or 0
-			local dpt = s.dpt
-			local value = s.value
-			if dpt == "1.001" then
-				value="on"
-			elseif dpt == "5.001" then
-				value="0"
-			elseif dpt == "5.xxx" then
-				value="0"
-			elseif dpt == "9.xxx" then
-				value="0"
-			elseif dpt == "20.102" then
-				value="comfort"
+	bacnet_objs = {"ai", "ao", "av", "bi", "bo", "bv", "mi", "mo", "mv"}
+	for _,group in pairs(bacnet_objs) do
+		logger_info("load "..group)
+		uci:foreach("bacnet_"..group, group, function(s)
+			if tagname == s.tagname then
+				local name = s.name
+				local addr = s.addr
+				local dpt = s.dpt
+				local value = s.value
+				if dpt == "1.001" then
+					value="on"
+				elseif dpt == "5.001" then
+					value="0"
+				elseif dpt == "5.xxx" then
+					value="0"
+				elseif dpt == "9.xxx" then
+					value="0"
+				elseif dpt == "20.102" then
+					value="comfort"
+				end
+				if initv then
+					write(name,addr,dpt)
+				else
+					write(name,addr,dpt)
+				end
+				if value then
+					writerule(name.."_rule",name,value,group,dpt)
+				end
 			end
-			if initv then
-				write(name,addr,dpt,initv)
-			else
-				write(name,addr,dpt)
+		end)
+		uci:foreach("bacnet_"..group, group, function(s)
+			if tagname == s.tagname then
+				local name = s.name
+				readval(name)
 			end
-			if value then
-				writerule(name.."_rule",name,value,group,dpt)
-			end
-		end
-		--uci_state:save('linknx_varlist_'..group)
-	end)
-	uci:foreach("bacnet_ai", "ai", function(s)
-		if tagname == s.tagname then
-			local name = s.name
-			readval(name)
-		end
-	end)
+		end)
+	end
 end
 
 logger_info("start")

@@ -3,7 +3,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=linknx-uci
-PKG_VERSION:=0.1.0
+PKG_VERSION:=0.1.1
 PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
@@ -37,9 +37,7 @@ define Package/linknx-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/linknx-uci $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/etc/linknx
-	$(INSTALL_DATA) ./files/etc/linknx/config.local.xml $(1)/etc/linknx
-	$(INSTALL_DATA) ./files/etc/linknx/config.socket.xml $(1)/etc/linknx
-	$(INSTALL_DATA) ./files/etc/linknx/config.xml $(1)/etc/linknx
+	$(INSTALL_DATA) ./files/etc/linknx/config.socket.xml $(1)/etc/linknx.xml
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/etc/uci-defaults/linknx-uci $(1)/etc/uci-defaults/linknx-uci
 	$(INSTALL_DIR) $(1)/usr/bin
