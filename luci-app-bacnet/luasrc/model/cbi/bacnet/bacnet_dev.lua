@@ -126,10 +126,10 @@ sva.placeholder = 1
 sva.datatype = "range(1, 128)"
 sva.rmempty = true
 sva = s:option(ListValue, "baud", "Uebertragungsrate")
+sva:value("","38400 Default")
 sva:value('9600')
 sva:value('19200')
 sva:value('38400')
-sva:value("","38400 Default")
 sva:value('57600')
 sva:value('115200')
 sva:depends("bacdl","mstp")
@@ -142,10 +142,10 @@ sva:value('E','Even')
 sva:depends("bacdl","mstp")
 sva.rmempty = true
 sva = s:option(ListValue, "data_bit", "Data Bit")
+sva:value("","8 Default")
 sva:value(5)
 sva:value(6)
 sva:value(7)
-sva:value("","8 Default")
 sva:value(8)
 sva:depends("bacdl","mstp")
 sva.rmempty = true

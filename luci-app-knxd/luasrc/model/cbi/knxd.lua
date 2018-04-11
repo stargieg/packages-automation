@@ -84,32 +84,26 @@ function svc.validate(self, value, section)
 	return nil, "unknow KNX url: "..value
 end
 
-svc = s:option(Flag, "ServerEn", "ServerEn","Enable starts an EIBnet/IP multicast server")
-svc.optional = true
-
 svc = s:option(Value, "Server", "Server","starts an EIBnet/IP multicast server")
-svc:depends("ServerEn",1)
-svc.optional = true
+svc.rmempty = false
 svc.placeholder = "224.0.23.12"
 svc.datatype = "ip4addr"
 
 svc = s:option(Flag, "Discovery", "Discovery","enable the EIBnet/IP server to answer discovery and description requests (SEARCH, DESCRIPTION)")
-svc:depends("ServerEn",1)
-svc.optional = true
+svc.rmempty = false
 
 svc = s:option(Value, "Name", "Name for ETS Discover", "name of the EIBnet/IP server (default is 'knxd')")
-svc:depends("Discovery",1)
 svc.placeholder = "OpenWrt"
 svc.datatype = "string"
 
 svc = s:option(Flag, "Tunnelling", "Tunnelling for ETS", "enable EIBnet/IP Tunneling in the EIBnet/IP server")
-svc:depends("ServerEn",1)
-svc.optional = true
+svc.rmempty = false
 
 svc = s:option(Flag, "Routing", "EIBnet/IP Routing in the EIBnet/IP server")
-svc:depends("ServerEn",1)
-svc.optional = true
-s:option(Flag, "GroupCache", "caching of group communication networkstate").optional = true
+svc.rmempty = false
+
+svc = s:option(Flag, "GroupCache", "caching of group communication networkstate")
+svc.rmempty = false
 
 svc = s:option(Value, "listen_tcp", "Listen tcp port", "listen at TCP port PORT (default 6720)")
 svc.optional = true

@@ -62,7 +62,7 @@ s:taboption("main",Flag, "Out_Of_Service", "Out Of Service")
 s:taboption("main",Value, "name", "Name")
 
 local sva = s:taboption("io", Value, "tagname", "Zugrifsname")
-uci:foreach("linknx", "daemon",
+uci:foreach("linknx", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
@@ -85,22 +85,45 @@ sva.placeholder = 1
 sva.datatype = "range(1, 255)"
 sva.rmempty = true
 local sva = s:taboption("io", ListValue, "func", "Funktions Code")
+sva:value('',"Halteregister (Holding Register) Default")
 sva:value('1',"Spulen (Coils)")
 sva:value('2',"Diskrete Eingäng (Disc Inputs)")
-sva:value('',"Halteregister (Holding Register) Default")
 sva:value('3',"Halteregister (Holding Register)")
 sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 sva.placeholder = 1
-sva.datatype = "portrange"
+sva.datatype = "string"
+sva:value("","1 Register * 1 Default")
 sva:value("doublefloat","2 Register zu Fliesspunkt")
 sva:value("float","1 Register zu Fliesspunkt")
 sva:value("bit","1 Bit aus 1 Register")
 sva:value("0.1","1 Register * 0.1")
-sva:value("","1 Register * 1 Default")
 sva:value("1","1 Register * 1")
 sva:value("10","1 Register * 10")
+sva.rmempty = true
+local sva = s:taboption("io", ListValue, "dpt", "Datapoint Types defined in KNX standard")
+sva:value("","none")
+sva:value("1.001","1.001 switching (on/off) (EIS1)")
+sva:value("3.007","3.007 dimming (control of dimmer using up/down/stop) (EIS2)")
+sva:value("3.008","3.008 blinds (control of blinds using close/open/stop)")
+sva:value("5.xxx","5.xxx 8bit unsigned integer (from 0 to 255) (EIS6)")
+sva:value("5.001","5.001 scaling (from 0 to 100%)")
+sva:value("5.003","5.003 angle (from 0 to 360°)")
+sva:value("6.xxx","6.xxx 8bit signed integer (EIS14)")
+sva:value("7.xxx","7.xxx 16bit unsigned integer (EIS10)")
+sva:value("8.xxx","8.xxx 16bit signed integer")
+sva:value("9.xxx","9.xxx 16 bit floating point number (EIS5)")
+sva:value("10.001","10.001 time (EIS3)")
+sva:value("11.001","11.001 date (EIS4)")
+sva:value("12.xxx","12.xxx 32bit unsigned integer (EIS11)")
+sva:value("13.xxx","13.xxx 32bit signed integer")
+sva:value("14.xxx","14.xxx 32 bit IEEE 754 floating point number")
+sva:value("16.000","16.000 string (max 14 ASCII chars restricted to ASCII codes 0..127) (EIS15)")
+sva:value("16.001","16.001 string (max 14 ASCII chars in range 0..255)")
+sva:value("20.102","20.102 heating mode (auto/comfort/standby/night/frost)")
+sva:value("28.001","28.001 variable length string object")
+sva:value("29.xxx","29.xxx signed 64bit value")
 sva.rmempty = true
 
 local sva = s:taboption("io", Flag, "unsigned", "Ohne Vorzeichen (z.B. Zähler)")

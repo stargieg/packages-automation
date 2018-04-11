@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2018-03-31-9
+PKG_VERSION:=2018-03-31-10
 PKG_SOURCE_VERSION:=ba42aacd7758a8d6b0937c05400c4b5efb5d3f04
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
@@ -402,7 +402,7 @@ define Package/bacnet-stack-uci/install
 	$(INSTALL_DATA) ./files/bacnet_ao.config $(1)/etc/config/bacnet_ao
 	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
 	$(INSTALL_DATA) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
-	$(INSTALL_DATA) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bo
+	$(INSTALL_DATA) ./files/bacnet_bo.config $(1)/etc/config/bacnet_bo
 	$(INSTALL_DATA) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bv
 	$(INSTALL_DATA) ./files/bacnet_mi.config $(1)/etc/config/bacnet_mi
 	$(INSTALL_DATA) ./files/bacnet_mo.config $(1)/etc/config/bacnet_mo

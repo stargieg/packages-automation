@@ -51,18 +51,20 @@ s:tab("main","Standard")
 s:tab("adv","Erweitert")
 s:tab("io","Zugrifsname")
 
-s:taboption("main", Flag, "disable", "Disable")
-s:taboption("main",Flag, "Out_Of_Service", "Out Of Service")
-s:taboption("main", Value, "name", "Name")
+s:taboption("main",Flag, "disable", "Disable")
+s:taboption("main",Flag, "Out_Of_Service", "Out Of Service").rmempty = false
+s:taboption("main",Value, "name", "Name")
 
-local sva = s:taboption("io", Value, "linknx", "Linknx Zugrifsname")
-uci:foreach("linknx", "daemon",
+local sva = s:taboption("io", Value, "tagname", "Zugrifsname")
+uci:foreach("linknx", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
-
-local sva = s:taboption("io", Value, "modbus", "Modbus Zugrifsname")
 uci:foreach("modbus", "station",
+	function (section)
+			sva:value(section.tagname)
+	end)
+uci:foreach("mbus", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
@@ -80,10 +82,10 @@ sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 sva.placeholder = 1
-sva.datatype = "portrange"
+sva.datatype = "string"
 local sva = s:taboption("io", ListValue, "resolution", "Auflösung")
-sva:value("dword","1 Bit aus 1 Register")
 sva:value("","1 Bit Default")
+sva:value("dword","1 Bit aus 1 Register")
 sva:value("bit","1 Bit")
 sva.rmempty = true
 local sva = s:taboption("io", ListValue, "bit", "Bit 0-15")
@@ -105,6 +107,10 @@ sva:value("12","Bit 12")
 sva:value("13","Bit 13")
 sva:value("14","Bit 14")
 sva:value("15","Bit 15")
+sva.rmempty = true
+local sva = s:taboption("io", ListValue, "dpt", "Datapoint Types defined in KNX standard")
+sva:value("","none")
+sva:value("1.001","1.001 switching (on/off) (EIS1)")
 sva.rmempty = true
 
 local sva = s:taboption("main", Flag, "value", "Value")

@@ -37,9 +37,9 @@ events[7] = {6,"Ereignis"}
 events[8] = {7,"Alle Ereignis behandeln"}
 
 --if arg1 then
---	m = Map("bacnet_mo_"..arg1, "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
+--	m = Map("bacnet_mo_"..arg1, "Bacnet Multistate Output", "Bacnet Multistate Output Configuration")
 --else
-m = Map("bacnet_mo", "Bacnet Multisate Output", "Bacnet Multisate Output Configuration")
+m = Map("bacnet_mo", "Bacnet Multistate Output", "Bacnet Multistate Output Configuration")
 --end
 m.on_after_commit = function() luci.sys.call("/bin/ubus call uci reload_config") end
 
@@ -53,7 +53,7 @@ s:option(Flag, "Out_Of_Service", "Out Of Service")
 s:option(Value, "name", "Name")
 
 sva = s:option(Value, "tagname",  "Zugrifsname")
-uci:foreach("linknx", "daemon",
+uci:foreach("linknx", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
@@ -67,15 +67,25 @@ sva.placeholder = 1
 sva.datatype = "range(1, 255)"
 sva.rmempty = true
 local sva = s:option(ListValue, "func", "Funktions Code")
+sva:value('',"Halteregister (Holding Register) Default")
 sva:value('1',"Spulen (Coils)")
 sva:value('2',"Diskrete Eingäng (Disc Inputs)")
-sva:value('',"Halteregister (Holding Register) Default")
 sva:value('3',"Halteregister (Holding Register)")
 sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
 local sva = s:option(Value, "addr", "Addr")
 sva.placeholder = 1
-sva.datatype = "portrange"
+sva.datatype = "string"
+local sva = s:option(ListValue, "dpt", "Datapoint Types defined in KNX standard")
+sva:value("","none")
+sva:value("1.001","1.001 switching (on/off) (EIS1)")
+sva:value("3.007","3.007 dimming (control of dimmer using up/down/stop) (EIS2)")
+sva:value("3.008","3.008 blinds (control of blinds using close/open/stop)")
+sva:value("5.xxx","5.xxx 8bit unsigned integer (from 0 to 255) (EIS6)")
+sva:value("7.xxx","7.xxx 16bit unsigned integer (EIS10)")
+sva:value("12.xxx","12.xxx 32bit unsigned integer (EIS11)")
+sva:value("20.102","20.102 heating mode (auto/comfort/standby/night/frost)")
+sva.rmempty = true
 
 s:option(Value, "value", "Value")
 s:option(Value, "fb_value", "Feedback Value")

@@ -51,18 +51,20 @@ s:tab("main","Standard")
 s:tab("adv","Erweitert")
 s:tab("io","Zugrifsname")
 
-s:taboption("main", Flag, "disable", "Disable")
-s:taboption("main",Flag, "Out_Of_Service", "Out Of Service")
-s:taboption("main", Value, "name", "Name")
+s:taboption("main",Flag, "disable", "Disable")
+s:taboption("main",Flag, "Out_Of_Service", "Out Of Service").rmempty = false
+s:taboption("main",Value, "name", "Name")
 
-local sva = s:taboption("io", Value, "linknx", "Linknx Zugrifsname")
-uci:foreach("linknx", "daemon",
+local sva = s:taboption("io", Value, "tagname", "Zugrifsname")
+uci:foreach("linknx", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
-
-local sva = s:taboption("io", Value, "modbus", "Modbus Zugrifsname")
 uci:foreach("modbus", "station",
+	function (section)
+			sva:value(section.tagname)
+	end)
+uci:foreach("mbus", "station",
 	function (section)
 			sva:value(section.tagname)
 	end)
@@ -72,18 +74,18 @@ sva.placeholder = 1
 sva.datatype = "range(1, 255)"
 sva.rmempty = true
 local sva = s:taboption("io", ListValue, "func", "Funktions Code")
-sva:value('1',"Spulen (Coils)")
 sva:value('',"Diskrete Eingäng (Disc Inputs) Default")
+sva:value('1',"Spulen (Coils)")
 sva:value('2',"Diskrete Eingäng (Disc Inputs)")
 sva:value('3',"Halteregister (Holding Register)")
 sva:value('4',"Eingaberegister (Input Register)")
 sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 sva.placeholder = 1
-sva.datatype = "portrange"
+sva.datatype = "string"
 local sva = s:taboption("io", ListValue, "resolution", "Auflösung")
-sva:value("dword","1 Bit aus 1 Register")
 sva:value("","1 Bit Default")
+sva:value("dword","1 Bit aus 1 Register")
 sva:value("bit","1 Bit")
 sva.rmempty = true
 local sva = s:taboption("io", ListValue, "bit", "Bit 0-15")
@@ -106,17 +108,16 @@ sva:value("13","Bit 13")
 sva:value("14","Bit 14")
 sva:value("15","Bit 15")
 sva.rmempty = true
+local sva = s:taboption("io", ListValue, "dpt", "Datapoint Types defined in KNX standard")
+sva:value("","none")
+sva:value("1.001","1.001 switching (on/off) (EIS1)")
+sva.rmempty = true
 
 local sva = s:taboption("main", Flag, "value", "Value")
 sva.rmempty = false
 
 local sva = s:taboption("adv", Flag, "alarm_value", "Alarm Value")
 sva.rmempty = false
-for i, v in ipairs(events) do
-	if v[1] ~= 0 then
-		sva:depends("event",v[1])
-	end
-end
 
 local sva = s:taboption("main", Value, "group",  "Gruppe")
 local uci = luci.model.uci.cursor()
