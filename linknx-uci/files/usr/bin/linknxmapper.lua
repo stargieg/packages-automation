@@ -18,7 +18,7 @@ local argv = {}
 local io = require "io"
 local sys = require("luci.sys")
 local uci = luci.model.uci.cursor()
-local uci_state = luci.model.uci.cursor_state()
+--local uci_state = luci.model.uci.cursor_state()
 local nixio = require "nixio"
 --local s = nixio.socket('unix', 'stream', none)
 local json = require "luci.json"
@@ -48,7 +48,7 @@ if not group then
 	return
 end
 
-logger_info(name.." "..value.." "..group.." "..dpt)
+--logger_info(name.." "..value.." "..group.." "..dpt)
 
 if string.find(value, 'on') then
 	value = '1'
@@ -61,8 +61,8 @@ el.id=99
 el.name=name
 el.group=group
 el.value=value
-logger_info(name.." "..value.." "..group)
-os.execute('ubus send linknx \''..json.encode(el)..'\'')
+--logger_info(name.." "..value.." "..group)
+--os.execute('ubus send linknx \''..json.encode(el)..'\'')
 
 uci:load("bacnet_"..group)
 uci:foreach("bacnet_"..group, group, function(s)
@@ -70,7 +70,8 @@ uci:foreach("bacnet_"..group, group, function(s)
 		uci:set('bacnet_'..group,s[".name"],'value',value)
 		uci:set('bacnet_'..group,s[".name"],'Out_Of_Service','0')
 		uci:set('bacnet_'..group,s[".name"],'value_time',tostring(os.time()))
+		uci:save('bacnet_'..group)
+		uci:commit('bacnet_'..group)
 	end
 end)
-uci:save('bacnet_'..group)
 --nixio.fs.chmod('/var/state/bacnet_'..group,'666')

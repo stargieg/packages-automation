@@ -75,8 +75,15 @@ function writerule(id,varname,varval,group,dpt)
 			line=line.."os.execute('/usr/bin/linknxmapper.lua '..varname..' '..value..' '..group..' '..dpt);\n"
 			line=line.."return 1;\n"
 		line=line.."</condition>"
-		line=line.."<condition type='object' id='"..varname.."' value='"..varval.."' trigger='true'>"
-		line=line.."</condition>"
+		if dpt == "1.001" then
+			line=line.."<condition type='object' id='"..varname.."' value='on' trigger='true'>"
+			line=line.."</condition>"
+			line=line.."<condition type='object' id='"..varname.."' value='off' trigger='true'>"
+			line=line.."</condition>"
+		else
+			line=line.."<condition type='object' id='"..varname.."' value='"..varval.."' trigger='true'>"
+			line=line.."</condition>"
+		end
 	line=line.."</condition>"
 	line=line.."<actionlist>\n"
 		line=line.."<action type=script>\n"
