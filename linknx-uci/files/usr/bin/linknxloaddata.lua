@@ -78,8 +78,6 @@ function writerule(id,varname,varval,group,dpt)
 		if dpt == "1.001" then
 			line=line.."<condition type='object' id='"..varname.."' value='on' trigger='true'>"
 			line=line.."</condition>"
-			line=line.."<condition type='object' id='"..varname.."' value='off' trigger='true'>"
-			line=line.."</condition>"
 		else
 			line=line.."<condition type='object' id='"..varname.."' value='"..varval.."' trigger='true'>"
 			line=line.."</condition>"

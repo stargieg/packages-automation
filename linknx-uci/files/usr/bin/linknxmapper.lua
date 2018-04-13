@@ -50,10 +50,12 @@ end
 
 --logger_info(name.." "..value.." "..group.." "..dpt)
 
-if string.find(value, 'on') then
-	value = '1'
-elseif string.find(value, 'off') then
-	value = '0'
+if dpt == "1.001" then
+	if string.find(value, 'on') then
+		value = '1'
+	else
+		value = '0'
+	end
 end
 
 local el = {}
@@ -63,7 +65,7 @@ el.group=group
 el.value=value
 --logger_info(name.." "..value.." "..group)
 --os.execute('ubus send linknx \''..json.encode(el)..'\'')
-
+local uci_commit = 0
 uci:load("bacnet_"..group)
 uci:foreach("bacnet_"..group, group, function(s)
 	if s.name == name then
@@ -71,7 +73,11 @@ uci:foreach("bacnet_"..group, group, function(s)
 		uci:set('bacnet_'..group,s[".name"],'Out_Of_Service','0')
 		uci:set('bacnet_'..group,s[".name"],'value_time',tostring(os.time()))
 		uci:save('bacnet_'..group)
-		uci:commit('bacnet_'..group)
+		uci_commit = 1
 	end
 end)
+if uci_commit == 1 then
+	uci:commit('bacnet_'..group)
+end
+
 --nixio.fs.chmod('/var/state/bacnet_'..group,'666')
