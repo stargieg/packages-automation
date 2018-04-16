@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-knxd
-PKG_VERSION:=0.2.3
+PKG_VERSION:=0.2.4
 PKG_RELEASE:=2
 PKG_BUILD_DEPENDS += lua/host luci-base/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_KNXD_SRCDIET

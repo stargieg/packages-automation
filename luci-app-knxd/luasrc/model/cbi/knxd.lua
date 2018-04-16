@@ -85,7 +85,6 @@ function svc.validate(self, value, section)
 end
 
 svc = s:option(Value, "Server", "Server","starts an EIBnet/IP multicast server")
-svc.rmempty = false
 svc.placeholder = "224.0.23.12"
 svc.datatype = "ip4addr"
 
@@ -106,17 +105,19 @@ svc = s:option(Flag, "GroupCache", "caching of group communication networkstate"
 svc.rmempty = false
 
 svc = s:option(Value, "listen_tcp", "Listen tcp port", "listen at TCP port PORT (default 6720)")
-svc.optional = true
+svc.optional = false
 svc.placeholder = 6720
 svc.datatype = "portrange"
 
 svc = s:option(Value, "listen_local", "Socket File", "listen at Unix domain socket FILE (default /var/run/knxd)")
-svc.optional = true
+svc.optional = false
 svc.placeholder = "/var/run/knxd"
 svc.datatype = "string"
 
 svc = s:option(Value, "eibaddr", "EIB HW Addr")
 svc.optional = true
+svc.placeholder = "0.0.1"
+svc.datatype = "string"
 function svc.validate(self, value, section)
 	local err
 	Area,Line,Device = string.match(value, "(%d+).(%d+).(%d+)")
@@ -138,6 +139,11 @@ function svc.validate(self, value, section)
 		return value
 	end
 end
+
+svc = s:option(Value, "client_addrs", "EIB Client HW Addr")
+svc.optional = false
+svc.placeholder = "0.0.2:10"
+svc.datatype = "string"
 
 svc = s:option(Value, "daemon", "Logfile")
 svc.optional = true

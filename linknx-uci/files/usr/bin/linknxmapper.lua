@@ -24,11 +24,11 @@ local nixio = require "nixio"
 local json = require "luci.json"
 
 function logger_err(msg)
-	os.execute("logger -p error -t linknxmapper "..msg)
+	nixio.syslog("err",msg)
 end
 
 function logger_info(msg)
-	os.execute("logger -p info -t linknxmapper "..msg)
+	nixio.syslog("info",msg)
 end
 
 local name= arg[1]
@@ -48,6 +48,11 @@ if not group then
 	return
 end
 
+if not dpt then
+	logger_err(name..":"..value.." no dpt")
+	return
+end
+
 --logger_info(name.." "..value.." "..group.." "..dpt)
 
 if dpt == "1.001" then
@@ -56,13 +61,22 @@ if dpt == "1.001" then
 	else
 		value = '0'
 	end
+elseif dpt == "3.007" then
+	if string.find(value, 'up') then
+		value = '1'
+	elseif string.find(value, 'down') then
+		value = '2'
+	else
+		value = '3'
+	end
 end
 
-local el = {}
-el.id=99
-el.name=name
-el.group=group
-el.value=value
+--TODO ubus intergration
+--local el = {}
+--el.id=99
+--el.name=name
+--el.group=group
+--el.value=value
 --logger_info(name.." "..value.." "..group)
 --os.execute('ubus send linknx \''..json.encode(el)..'\'')
 local uci_commit = 0
