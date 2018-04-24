@@ -92,7 +92,7 @@ svc.optional = true
 svc.placeholder = "cache_D"
 svc.datatype = "string"
 
-local svc = mainsec:option(Flag, "force_broadcast", "force-broadcast", "Packets have a \"hop count\", which determines how many routers they may traverse until they're discarded. This mitigates the problems caused by bus loops (routers reachable by more than one path). A maximum hop count is specified to (a) never be decremented, (b) such packets are broadcast to every interface instead of just those their destination address says they should go to. knxd ignores this requirement unless you set this option, because it's almost never useful and escalates configuration errors from \"minor annoyance\" to \"absolute disaster if such a packet ever gets tramsmitted\".")
+local svc = mainsec:option(Flag, "force_broadcast", "force-broadcast", "Packets have a \"hop count\", which determines how many routers they may traverse until they are discarded. This mitigates the problems caused by bus loops (routers reachable by more than one path). A maximum hop count is specified to (a) never be decremented, (b) such packets are broadcast to every interface instead of just those their destination address says they should go to. knxd ignores this requirement unless you set this option, because it's almost never useful and escalates configuration errors from \"minor annoyance\" to \"absolute disaster if such a packet ever gets tramsmitted\".")
 svc.optional = true
 
 local svc = mainsec:option(Flag, "background", "background", "Instructs knxd to fork itself to the background.")
@@ -177,11 +177,10 @@ local svc = drv:option(DummyValue, "dv12", nil,"A mostly-TPUART2-compatible KNX 
 svc:depends("driver","ncn5120tcp")
 svc.optional = false
 
+--Comon
 local svc = drv:option(Flag, "ignore", "ignore","The driver is configured, but not started up automatically. Note: Starting up knxd still fails if there is a configuration error.")
-svc.rmempty = true
 svc.optional = true
-local svc = drv:option(Flag, "may_fail", "may-fail","If the driver doesn't initially start up, knxd will continue anyway instead of terminating with an error.")
-svc.rmempty = true
+local svc = drv:option(Flag, "may_fail", "may-fail","If the driver does not initially start up, knxd will continue anyway instead of terminating with an error.")
 svc.optional = true
 local svc = drv:option(Value, "retry_delay", "retry-delay","If the driver fails to start (or dies), knxd will restart it after this many seconds.")
 svc.optional = true
@@ -191,10 +190,157 @@ local svc = drv:option(Value, "max_retry", "max-retry","The maximum number of re
 svc.optional = true
 svc.placeholder = 0
 svc.datatype = "portrange"
-local svc = drv:option(Value, "send-timeout", "send-timeout","Transmission timeout. If a driver does not indicate that it's ready for the next transmission after this many seconds, it will be marked as failing. Note that this value is ineffective when using the \"queue\" filter.")
+local svc = drv:option(Value, "send_timeout", "send-timeout","Transmission timeout. If a driver does not indicate that it's ready for the next transmission after this many seconds, it will be marked as failing. Note that this value is ineffective when using the \"queue\" filter.")
 svc.optional = true
 svc.placeholder = 10
 svc.datatype = "portrange"
+local svc = drv:option(Value, "send_retries", "send-retries","The number of times to repeat the transmission of a packet. If (ultimately) unsuccessful, the packet will be discarded.")
+svc.optional = true
+svc.placeholder = 3
+svc.datatype = "portrange"
+local svc = drv:option(Value, "debug", "debug section name", "This option, available in all sections, names the config file section where specific debugging options for this section can be configured.")
+svc.optional = true
+svc.placeholder = "debug_A"
+svc.datatype = "string"
+--IP
+local svc = drv:option(Value, "multicast_address", "IP multicast-address","The multicast IP address to use.")
+svc.optional = true
+svc.placeholder = "224.0.23.12"
+svc.datatype = "ip4addr"
+svc:depends("driver","ip")
+local svc = drv:option(Value, "port", "IP port","The UDP port to listen on / transmit to.")
+svc.optional = true
+svc.placeholder = "3671"
+svc.datatype = "portrange"
+svc:depends("driver","ip")
+local svc = drv:option(ListValue, "ip_interface", "IP interface","The IP interface to use. the default is the first broadcast-capable interface on your system, or the interface which your default route uses.")
+svc.optional = true
+svc.placeholder = "lan"
+uci:foreach("network", "interface",
+	function(section)
+		svc:value(section[".name"])
+	end)
+svc.datatype = "network"
+svc:depends("driver","ip")
+local svc = drv:option(Value, "ip_address", "ip-address","The address (or host name) of the tunnel server to connect to.")
+svc.optional = false
+svc.placeholder = "192.168.1.66"
+svc.datatype = "hostname"
+svc:depends("driver","ipt")
+svc:depends("driver","iptn")
+svc:depends("driver","tpuarttcp")
+svc:depends("driver","ncn5120tcp")
+svc:depends("driver","ft12tcp")
+svc:depends("driver","ft12cemitcp")
+local svc = drv:option(Value, "dest_port", "dest-port","The port to send to.")
+svc.optional = true
+svc.placeholder = "3671"
+svc.datatype = "portrange"
+svc:depends("driver","ipt")
+svc:depends("driver","iptn")
+svc:depends("driver","tpuarttcp")
+svc:depends("driver","ncn5120tcp")
+svc:depends("driver","ft12tcp")
+svc:depends("driver","ft12cemitcp")
+local svc = drv:option(Value, "src_port", "src-port","The port to send from. by default, the OS will assign a free port.")
+svc.optional = true
+svc.placeholder = "3671"
+svc.datatype = "portrange"
+svc:depends("driver","ipt")
+svc:depends("driver","iptn")
+local svc = drv:option(Value, "heartbeat_timer", "heartbeat-timer","Timer for periodically checking whether the server is still connected to us.")
+svc.optional = true
+svc.placeholder = "30"
+svc.datatype = "portrange"
+svc:depends("driver","ipt")
+svc:depends("driver","iptn")
+local svc = drv:option(Value, "heartbeat_retries", "heartbeat-retries","Retry timer for coping with lost heartbeat packets. If more consecutive heartbeat packets are unanswered, the interface will be considered failed.")
+svc.optional = true
+svc.placeholder = "3"
+svc.datatype = "portrange"
+svc:depends("driver","ipt")
+svc:depends("driver","iptn")
+local svc = drv:option(Flag, "nat", "nat","Require network address translation.")
+svc.optional = true
+svc:depends("driver","iptn")
+local svc = drv:option(Value, "nat_ip", "nat-ip","The Public IP Addr from the NAT Gateway. (STUN)")
+svc.optional = false
+svc.datatype = "ip4addr"
+svc:depends("driver","iptn")
+local svc = drv:option(Value, "data_port", "data-port","Data Port")
+svc.optional = false
+svc.placeholder = "3671"
+svc.datatype = "portrange"
+svc:depends("driver","iptn")
+--USB
+local svc = drv:option(Value, "usb_bus", "bus","The USB bus the interface is plugged into.")
+svc.optional = false
+svc.placeholder = "1"
+svc.datatype = "portrange"
+svc:depends("driver","usb")
+local svc = drv:option(Value, "usb_device", "device","The interface's device number on the bus.")
+svc.optional = true
+svc.placeholder = "1"
+svc.datatype = "portrange"
+for i = 0, 10 do
+	svc:depends("usb_bus",tostring(i))
+end
+local svc = drv:option(Value, "usb_config", "config","The USB configuration to use on this device. Most interfaces only have one, so this option is not needed.")
+svc.optional = true
+svc.placeholder = "1"
+svc.datatype = "portrange"
+for i = 0, 10 do
+	svc:depends("usb_device",tostring(i))
+end
+local svc = drv:option(Value, "usb_setting", "setting","The setting to use on this device configuration. Most interfaces only have one, so this option is not needed.")
+svc.optional = true
+svc.placeholder = "1"
+svc.datatype = "portrange"
+for i = 0, 10 do
+	svc:depends("usb_config",tostring(i))
+end
+local svc = drv:option(Value, "usb_interface", "interface","The interface to use on this setting. Most interfaces only have one, so this option is not needed.")
+svc.optional = true
+svc.placeholder = "1"
+svc.datatype = "portrange"
+for i = 0, 10 do
+	svc:depends("usb_setting",tostring(i))
+end
+local svc = drv:option(ListValue, "usb_version", "version","The EMI protocol version")
+svc.optional = true
+svc:value('',"auto-detected")
+svc:value('1')
+svc:value('2')
+svc:value('3')
+svc:depends("driver","usb")
+local svc = drv:option(ListValue, "baudrate", "baudrate", "Interface speed. This is interface specific, and configured in hardware.")
+svc:value('','19200 Default')
+svc:value('9600')
+svc:value('19200')
+svc:value('38400')
+svc:depends("driver","tpuart")
+svc:depends("driver","ncn5120")
+svc:depends("driver","ft12")
+svc:depends("driver","ft12cemi")
+svc.rmempty = true
+local svc = drv:option(Flag, "ack_group", "ack-group","Accept all group-addressed packets, instead of checking which knxd can forward. This option is usually a no-op because knxd forwards all packets anyway.")
+svc:depends("driver","usb")
+svc:depends("driver","tpuart")
+svc:depends("driver","ncn5120")
+svc:depends("driver","ft12")
+svc:depends("driver","ft12cemi")
+svc.rmempty = true
+local svc = drv:option(Flag, "ack_individual", "ack-individual","Accept all device-addressed packets, instead of checking which knxd can forward. This option is not a no-op because, while knxd defaults to forwarding all packets, it won't accept messages to devices that it knows to be on the bus on which the message in question arrived.")
+svc:depends("driver","usb")
+svc:depends("driver","tpuart")
+svc:depends("driver","ncn5120")
+svc:depends("driver","ft12")
+svc:depends("driver","ft12cemi")
+svc.rmempty = true
+local svc = drv:option(Flag, "reset", "reset","Reset the device while connecting to it. This also affects reconnectiosn due to timeout.")
+svc.rmempty = true
+local svc = drv:option(Flag, "monitor", "monitor","Use this device as a bus monitor.")
+svc.rmempty = true
 
 local srv = m:section(TypedSection, "server", 'Server section name', "A server is a point of connection which knxd establishes so that other interfaces, routers or clients may connect to it.")
 srv.addremove = true
@@ -212,6 +358,80 @@ local svc = srv:option(DummyValue, "dv14", nil,"Allow local knxd-specific client
 svc:depends("server","knxd_unix")
 local svc = srv:option(DummyValue, "dv15", nil,"Allow remote knxd-specific clients to connect using a TCP socket.")
 svc:depends("server","knxd_tcp")
+
+--Comon
+local svc = srv:option(Flag, "ignore", "ignore","The driver is configured, but not started up automatically. Note: Starting up knxd still fails if there is a configuration error.")
+svc.rmempty = true
+local svc = srv:option(Flag, "may_fail", "may-fail","If the driver does not initially start up, knxd will continue anyway instead of terminating with an error.")
+svc.optional = true
+local svc = srv:option(Value, "retry_delay", "retry-delay","If the driver fails to start (or dies), knxd will restart it after this many seconds.")
+svc.optional = true
+svc.placeholder = 0
+svc.datatype = "portrange"
+local svc = srv:option(Value, "max_retry", "max-retry","The maximum number of retries before giving up.")
+svc.optional = true
+svc.placeholder = 0
+svc.datatype = "portrange"
+local svc = srv:option(Value, "send_timeout", "send-timeout","Transmission timeout. If a driver does not indicate that it's ready for the next transmission after this many seconds, it will be marked as failing. Note that this value is ineffective when using the \"queue\" filter.")
+svc.optional = true
+svc.placeholder = 10
+svc.datatype = "portrange"
+local svc = srv:option(Value, "debug", "debug section name", "This option, available in all sections, names the config file section where specific debugging options for this section can be configured.")
+svc.optional = true
+svc.placeholder = "debug_B"
+svc.datatype = "string"
+
+local svc = srv:option(Value, "port", "IP port","The UDP port to listen on / transmit to.")
+svc.optional = true
+svc.placeholder = "3671"
+svc.datatype = "portrange"
+svc:depends("server","knxd_tcp")
+svc:depends("server","ets_router")
+local svc = srv:option(ListValue, "interface", "The IP interfce to use. Useful if your KNX router has more than one IP interface. defaults to the interface with the default route.")
+svc.optional = true
+svc.placeholder = "lan"
+uci:foreach("network", "interface",
+	function(section)
+		svc:value(section[".name"])
+	end)
+svc.datatype = "network"
+svc:depends("server","knxd_tcp")
+svc:depends("server","ets_router")
+local svc = srv:option(Value, "ip_address", "ip-address","Bind to this address.")
+svc.optional = false
+svc.datatype = "ip4addr"
+svc:depends("server","knxd_tcp")
+local svc = srv:option(Value, "multicast_address", "multicast-address","The multicast IP address to use.")
+svc.optional = false
+svc.datatype = "ip4addr"
+svc.placeholder = "224.0.23.12"
+svc:depends("server","ets_router")
+local svc = srv:option(Value, "tunnel", "tunnel section name", "Allow client connections via tunneling. This is typically used by single devices or programs. This option names a section with configuration for tunnelled connections. It's OK if that section doesn't exist or is empty.")
+svc.optional = true
+svc.datatype = "string"
+svc:depends("server","ets_router")
+local svc = srv:option(Value, "router", "router section name", "Exchange packets via multicast. This is typically used by other KNX routers. This option names a section with configuration for the multicast connection. It's OK if that section doesn't exist or is empty.")
+svc.rmempty = false
+svc.optional = true
+svc.datatype = "string"
+svc:depends("server","ets_router")
+local svc = srv:option(Flag, "discover", "discover", "Reply to KNX discovery packets. Programs like ETS send these packets to discover routers and tunnels.")
+svc.optional = true
+svc:depends("server","ets_router")
+local svc = srv:option(Flag, "multi_port", "multi-port", "Reply to KNX discovery packets. Programs like ETS send these packets to discover routers and tunnels.")
+svc.optional = true
+svc:depends("server","ets_router")
+local svc = srv:option(Value, "name", "name", "The server name announced in Discovery packets.")
+svc.rmempty = false
+svc.optional = true
+svc.datatype = "string"
+svc:depends("server","ets_router")
+local svc = srv:option(Value, "path", "path", "Path to the socket file to use.")
+svc.rmempty = false
+svc.optional = true
+svc.placeholder = "/var/run/knxd"
+svc.datatype = "string"
+svc:depends("server","knxd_unix")
 
 
 return m
