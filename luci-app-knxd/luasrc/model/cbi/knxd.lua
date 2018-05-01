@@ -28,9 +28,8 @@ svc.placeholder = "OpenWrt"
 svc.datatype = "string"
 
 local svc = mainsec:option(Value, "addr", "KNX device address", "The KNX address of knxd itself. Used e.g. for requests originating at the group cache.")
-svc.optional = true
+svc.optional = false
 svc.placeholder = "0.0.1"
-svc.datatype = "string"
 function svc.validate(self, value, section)
 	local err
 	Area,Line,Device = string.match(value, "(%d+).(%d+).(%d+)")
@@ -54,9 +53,8 @@ function svc.validate(self, value, section)
 end
 
 local svc = mainsec:option(Value, "client_addrs", "KNX device address plus length", "Address range to be distributed to client connections. Note that the length parameter indicates the number of addresses to be allocated.")
-svc.optional = true
+svc.optional = false
 svc.placeholder = "2.2.20:10"
-svc.datatype = "string"
 function svc.validate(self, value, section)
 	local err
 	Area,Line,Device,length = string.match(value, "(%d+).(%d+).(%d+):(%d+)")
@@ -313,6 +311,23 @@ svc:value('1')
 svc:value('2')
 svc:value('3')
 svc:depends("driver","usb")
+local svc = drv:option(Value, "tty_device", "device","The device to connect to. the default is /dev/ttyKNX1 which is a symlink created by a udev rule, which you need anyway in order to change the device's owner.")
+svc.optional = true
+svc.placeholder = "1"
+svc.datatype = "string"
+for device in nixio.fs.glob("/dev/ttyS[0-9]*") do
+	svc:value(device)
+end
+for device in nixio.fs.glob("/dev/ttyUSB[0-9]*") do
+	svc:value(device)
+end
+for device in nixio.fs.glob("/dev/ttyKNX[0-9]*") do
+	svc:value(device)
+end
+svc:depends("driver","tpuart")
+svc:depends("driver","ncn5120")
+svc:depends("driver","ft12")
+svc:depends("driver","ft12cemi")
 local svc = drv:option(ListValue, "baudrate", "baudrate", "Interface speed. This is interface specific, and configured in hardware.")
 svc:value('','19200 Default')
 svc:value('9600')
@@ -433,5 +448,14 @@ svc.placeholder = "/var/run/knxd"
 svc.datatype = "string"
 svc:depends("server","knxd_unix")
 
+local argsec = m:section(NamedSection, "args", "daemon args", "The section controls the deamon comandline arguments.")
+local svc = argsec:option(ListValue, "cfg_source", "Select config source uci or knxd.ini file")
+svc:value('uci')
+svc:value('file')
+
+local svc = argsec:option(Value, "cfg_path","Path to the knxd.ini file")
+svc.placeholder = "/etc/knxd.ini"
+svc.datatype = "string"
+svc:depends("cfg_source","file")
 
 return m

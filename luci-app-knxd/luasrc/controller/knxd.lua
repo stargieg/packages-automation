@@ -46,6 +46,9 @@ function index()
 	
 	page = entry({"admin", "services", "knxd_diag_proto"}, call("knxd_diag_proto"), nil)
 	page.leaf = true
+
+	page = entry({"admin", "services", "knxd_diag_ini"}, call("knxd_diag_ini"), nil)
+	page.leaf = true
 end
 
 function knxd_diag_vbusmonitor()
@@ -139,6 +142,25 @@ function knxd_diag_proto()
 	local cmd = "cat /var/log/knxd.log"
 	luci.http.prepare_content("text/plain")
 	luci.http.write(cmd)
+	luci.http.write("\n")
+	local util = io.popen(cmd)
+	if util then
+		while true do
+			local ln = util:read("*l")
+			if not ln then break end
+			luci.http.write(ln)
+			luci.http.write("\n")
+		end
+		util:close()
+	end
+	return
+end
+
+function knxd_diag_ini()
+	local cmd = "cat /tmp/etc/knxd.ini"
+	luci.http.prepare_content("text/plain")
+	luci.http.write(cmd)
+	luci.http.write("\n")
 	local util = io.popen(cmd)
 	if util then
 		while true do

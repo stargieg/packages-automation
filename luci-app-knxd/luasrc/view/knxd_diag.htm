@@ -90,18 +90,22 @@
 				<input type="button" value="<%:vbusmonitor%>" class="cbi-button cbi-button-apply" onclick="update_status('vbusmonitor')" />
 			</div>
 
-			<div style="width:25%; float:left">
+			<div style="width:20%; float:left">
 				<input type="button" value="<%:groupsocketlisten%>" class="cbi-button cbi-button-apply" onclick="update_status('groupsocketlisten')" />
 			</div>
 
-			<div style="width:25%; float:left;">
-				<input type="button" value="Sende an" class="cbi-button cbi-button-apply" onclick="write_addr('groupswrite',this.form.addr,this.form.value)" /><br />
+			<div style="width:20%; float:left;">
+				<input type="button" value="<%:send to%>" class="cbi-button cbi-button-apply" onclick="write_addr('groupswrite',this.form.addr,this.form.value)" /><br />
 				<input style="margin: 5px 0" type="text" value="0/0/1" name="addr">  Adresse</input>
 				<input style="margin: 5px 0" type="text" value="1" name="value">  Wert</input>
 			</div>
 
-			<div style="width:25%; float:left">
-				<input type="button" value="<%:proto%>" class="cbi-button cbi-button-apply" onclick="update_status('proto')" />
+			<div style="width:20%; float:left">
+				<input type="button" value="<%:logfile%>" class="cbi-button cbi-button-apply" onclick="update_status('proto')" />
+			</div>
+
+			<div style="width:20%; float:left">
+				<input type="button" value="<%:inifile%>" class="cbi-button cbi-button-apply" onclick="update_status('ini')" />
 			</div>
 
 			<br style="clear:both" /><br />
