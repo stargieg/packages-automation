@@ -86,6 +86,9 @@ uci:foreach("bacnet_"..group, group, function(s)
 		uci:set('bacnet_'..group,s[".name"],'value',value)
 		uci:set('bacnet_'..group,s[".name"],'Out_Of_Service','0')
 		uci:set('bacnet_'..group,s[".name"],'value_time',tostring(os.time()))
+		if group == "ao" or group == "bo" or group == "mo" then
+			uci:set('bacnet_'..group,s[".name"],'fb_value',value)
+		end
 		uci:save('bacnet_'..group)
 		uci_commit = 1
 	end
