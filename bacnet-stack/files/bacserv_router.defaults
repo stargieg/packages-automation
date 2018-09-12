@@ -64,7 +64,7 @@ if [ -z "$has_bip" ] ; then
 	uci_set bacnet_dev $cfg name "$hostname-bip"
 	uci_set bacnet_dev $cfg Id "$hostname_rand"
 	uci_set bacnet_dev $cfg port "47808"
-	uci_set bacnet_dev $cfg net "0"
+	uci_set bacnet_dev $cfg net "1"
 	uci_set bacnet_dev $cfg iface "lan"
 	uci_set bacnet_dev $cfg bacdl "bip"
 	uci_commit bacnet_dev
@@ -82,7 +82,7 @@ if [ -z "$has_mstp" ] ; then
 	uci_set bacnet_dev $cfg name "$hostname-mstp"
 	uci_set bacnet_dev $cfg Id "$hostname_rand"
 	uci_set bacnet_dev $cfg port "47808"
-	uci_set bacnet_dev $cfg net "1"
+	uci_set bacnet_dev $cfg net "6661"
 	uci_set bacnet_dev $cfg iface "/dev/ttyUSB0"
 	uci_set bacnet_dev $cfg bacdl "mstp"
 	uci_commit bacnet_dev
