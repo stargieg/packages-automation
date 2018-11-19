@@ -1,4 +1,4 @@
-
+#Test
 CFLAGS += -Wall -std=gnu99 -pedantic -DDATADIR=\"/www/ws-chat\" -DCONFIGDIR=\"/etc\"
 OBJ = ws-mirror-server.o
 OBJ_UBUS = ws-mirror-server-ubus.o
