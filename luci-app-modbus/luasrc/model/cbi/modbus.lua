@@ -39,6 +39,10 @@ sva = s:option(Value, "unit_id", "Standart Unit ID wenn im Bacnet objekt nicht d
 sva.placeholder = 1
 sva.datatype = "range(0, 128)"
 
+sva = s:option(Value, "poll", "Poll Intervall in s")
+sva.placeholder = 5
+sva.datatype = "range(1, 128)"
+
 sva = s:option(ListValue, "backend", "Schnitstelle")
 sva:value("tcp","Modbus TCP/IPv4")
 sva:value("tcp_pi","Modbus TCP/IPv6")

@@ -301,11 +301,9 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 			}
 		}
 
-
 		value_time = ucix_get_option_int(itr_pv->ctx, itr_pv->section, sec_idx,
 			"value_time",0);
 		t->value_time = value_time;
-
 
 		t->next = itr_pv->list;
 		itr_pv->list = t;
@@ -314,7 +312,8 @@ void load_pv(const char *sec_idx, struct pv_itr_ctx *itr_pv)
 
 void load_bacnet(char *idx) {
 	char tagname[128];
-	int port;
+	int port=502;
+	int poll=5;
 	char port6[128];
 	const char *backend;
 	int use_backend=TCP;
@@ -322,7 +321,7 @@ void load_bacnet(char *idx) {
 	char ip6addr[128];
 	char ttydev[128];
 	int baud=115200;
-	char parity_bit;
+	char parity_bit="N";
 	int data_bit=8;
 	int stop_bit=1;
 	int unit_id_tag = 1;
@@ -349,7 +348,7 @@ void load_bacnet(char *idx) {
 	int rewrite = 1;
 	float val_f, pval_f,val_fab;
 	int j,k,l,m,n,write,bitv,val_i,val_b;
-	bool uci_change[16],uci_change_ext[16];
+	bool uci_change_ext[16];
 	bool newval;
 	time_t chk_mtime[16];
 	time_t mtime_bacnet[16];
@@ -375,6 +374,8 @@ void load_bacnet(char *idx) {
 				"unit_id",1);
 			backend = ucix_get_option(uctx_m, section, idx,
 				"backend");
+			poll = ucix_get_option_int(uctx_m, section, idx,
+				"poll",5);
 			if (strcmp(backend, "tcp") == 0) {
 				use_backend = TCP;
 				snprintf(ip4addr, sizeof(ip4addr),
@@ -430,10 +431,11 @@ void load_bacnet(char *idx) {
 			} else {
 				return;
 			}
+			ucix_cleanup(uctx_m);
 		} else {
+			ucix_cleanup(uctx_m);
 			return;
 		}
-		ucix_cleanup(uctx_m);
 	} else {
 		return;
 	}
@@ -459,7 +461,6 @@ void load_bacnet(char *idx) {
 
 	// loop forever
 	for (;;) {
-		usleep(10000);
 		for( m=0; m<65535; m++ ) {
 			if (coil_read[m]) {
 				coil_read[m]=NULL;
@@ -475,7 +476,6 @@ void load_bacnet(char *idx) {
 			}
 		}
 		for( l=0; l<section_n; l++ ) {
-			uci_change[l] = NULL;
 			uci_change_ext[l] = NULL;
 			chk_mtime[l] = 0;
 			chk_mtime[l] = check_uci_update(pv_section[l], mtime_bacnet[l]);
@@ -535,7 +535,6 @@ void load_bacnet(char *idx) {
 			memset(tab_bit, 0, max_offset * sizeof(uint8_t));
 			rc= -1;
 			j = cur_pv->section_idx;
-			uci_change[j] = NULL;
 			uct_b = ucix_init(pv_section[j]);
 			if (mctx) {
 				write = ucix_get_option_int(uct_b, pv_section[j], cur_pv->idx,"write",0);
@@ -604,9 +603,8 @@ void load_bacnet(char *idx) {
 						}
 					}
 					uci_change_ext[j] = true;
-					uci_change[j] = true;
 					ucix_del(uct_b, pv_section[j], cur_pv->idx,"write");
-					ucix_save_state(uct_b);
+					ucix_save_state(uct_b, pv_section[j]);
 				}
 				if (!uci_change_ext[j]) {
 					offset = 1;
@@ -688,7 +686,7 @@ void load_bacnet(char *idx) {
 						cur_pv->Out_Of_Service = 0;
 						ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
 							"Out_Of_Service",0);
-						uci_change[j] = true;
+						ucix_save_state(uct_b, pv_section[j]);
 					}
 				}
 				uci_change_ext[j] = NULL;
@@ -704,10 +702,9 @@ void load_bacnet(char *idx) {
 					if (cur_pv->Out_Of_Service == 0 && cur_pv->err_counter > 2) {
 						fprintf(stderr,"Out_Of_Service %s %s\n",pv_section[j],cur_pv->idx);
 						cur_pv->Out_Of_Service = 1;
-						uct_b = ucix_init(pv_section[j]);
 						ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
 							"Out_Of_Service",1);
-						uci_change[j] = true;
+						ucix_save_state(uct_b, pv_section[j]);
 					}
 				} else {
 					cur_pv->err_counter=0;
@@ -785,25 +782,27 @@ void load_bacnet(char *idx) {
 							ucix_add_option_int(uct_b, pv_section[j], cur_pv->idx,
 								"Out_Of_Service",0);
 						}
-						uci_change[j] = true;
+						ucix_save_state(uct_b, pv_section[j]);
 					}
 					free(tab_reg);
 				}
-				if (uci_change[j]) {
-					ucix_commit(uct_b, pv_section[j]);
-					mtime_bacnet[j] = time(NULL);
-					uci_change[j] = NULL;
-				}
-				if(uct_b)
-					ucix_cleanup(uct_b);
 			}
-			if (mctx) {
-				rewrite++;
-				if (rewrite>1000) {
-					rewrite=0;
-				}
-			}
+			if(uct_b)
+				ucix_cleanup(uct_b);
 		}
+		rewrite++;
+		if (rewrite>300) {
+			for( n=0; n<section_n; n++ ) {
+				uct_b = ucix_init(pv_section[n]);
+				if(uct_b) {
+					fprintf(stderr,"uci commit %s\n",pv_section[n]);
+					ucix_commit(uct_b, pv_section[n]);
+					ucix_cleanup(uct_b);
+				}
+			}
+			rewrite=0;
+		}
+		sleep(poll);
 	}
 }
 
