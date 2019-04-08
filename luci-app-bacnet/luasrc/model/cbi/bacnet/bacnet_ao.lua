@@ -58,7 +58,7 @@ s:tab("adv","Erweitert")
 s:tab("io","Zugrifsname")
 
 s:taboption("main",Flag, "disable", "Disable")
-s:taboption("main",Flag, "Out_Of_Service", "Out Of Service")
+s:taboption("main",Flag, "Out_Of_Service", "Out Of Service").rmempty = false
 s:taboption("main",Value, "name", "Name")
 
 local sva = s:taboption("io", Value, "tagname", "Zugrifsname")
@@ -90,14 +90,6 @@ sva.rmempty = true
 local sva = s:taboption("io", Value, "addr", "Addr")
 sva.placeholder = 1
 sva.datatype = "string"
-sva:value("","1 Register * 1 Default")
-sva:value("doublefloat","2 Register zu Fliesspunkt")
-sva:value("float","1 Register zu Fliesspunkt")
-sva:value("bit","1 Bit aus 1 Register")
-sva:value("0.1","1 Register * 0.1")
-sva:value("1","1 Register * 1")
-sva:value("10","1 Register * 10")
-sva.rmempty = true
 local sva = s:taboption("io", ListValue, "dpt", "Datapoint Types defined in KNX standard")
 sva:value("","none")
 sva:value("1.001","1.001 switching (on/off) (EIS1)")
@@ -136,6 +128,18 @@ sva:value("63","Grad Kelvin")
 sva:value("53","Pascal")
 sva:value("134","mbar")
 sva:value("27","Hz")
+sva:value("80","m^3")
+sva:value("82","L")
+sva:value("18","Wh")
+sva:value("19","kWh")
+sva:value("146","MWh")
+sva:value("132","mW")
+sva:value("47","W")
+sva:value("48","kW")
+sva:value("49","MW")
+sva:value("85","m^3/s")
+sva:value("86","m^3/min")
+sva:value("87","m^3/min")
 
 
 local sva = s:taboption("main", ListValue, "group",  "Gruppe")
