@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bacnet-stack
-PKG_VERSION:=2018-09-12-1
+PKG_VERSION:=2018-09-12-2
 PKG_SOURCE_VERSION:=187d5feb9ed9db3747445f7d68cebebf76cc1027
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
@@ -342,6 +342,22 @@ define Build/Compile
 endef
 endif
 
+define Package/bacnet-stack-uci/conffiles
+/etc/config/bacnet_dev
+/etc/config/bacnet_ai
+/etc/config/bacnet_ao
+/etc/config/bacnet_av
+/etc/config/bacnet_bi
+/etc/config/bacnet_bo
+/etc/config/bacnet_bv
+/etc/config/bacnet_mi
+/etc/config/bacnet_mo
+/etc/config/bacnet_mv
+/etc/config/bacnet_nc
+/etc/config/bacnet_tl
+/etc/config/bacnet_group
+endef
+
 define Package/bacnet-stack-bip/postinst
 #!/bin/sh
 
@@ -397,19 +413,19 @@ endef
 define Package/bacnet-stack-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config
 	$(INSTALL_BIN) ./files/bacserv.init $(1)/etc/init.d/bacserv
-	$(INSTALL_DATA) ./files/bacnet_dev.config $(1)/etc/config/bacnet_dev
-	$(INSTALL_DATA) ./files/bacnet_ai.config $(1)/etc/config/bacnet_ai
-	$(INSTALL_DATA) ./files/bacnet_ao.config $(1)/etc/config/bacnet_ao
-	$(INSTALL_DATA) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
-	$(INSTALL_DATA) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
-	$(INSTALL_DATA) ./files/bacnet_bo.config $(1)/etc/config/bacnet_bo
-	$(INSTALL_DATA) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bv
-	$(INSTALL_DATA) ./files/bacnet_mi.config $(1)/etc/config/bacnet_mi
-	$(INSTALL_DATA) ./files/bacnet_mo.config $(1)/etc/config/bacnet_mo
-	$(INSTALL_DATA) ./files/bacnet_mv.config $(1)/etc/config/bacnet_mv
-	$(INSTALL_DATA) ./files/bacnet_nc.config $(1)/etc/config/bacnet_nc
-	$(INSTALL_DATA) ./files/bacnet_tl.config $(1)/etc/config/bacnet_tl
-	$(INSTALL_DATA) ./files/bacnet_group.config $(1)/etc/config/bacnet_group
+	$(INSTALL_CONF) ./files/bacnet_dev.config $(1)/etc/config/bacnet_dev
+	$(INSTALL_CONF) ./files/bacnet_ai.config $(1)/etc/config/bacnet_ai
+	$(INSTALL_CONF) ./files/bacnet_ao.config $(1)/etc/config/bacnet_ao
+	$(INSTALL_CONF) ./files/bacnet_av.config $(1)/etc/config/bacnet_av
+	$(INSTALL_CONF) ./files/bacnet_bi.config $(1)/etc/config/bacnet_bi
+	$(INSTALL_CONF) ./files/bacnet_bo.config $(1)/etc/config/bacnet_bo
+	$(INSTALL_CONF) ./files/bacnet_bv.config $(1)/etc/config/bacnet_bv
+	$(INSTALL_CONF) ./files/bacnet_mi.config $(1)/etc/config/bacnet_mi
+	$(INSTALL_CONF) ./files/bacnet_mo.config $(1)/etc/config/bacnet_mo
+	$(INSTALL_CONF) ./files/bacnet_mv.config $(1)/etc/config/bacnet_mv
+	$(INSTALL_CONF) ./files/bacnet_nc.config $(1)/etc/config/bacnet_nc
+	$(INSTALL_CONF) ./files/bacnet_tl.config $(1)/etc/config/bacnet_tl
+	$(INSTALL_CONF) ./files/bacnet_group.config $(1)/etc/config/bacnet_group
 endef
 
 define Package/bacnet-stack-bip/install
