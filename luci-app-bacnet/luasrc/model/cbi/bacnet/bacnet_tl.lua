@@ -38,7 +38,7 @@ s.anonymous = false
 s.template = "cbi/tblsection"
 
 s:option(Flag, "disable", "Disable")
-local sva = s:option(ListValue, "object_type", "Log Device Typ")
+local sva = s:option(ListValue, "device_type", "Log Device Typ")
 sva:value("8","DEV")
 sva.rmempty = true
 
