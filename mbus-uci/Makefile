@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mbus-uci
 PKG_VERSION:=0.2
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 PKG_BUILD_DEPENDS:=libmbus
@@ -38,7 +38,11 @@ endef
 define Build/Compile
 endef
 
-define Package/bacnet-stack/postinst
+define Package/mbus-uci/conffiles
+/etc/config/mbus
+endef
+
+define Package/mbus-uci/postinst
 #!/bin/sh
 
 [ -n $${IPKG_INSTROOT} ] || {
@@ -49,7 +53,7 @@ endef
 
 define Package/mbus-uci/install
 	$(INSTALL_DIR) $(1)/etc/init.d $(1)/etc/config $(1)/etc/uci-defaults
-	$(INSTALL_DATA) ./files/mbus.config $(1)/etc/config/mbus
+	$(INSTALL_CONF) ./files/mbus.config $(1)/etc/config/mbus
 	$(INSTALL_BIN) ./files/mbus.init $(1)/etc/init.d/mbus
 	$(INSTALL_DIR) $(1)/usr/sbin $(1)/usr/bin
 	$(INSTALL_BIN) ./files/xml_parser.sh $(1)/usr/bin/xml_parser.sh
