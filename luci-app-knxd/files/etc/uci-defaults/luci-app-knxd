@@ -1,9 +1,66 @@
 #!/bin/sh
 
-[ -f "${IPKG_INSTROOT}/etc/config/ucitrack" ] && \
-[ "$(uci get ucitrack.@knxd[0].init 2>/dev/null)" != "knxd" ] && \
+[ "$(uci get ucitrack.@knxd[0].init 2>/dev/null)" != "knxd-ini" ] && \
 uci batch <<-EOF >/dev/null 2>/dev/null
-	add ucitrack knxd
-	set ucitrack.@knxd[-1].init='knxd'
+	get ucitrack.@knxd[0] || add ucitrack knxd
+	set ucitrack.@knxd[0].init='knxd-ini'
 	commit ucitrack
 EOF
+
+. /lib/functions.sh
+
+add_cfg=1
+chk_cfg() {
+	add_cfg=0
+}
+config_load knxd
+config_foreach chk_cfg driver
+config_foreach chk_cfg server
+config_foreach chk_cfg debug
+config_foreach chk_cfg main
+
+if [ $add_cfg -eq 1 ] ; then
+	uci_add knxd server A
+	uci_set knxd A port '6720'
+	uci_set knxd A server 'knxd_tcp'
+	uci_set knxd A systemd_ignore 'false'
+	uci_commit knxd
+	uci_add knxd server server
+	uci_set knxd server debug 'debug-server'
+	uci_set knxd server systemd_ignore 'false'
+	uci_set knxd server server 'ets_router'
+	uci_set knxd server discover '1'
+	uci_set knxd server interface 'lan'
+	uci_set knxd server multicast_address '224.0.23.12'
+	uci_set knxd server tunnel 'tunnel'
+	uci_commit knxd
+	uci_add knxd server B
+	uci_set knxd B socktype 'unix'
+	uci_set knxd B path '/var/run/knxd'
+	uci_set knxd B server 'knxd_unix'
+	uci_set knxd B systemd_ignore '0'
+	uci_commit knxd
+	uci_add knxd driver C
+	uci_set knxd C socktype 'ip'
+	uci_set knxd C driver 'usb'
+	uci_set knxd C usb_bus '2'
+	uci_set knxd C usb_device '2'
+	uci_set knxd C usb_config '1'
+	uci_commit knxd
+	uci_add knxd debug debug_server
+	uci_set knxd debug_server name 'mcast:knxd'
+	uci_commit knxd
+	uci_add knxd main router
+	uci_set knxd router addr '0.0.100'
+	uci_set knxd router client_addrs '2.2.20:10'
+	uci_set knxd router connections 'A,server,B,C'
+	uci_set knxd router logfile '/var/log/knxd.log'
+	uci_set knxd router name "$(uname -n)"
+	uci_commit knxd
+fi
+
+/etc/init.d/knxd stop 2>/dev/null
+/etc/init.d/knxd disable 2>/dev/null
+/etc/init.d/knxd-ini enable
+
+exit 0

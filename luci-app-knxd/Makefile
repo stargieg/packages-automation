@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-knxd
-PKG_VERSION:=0.2.5
+PKG_VERSION:=0.2.6
 PKG_RELEASE:=1
 PKG_BUILD_DEPENDS += lua/host luci-base/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_KNXD_SRCDIET
@@ -62,6 +62,8 @@ define Package/luci-app-knxd/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/knxd_diag.htm $(1)/usr/lib/lua/luci/view
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) files/etc/uci-defaults/luci-app-knxd $(1)/etc/uci-defaults/
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) files/etc/init.d/knxd-ini $(1)/etc/init.d/
 endef
 
 $(eval $(call BuildPackage,luci-app-knxd))
