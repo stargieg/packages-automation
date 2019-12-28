@@ -109,6 +109,9 @@ svc.datatype = "string"
 local dbg = m:section(TypedSection, "debug", 'Debugging and logging')
 dbg.addremove = true
 dbg.anonymous = false
+local svc = dbg:option(Value, "name","name", "The logging name")
+svc.placeholder = "mcast:knxd"
+svc.datatype = "string"
 svc = dbg:option(ListValue, "error_level", "error-level","The minimum severity level of error messages to be printed. Possible values are 0…6, corresponding to none fatal error warning note info debug.")
 svc:value('0',"0, none")
 svc:value('1',"1, fatal")
@@ -433,7 +436,7 @@ svc:depends("server","ets_router")
 local svc = srv:option(Flag, "discover", "discover", "Reply to KNX discovery packets. Programs like ETS send these packets to discover routers and tunnels.")
 svc.optional = true
 svc:depends("server","ets_router")
-local svc = srv:option(Flag, "multi_port", "multi-port", "Reply to KNX discovery packets. Programs like ETS send these packets to discover routers and tunnels.")
+local svc = srv:option(Flag, "multi_port", "multi-port", "If set, instructs knxd to use a separate port for exchanging KNX data instead of using the default port. This allows two KNX routers (knxd or otherwise) to co-exist on the same computer.")
 svc.optional = true
 svc:depends("server","ets_router")
 local svc = srv:option(Value, "name", "name", "The server name announced in Discovery packets.")
