@@ -2,8 +2,8 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-modbus
 PKG_VERSION:=0.7
-PKG_RELEASE:=2
-PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_RELEASE:=4
+PKG_BUILD_DEPENDS += LUCI_APP_MODBUS_SRCDIET:luasrcdiet/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_MODBUS_SRCDIET
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
@@ -14,7 +14,7 @@ define Package/luci-app-modbus
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Modbus Device
-  DEPENDS:=+modbus-uci +luci-mod-admin-full +luci-lib-nixio
+  EXTRA_DEPENDS:=modbus-uci, luci-mod-admin-full, luci-lib-nixio
 endef
 
 define Package/luci-app-modbus/config
@@ -25,8 +25,7 @@ endef
 
 define SrcDiet
   $(FIND) $(1) -type f -name '*.lua' | while read src; do \
-    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
-      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    if LUA_PATH="$(STAGING_DIR_HOSTPKG)/lib/lua/5.1/?.lua" luasrcdiet --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
     then mv "$$$$src.o" "$$$$src"; fi; \
   done
 endef

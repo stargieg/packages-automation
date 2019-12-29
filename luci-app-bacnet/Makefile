@@ -2,8 +2,8 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-bacnet
 PKG_VERSION:=0.1.16
-PKG_RELEASE:=2
-PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_RELEASE:=3
+PKG_BUILD_DEPENDS += LUCI_APP_BACNET_SRCDIET:luasrcdiet/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_BACNET_SRCDIET
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -14,7 +14,7 @@ define Package/luci-app-bacnet
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=Bacnet Device
-  DEPENDS:=+bacnet-stack-uci +luci-mod-admin-full
+  EXTRA_DEPENDS:=bacnet-stack-uci, luci-mod-admin-full
 endef
 
 define Package/luci-app-bacnet/config
@@ -25,8 +25,7 @@ endef
 
 define SrcDiet
   $(FIND) $(1) -type f -name '*.lua' | while read src; do \
-    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
-      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    if LUA_PATH="$(STAGING_DIR_HOSTPKG)/lib/lua/5.1/?.lua" luasrcdiet --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
     then mv "$$$$src.o" "$$$$src"; fi; \
   done
 endef
