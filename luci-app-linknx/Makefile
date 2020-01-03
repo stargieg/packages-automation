@@ -1,9 +1,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx
-PKG_VERSION:=0.2.1
-PKG_RELEASE:=1
-PKG_BUILD_DEPENDS += lua/host luci-base/host
+PKG_VERSION:=0.3.0
+PKG_RELEASE:=0
+PKG_BUILD_DEPENDS += LUCI_APP_LINKNX_SRCDIET:luasrcdiet/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_LINKNX_SRCDIET
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -15,7 +15,7 @@ define Package/luci-app-linknx
   SUBMENU:=3. Applications
   TITLE:=linknx daemon
   URL:=https://github.com/linknx/linknx/wiki
-  DEPENDS:=+linknx +luci-mod-admin-full +luci-lib-nixio
+  EXTRA_DEPENDS:=linknx-uci, luci-mod-admin-full
 endef
 
 define Package/luci-app-linknx/config
@@ -26,8 +26,7 @@ endef
 
 define SrcDiet
   $(FIND) $(1) -type f -name '*.lua' | while read src; do \
-    if $(STAGING_DIR_HOST)/bin/lua $(STAGING_DIR_HOST)/bin/LuaSrcDiet \
-      --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
+    if LUA_PATH="$(STAGING_DIR_HOSTPKG)/lib/lua/5.1/?.lua" luasrcdiet --noopt-binequiv -o "$$$$src.o" "$$$$src"; \
     then mv "$$$$src.o" "$$$$src"; fi; \
   done
 endef
@@ -61,8 +60,6 @@ define Package/luci-app-linknx/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx_xml.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/linknx_diag.htm $(1)/usr/lib/lua/luci/view
-	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) files/etc/uci-defaults/luci-app-linknx $(1)/etc/uci-defaults/
 endef
 
 $(eval $(call BuildPackage,luci-app-linknx))
