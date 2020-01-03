@@ -3,12 +3,10 @@
 -- Licensed to the public under the Apache License 2.0.
 
 local fs = require "nixio.fs"
-local uci = require("luci.model.uci").cursor()
-local conffile = uci:get( "linknx", "args", "conf" )
+local conffile = "/etc/luci-uploads/ets5export.xml"
 
-f = SimpleForm("linknx_xml", "linknx xml config file", "linknx xml config file")
-
-t = f:field(TextValue, "linknx_xml")
+f = SimpleForm("linknx_xml", "linknx import ets5export.xml file", nil)
+t = f:field(TextValue, "import_xml")
 t.rmempty = true
 t.rows = 10
 function t.cfgvalue()
@@ -17,9 +15,10 @@ end
 
 function f.handle(self, state, data)
 	if state == FORM_VALID then
-		if data.linknx_xml then
-			fs.writefile(conffile, data.linknx_xml:gsub("\r\n", "\n"))
-			--TODO reload linkx
+		if data.import_xml then
+			fs.writefile(conffile, data.import_xml:gsub("\r\n", "\n"))
+			os.execute("ets5xml2uci.lua "..conffile)
+			os.execute("/etc/init.d/linknx-uci restart")
 		end
 	end
 	return true

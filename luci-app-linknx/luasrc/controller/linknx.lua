@@ -15,32 +15,31 @@ $Id$
 module("luci.controller.linknx", package.seeall)
 
 function index()
-	if not nixio.fs.access("/etc/config/linknx") then
-		return
-	end
 
 	local page = entry({"admin", "services", "linknx"}, cbi("linknx"))
 	page.dependent = true
 	page.title  = _("linknx")
 	page.order = 12
+	page.leaf = true
+	page.subindex = true
 
 	local page = entry({"admin", "services", "linknx_xml"}, form("linknx_xml"))
 	page.dependent = true
-	page.title  = _("linknx xml config")
+	page.title  = _("linknx xml import")
 	page.order = 13
 
-	page = node("admin", "services", "linknx_diag")
+	local page = node("admin", "services", "linknx_diag")
 	page.target = template("linknx_diag")
 	page.title  = _("linknx Diagnostics")
 	page.order  = 14
 
-	page = entry({"admin", "services", "linknx_diag_read"}, call("linknx_diag_read"), nil)
+	local page = entry({"admin", "services", "linknx_diag_read"}, call("linknx_diag_read"), nil)
 	page.leaf = true
 
-	page = entry({"admin", "services", "linknx_diag_write"}, call("linknx_diag_write"), nil)
+	local page = entry({"admin", "services", "linknx_diag_write"}, call("linknx_diag_write"), nil)
 	page.leaf = true
 
-	page = entry({"admin", "services", "linknx_diag_proto"}, call("linknx_diag_proto"), nil)
+	local page = entry({"admin", "services", "linknx_diag_proto"}, call("linknx_diag_proto"), nil)
 	page.leaf = true
 
 end
