@@ -38,6 +38,16 @@ if not arg1 then
 			end
 		end
 	end
+	s = m:section(NamedSection, "args", "LINKNX deamon")
+	--o = s:option(Value, "conf", "xml config file")
+	o = s:option(FileUpload, "conf", "xml config file")
+	o.placeholder="/etc/linknx.xml"
+	o.default="/etc/linknx.xml"
+	o.optional = false
+	o = s:option(Value, "options", "options")
+	o.placeholder="-w --daemon=/tmp/linknx/linknx.log --pid-file=/var/run/linknx.pid"
+	o.default="-w --daemon=/tmp/linknx/linknx.log --pid-file=/var/run/linknx.pid"
+	o.optional = false
 	return m
 else
 	maingrp = uci:get(arg1,"main_group", "Name")

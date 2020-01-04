@@ -1,0 +1,7 @@
+5xxx    value:GAUGE:0:255
+5001    value:GAUGE:0:100
+5003    value:GAUGE:0:360
+6xxx    value:GAUGE:-128:128
+7xxx    value:GAUGE:0:65536
+8xxx    value:GAUGE:-65536:65536
+9xxx    value:GAUGE:0:U

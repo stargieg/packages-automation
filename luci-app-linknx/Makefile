@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-linknx
-PKG_VERSION:=0.3.0
+PKG_VERSION:=0.3.1
 PKG_RELEASE:=0
 PKG_BUILD_DEPENDS += LUCI_APP_LINKNX_SRCDIET:luasrcdiet/host
 PKG_CONFIG_DEPENDS += CONFIG_LUCI_APP_LINKNX_SRCDIET
@@ -15,7 +15,7 @@ define Package/luci-app-linknx
   SUBMENU:=3. Applications
   TITLE:=linknx daemon
   URL:=https://github.com/linknx/linknx/wiki
-  EXTRA_DEPENDS:=linknx-uci, luci-mod-admin-full
+  EXTRA_DEPENDS:=linknx-uci, luci-mod-admin-full, collectd-mod-exec, luci-app-statistics
 endef
 
 define Package/luci-app-linknx/config
@@ -59,7 +59,16 @@ define Package/luci-app-linknx/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/controller/linknx.lua $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx_xml.lua $(1)/usr/lib/lua/luci/model/cbi
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/view/linknx_diag.htm $(1)/usr/lib/lua/luci/view
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/luasrc/view/linknx_diag.htm $(1)/usr/lib/lua/luci/view
+	$(INSTALL_DIR) $(1)/etc/uci-default
+	$(INSTALL_BIN) ./files/etc/uci-defaults/linknx-uci $(1)/etc/uci-defaults
+	$(INSTALL_DIR) $(1)/etc/collectd/conf.d
+	$(INSTALL_DATA) ./files/etc/collectd/conf.d/linknx.conf $(1)/etc/collectd/conf.d
+	$(INSTALL_BIN) ./files/usr/bin/linknx-stat.sh $(1)/usr/bin
+	$(INSTALL_DIR) $(1)/usr/share/collectd
+	$(INSTALL_DATA) ./files/usr/share/collectd/linknx.db $(1)/usr/share/collectd
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/statistics/rrdtool/definitions
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/statistics/rrdtool/definitions/linknx.lua $(1)/usr/lib/lua/luci/view
 endef
 
 $(eval $(call BuildPackage,luci-app-linknx))

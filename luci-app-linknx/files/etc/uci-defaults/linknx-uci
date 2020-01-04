@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grep -q "/usr/bin/linknx-stat.sh" /etc/config/luci_statistics || 
+uci -q batch <<-EOF >/dev/null
+	set luci_statistics.collectd_exec.enable=1
+	delete luci_statistics.@collectd_exec_input[-1]
+	add luci_statistics collectd_exec_input
+	set luci_statistics.@collectd_exec_input[-1].cmdline='/usr/bin/linknx-stat.sh'
+	commit luci_statistics
+EOF
+
+exit 0
