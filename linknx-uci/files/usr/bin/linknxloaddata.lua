@@ -34,6 +34,8 @@ end
 
 function writerule(id,varname,varval)
 	local line
+	local init
+	init = "eval" --false|true|eval
 	line="<write>\n<config>\n<rules>\n<rule id="..id..">\n"
 	line=line.."<condition type='and'>"
 		line=line.."<condition type='script'>"
@@ -42,7 +44,7 @@ function writerule(id,varname,varval)
 			line=line.."os.execute('/usr/bin/linknxmapper.lua '..varname..' '..value);\n"
 			line=line.."return 1;\n"
 		line=line.."</condition>"
-		line=line.."<condition type='object' id='"..varname.."' value='"..varval.."' trigger='true'>"
+		line=line.."<condition type='object' id='"..varname.."' value='"..varval.."' init='"..init.."' trigger='true'>"
 		line=line.."</condition>"
 	line=line.."</condition>"
 	line=line.."<actionlist>\n"
