@@ -69,7 +69,7 @@ define Package/luci-app-linknx/install
 	$(INSTALL_DIR) $(1)/usr/share/collectd
 	$(INSTALL_DATA) ./files/usr/share/collectd/linknx.db $(1)/usr/share/collectd
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/statistics/rrdtool/definitions
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/statistics/rrdtool/definitions/linknx.lua $(1)/usr/lib/lua/luci/view
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/statistics/rrdtool/definitions/linknx.lua $(1)/usr/lib/lua/luci/statistics/rrdtool/definitions
 endef
 
 $(eval $(call BuildPackage,luci-app-linknx))
