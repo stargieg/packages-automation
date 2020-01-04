@@ -60,10 +60,11 @@ define Package/luci-app-linknx/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/luasrc/model/cbi/linknx_xml.lua $(1)/usr/lib/lua/luci/model/cbi
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/luasrc/view/linknx_diag.htm $(1)/usr/lib/lua/luci/view
-	$(INSTALL_DIR) $(1)/etc/uci-default
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/etc/uci-defaults/linknx-uci $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/collectd/conf.d
 	$(INSTALL_DATA) ./files/etc/collectd/conf.d/linknx.conf $(1)/etc/collectd/conf.d
+	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknx-stat.sh $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/usr/share/collectd
 	$(INSTALL_DATA) ./files/usr/share/collectd/linknx.db $(1)/usr/share/collectd
