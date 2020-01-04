@@ -35,5 +35,9 @@ long=maingrp.."/"..middlegrp.."/"..comment
 logger_info(value.." "..name.." comment "..long)
 
 state = uci.cursor(nil, "/var/state")
+count = state:get(config, section, "count") or "0"
+count = tonumber(count)
+count = count + 1
+state:set(config, section, "count", count)
 state:set(config, section, "value", value)
 state:save(config)
