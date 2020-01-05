@@ -3,7 +3,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=linknx-uci
-PKG_VERSION:=0.2.2
+PKG_VERSION:=0.2.3
 PKG_RELEASE:=0
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
