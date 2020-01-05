@@ -9,4 +9,6 @@ uci -q batch <<-EOF >/dev/null
 	commit luci_statistics
 EOF
 
+chmod 644 /etc/config/knx_*
+
 exit 0
