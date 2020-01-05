@@ -1,6 +1,7 @@
 #!/usr/bin/lua
 
 require "uci"
+nixio = require "nixio"
 local argv = {}
 
 function logger_err(msg)
@@ -41,3 +42,5 @@ count = count + 1
 state:set(config, section, "count", count)
 state:set(config, section, "value", value)
 state:save(config)
+nixio.fs.chmod("/var/state/"..config,644)
+

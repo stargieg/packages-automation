@@ -39,8 +39,6 @@ for i in $(seq 0 31); do
 	done
 done
 
-echo "$var_5001" >> /tmp/knx.dbg
-
 while sleep $sleep_n; do
 	for i in $var_5xxx ; do
 		value=$(uci -q -p /var/state get $i.value)

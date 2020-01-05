@@ -15,6 +15,7 @@ start_service() {
 	config_files="$(ls /etc/config/knx*)"
 	for file in $config_files ; do
 		if [ -f "$file" ] ; then
+			chmod 644 $file
 			procd_add_config_trigger "config.change" "$file" /etc/init.d/linknx-uci restart
 		fi
 	done

@@ -107,6 +107,7 @@ callbacks = {
                 end
             end
             x:commit("knx_"..main_group_nr.."_"..middle_group_nr)
+            nixio.fs.chmod("/etc/config/knx_"..main_group_nr.."_"..middle_group_nr,644)
         end
     end,
     EndElement = function (parser, name, attributes)
