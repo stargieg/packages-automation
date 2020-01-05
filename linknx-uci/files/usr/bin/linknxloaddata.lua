@@ -4,11 +4,11 @@ require "uci"
 nixio = require "nixio"
 
 function logger_err(msg)
-	os.execute("logger -p error -t linknxloaddata "..msg)
+	io.popen("logger -p error -t linknxloaddata "..msg)
 end
 
 function logger_info(msg)
-	os.execute("logger -p info -t linknxloaddata "..msg)
+	io.popen("logger -p info -t linknxloaddata "..msg)
 end
 
 

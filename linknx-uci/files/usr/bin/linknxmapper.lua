@@ -4,11 +4,11 @@ require "uci"
 local argv = {}
 
 function logger_err(msg)
-	os.execute("logger -p error -t linknxmapper "..msg)
+	io.popen("logger -p error -t linknxmapper "..msg)
 end
 
 function logger_info(msg)
-	os.execute("logger -p info -t linknxmapper "..msg)
+	io.popen("logger -p info -t linknxmapper "..msg)
 end
 
 local name= arg[1]

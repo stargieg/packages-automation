@@ -55,10 +55,30 @@ else
 	m = Map(arg1, arg1, arg1.." "..maingrp.."/"..middlegrp)
 	s = m:section(TypedSection, "grp", "KNX groups")
 	s.template = "cbi/tblsection"
-	sval = s:option(DummyValue, "Value","Value")
-	function sval.value(self, section)
+	local dval = s:option(DummyValue, "Value","Value")
+	function dval.value(self, section)
 		value = self.map:get(section)
 		return uci:get_state(arg1,value[".name"],"value") or ""
+	end
+	function dval.cfgvalue(self, section)
+		value = self.map:get(section)
+		return uci:get_state(arg1,value[".name"],"value") or ""
+	end
+	local nval = s:option(Value, "newValue","newValue")
+	function nval.cfgvalue(self, section)
+		local sec = self.map:get(section)
+		return uci:get_state(arg1,sec[".name"],"value") or ""
+	end
+	function nval.write(self, section, value)
+		local sec = self.map:get(section)
+		local cvalue = self:cfgvalue(section) or ""
+		local varname=arg1.."."..sec[".name"]
+		--io.popen("logger -p info -t luciwrite "..varname.." fvalue ".." "..value.." cvalue "..cvalue.." >/dev/null 2>&1 &")
+		if value and cvalue~=value then
+			--BUG ON knx is faster then this luci cgi. form value is unchanged and uci state has new feedback from knx 
+			io.popen("(sleep 2 && /usr/bin/linknxwritevalue.lua "..varname.." "..value.." )>/dev/null 2>&1 &")
+			--io.popen("logger -p info -t luciwrite write >/dev/null 2>&1 &")
+		end
 	end
 	s:option(Value, "Address", "Address")
 	s:option(Value, "Name", "ETS Name")
