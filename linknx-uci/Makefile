@@ -15,7 +15,7 @@ define Package/linknx-uci
   CATEGORY:=Network
   TITLE:=Config generator for LINKNX and mqtt-client
   URL:=https://sourceforge.net/p/linknx/wiki/Main_Page/
-  EXTRA_DEPENDS:=linknx, libuci-lua, luaexpat, luci-lib-nixio, lua-mosquitto
+  EXTRA_DEPENDS:=linknx, libuci-lua, luaexpat, luci-lib-nixio, lua-mosquitto, mosquitto
 endef
 
 define Build/Compile
