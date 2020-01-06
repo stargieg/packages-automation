@@ -39,7 +39,7 @@ local s = nixio.socket('inet', 'stream', none)
 s:connect('localhost','1028')
 --s = nixio.socket('unix', 'stream', none)
 --s:connect('/var/run/linknx')
-s:send("<write><object id="..txt.." value="..varval.."/></write>\r\n\4")
+s:send("<write><object id="..name.." value="..value.."/></write>\r\n\4")
 s:close()
 
 local x = uci.cursor()
