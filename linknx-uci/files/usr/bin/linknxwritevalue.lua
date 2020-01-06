@@ -3,16 +3,52 @@
 require "uci"
 nixio = require "nixio"
 
-function writeval(txt,varval)
-	s:send("<write><object id="..txt.." value="..varval.."/></write>\r\n\4")
+function logger_err(msg)
+	local pc=io.popen("logger -p error -t linknxwrite "..msg)
+	if pc then pc:close() end
 end
 
-varname = arg[1] or ""
-varval = arg[2] or ""
-s = nixio.socket('inet', 'stream', none)
+function logger_info(msg)
+	local pc=io.popen("logger -p info -t linknxwrite "..msg)
+	if pc then pc:close() end
+end
+
+local name = arg[1]
+local value = arg[2]
+local mid = arg[3]
+
+if not name then
+	logger_err("no varname")
+	return
+end
+
+if not value then
+	logger_err(name.." no value")
+	return
+end
+
+local config=string.gsub(name,"^(.-)%..*$","%1")
+local section=string.gsub(name,"^.*%.(.-)$","%1")
+local state = uci.cursor(nil, "/var/state")
+local cfgvalue = state:get(config, section, "value", value) or ""
+if mid and value == cfgvalue then
+	logger_info(name.." no change of value "..value.."/"..cfgvalue.."/"..mid)
+	return
+end
+local s = nixio.socket('inet', 'stream', none)
 s:connect('localhost','1028')
 --s = nixio.socket('unix', 'stream', none)
 --s:connect('/var/run/linknx')
-writeval(varname,varval)
+s:send("<write><object id="..txt.." value="..varval.."/></write>\r\n\4")
 s:close()
-assert(loadfile("/usr/bin/linknxmapper.lua"))(varname,varval)
+
+local x = uci.cursor()
+local comment=x:get(config, section, "Name")
+local maingrp=x:get(config, "main_group", "Name")
+local middlegrp=x:get(config, "middle_group", "Name")
+local topic=maingrp.."/"..middlegrp.."/"..comment
+
+local state = uci.cursor(nil, "/var/state")
+state:set(config, section, "value", value)
+state:save(config)
+nixio.fs.chmod("/var/state/"..config,644)
