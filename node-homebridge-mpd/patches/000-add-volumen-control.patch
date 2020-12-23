@@ -1,0 +1,30 @@
+From 491a52b87912be463cf671b0f0f7bbf12d5ca16d Mon Sep 17 00:00:00 2001
+From: Patrick Grimm <patrick@lunatiki.de>
+Date: Wed, 23 Dec 2020 15:20:05 +0100
+Subject: [PATCH] FIX missing volume control
+
+Issue #3
+---
+ index.js | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/index.js b/index.js
+index a5ee141..04b0d04 100644
+--- a/index.js
++++ b/index.js
+@@ -23,7 +23,7 @@ function MpdAccessory(log, config) {
+     host: this.host,
+   });
+ 
+-  this.service = new Service.Switch(this.name);
++  this.service = new Service.Lightbulb(this.name);
+ 
+   this.service
+     .getCharacteristic(Characteristic.On)
+@@ -110,4 +110,4 @@ MpdAccessory.prototype.setVolume = function(volume, callback) {
+       callback(null);
+     }   
+   });
+-}
+\ No newline at end of file
++}
