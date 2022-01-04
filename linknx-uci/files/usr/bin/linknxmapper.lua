@@ -48,7 +48,7 @@ count = count + 1
 state:set(config, section, "count", count)
 state:set(config, section, "value", value)
 state:save(config)
-logger_info(name.."/"..value.."/"..topic.."/"..homebridge)
+logger_info(name.."/"..value.."/"..topic)
 
 mclient = mqtt.new()
 
