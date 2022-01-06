@@ -68,6 +68,7 @@ mclient:connect(mhost, mport, 5)
 mclient:loop_forever()
 
 if homebridge == "1" then
+	type=x:get(config, section, "type")
 	local valuejs
 	if not valuejs and value == "on" then
 		valuejs=json.stringify({ name = name, service_name = topic, characteristic = "On", value = true})
@@ -77,6 +78,9 @@ if homebridge == "1" then
 	end
 	if not valuejs and value == "0" then
 		valuejs=json.stringify({ name = name, service_name = topic, characteristic = "On", value = false})
+	end
+	if not valuejs and type == "9.xxx" then
+		valuejs=json.stringify({ name = name, service_name = topic, characteristic = "CurrentTemperature", value = value})
 	end
 	if not valuejs then
 		value=math.floor(value + .5)

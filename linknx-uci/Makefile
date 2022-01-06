@@ -3,7 +3,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=linknx-uci
-PKG_VERSION:=0.3.4
+PKG_VERSION:=0.3.5
 PKG_RELEASE:=0
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
@@ -29,6 +29,7 @@ define Package/linknx-uci/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknxloaddata.lua $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknxmapper.lua $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/linknxhb.lua $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknxreadvalue.lua $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/linknxwritevalue.lua $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/ets5xml2uci.lua $(1)/usr/bin
