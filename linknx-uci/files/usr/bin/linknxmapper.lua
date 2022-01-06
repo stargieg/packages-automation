@@ -33,6 +33,10 @@ config=string.gsub(name,"^(.-)%..*$","%1")
 section=string.gsub(name,"^.*%.(.-)$","%1")
 
 x = uci.cursor()
+mhost=x:get("linknx_mqtt", "mqtt", "host")
+mport=x:get("linknx_mqtt", "mqtt", "port")
+muser=x:get("linknx_mqtt", "mqtt", "user")
+mpw=x:get("linknx_mqtt", "mqtt", "pw")
 comment=x:get(config, section, "Name")
 maingrp=x:get(config, "main_group", "Name")
 middlegrp=x:get(config, "middle_group", "Name")
@@ -59,7 +63,8 @@ end
 mclient.ON_PUBLISH = function()
 	mclient:disconnect()
 end
-mclient:connect()
+mclient:login_set(muser, mpw)
+mclient:connect(mhost, mport, 5)
 mclient:loop_forever()
 
 if homebridge == "1" then
@@ -85,7 +90,8 @@ if homebridge == "1" then
 		mclienthb.ON_PUBLISH = function()
 			mclienthb:disconnect()
 		end
-		mclienthb:connect()
+		mclienthb:login_set(muser, mpw)
+		mclient:connect(mhost, mport, 5)
 		mclienthb:loop_forever()
 	end
 end

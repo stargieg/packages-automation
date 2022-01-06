@@ -1,0 +1,6 @@
+
+config conn mqtt
+        option host 'localhost'
+	option port '1883'
+        option user 'admin'
+	option pw 'admin'

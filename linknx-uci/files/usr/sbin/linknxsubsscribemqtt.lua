@@ -80,5 +80,10 @@ mclient.ON_MESSAGE = function(mid, topic, payload)
 		end
 	end
 end
-mclient:connect()
+mhost=x:get("linknx_mqtt", "mqtt", "host")
+mport=x:get("linknx_mqtt", "mqtt", "port")
+muser=x:get("linknx_mqtt", "mqtt", "user")
+mpw=x:get("linknx_mqtt", "mqtt", "pw")
+mclient:login_set(muser, mpw)
+mclient:connect(mhost, mport)
 mclient:loop_forever()
