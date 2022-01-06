@@ -48,7 +48,14 @@ if not arg1 then
 	o.placeholder="-w --daemon=/tmp/linknx/linknx.log --pid-file=/var/run/linknx.pid"
 	o.default="-w --daemon=/tmp/linknx/linknx.log --pid-file=/var/run/linknx.pid"
 	o.optional = false
-	return m
+
+	mq = Map("linknx_mqtt", "linknx MQTT Server", "settings")
+	mqs = mq:section(NamedSection, "mqtt", "connection")
+	mqs:option(Value, "host", "hostname").datatype = "hostname"
+	mqs:option(Value, "port", "port").datatype = "port"
+	mqs:option(Value, "user", "user").datatype = "string"
+	mqs:option(Value, "pw", "pw").password = true
+	return mq,n
 else
 	maingrp = uci:get(arg1,"main_group", "Name")
 	middlegrp = uci:get(arg1,"middle_group", "Name")	
@@ -83,5 +90,10 @@ else
 	s:option(Value, "Address", "Address")
 	s:option(Value, "Name", "ETS Name")
 	s:option(Value, "type", "type")
+	s:option(Flag, "homebridge", "Homebridge")
+	local svc = s:option(ListValue, "characteristic", "Characteristic")
+	svc:value('')
+	svc:value('CurrentTemperature')
+	svc:value('Brightness')
 	return m
 end
