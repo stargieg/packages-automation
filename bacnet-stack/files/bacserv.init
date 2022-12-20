@@ -23,13 +23,13 @@ start_dev() {
 		procd_set_param env \
 		UCI_SECTION="$cfg" \
 		BACNET_DATALINK="$bacdl" \
-		BACNET_IFACE="$ifname" \
+		BACNET_IFACE="$iface" \
 		BACNET_IP_PORT="$port"
 	else
 		procd_set_param env \
 		UCI_SECTION="$cfg" \
 		BACNET_DATALINK="$bacdl" \
-		BACNET_IFACE="$ifname"
+		BACNET_IFACE="$iface"
 	fi
 	procd_open_trigger
 	procd_add_raw_trigger "interface.*" 2000 /etc/init.d/bacserv restart
